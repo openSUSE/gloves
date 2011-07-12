@@ -4,7 +4,7 @@ require 'file_service.rb'
 require 'rubygems'
 require 'augeas'
 
-class Krb5Conf < FileService
+class KrbConf < FileService
 
   # identification of relevant DBUS service
   filename = "_etc_krb5_conf"
