@@ -20,8 +20,8 @@ Rights for setting/getting user permissions
     </defaults>
   </action>
   <action id="org.opensuse.systemagents.file._etc_krb5_conf.write">
-    <description>Writing to file /etc/Krb5.conf</description>
-    <message>Authentication is required to write to /etc/Krb5.conf</message>
+    <description>Writing to file /etc/krb5.conf</description>
+    <message>Authentication is required to write to /etc/krb5.conf</message>
     <defaults>
       <allow_inactive>no</allow_inactive>
       <allow_active>no</allow_active>
