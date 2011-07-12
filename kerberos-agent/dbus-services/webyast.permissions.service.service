@@ -1,0 +1,5 @@
+# DBus service activation config
+[D-BUS Service]
+Name=org.opensuse.systemagents.file._etc_krb5_conf
+Exec=/usr/share/systemagents/bin/file_services/_etc_krb5_conf.rb
+User=root

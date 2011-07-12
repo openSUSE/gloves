@@ -16,11 +16,11 @@ class FileService < DbusService
   end
 
   def self.service_name
-    "org.opensuse.systemagents.#{filename}.service" #TODO check filename characters
+    "org.opensuse.systemagents.file.#{filename}.service" #TODO check filename characters
   end
 
   def self.object_path
-    "org/opensuse/systemagents/#{filename}" #TODO check filename characters
+    "org/opensuse/systemagents/file/#{filename}" #TODO check filename characters
   end
 
   def self.filename(value=nil)
