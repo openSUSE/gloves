@@ -6,8 +6,8 @@ class FileService < DbusService
     dbus_method :read, "out result:v{sv}, in params:v{sv}" do |result,params,user|
       #TODO permissions check
       [read(params)]
-    end
       #TODO exception rescue
+    end
     dbus_method :write, "out result:v{sv}, in params:v{sv}" do |result,params,user|
       #TODO permissions check
       [write(params)]
