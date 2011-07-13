@@ -2,9 +2,9 @@ require "dbus_service"
 
 module DbusServices
   class ScriptService < DbusService
-    FILE_INTERFACE = "org.opensuse.systemagents.script.interface"
+    FILE_INTERFACE = "org.opensuse.systemagents.script"
     dbus_interface(FILE_INTERFACE) do
-      dbus_method :read, "out result:v{sv}, in params:v{sv}" do |result,params,user|
+      dbus_method :execute, "out result:a{sv}, in params:a{sv}" do |params,user|
         #TODO permissions check
         [execute(params)]
         #TODO exception rescue
@@ -12,7 +12,7 @@ module DbusServices
     end
 
     def self.service_name
-      "org.opensuse.systemagents.script.#{filename}.service" #TODO check filename characters
+      "org.opensuse.systemagents.script.#{filename}" #TODO check filename characters
     end
 
     def self.object_path

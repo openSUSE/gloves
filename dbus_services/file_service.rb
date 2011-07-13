@@ -2,7 +2,7 @@ require "dbus_service"
 
 module DbusServices
   class FileService < DbusService
-    FILE_INTERFACE = "org.opensuse.systemagents.file.interface"
+    FILE_INTERFACE = "org.opensuse.systemagents.file"
     dbus_interface(FILE_INTERFACE) do
       dbus_method :read, "out result:a{sv}, in params:a{sv}" do |params,user|
         #TODO permissions check
@@ -17,7 +17,7 @@ module DbusServices
     end
 
     def self.service_name
-      "org.opensuse.systemagents.file.#{filename}.service" #TODO check filename characters
+      "org.opensuse.systemagents.file.#{filename}" #TODO check filename characters
     end
 
     def self.object_path

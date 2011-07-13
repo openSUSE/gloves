@@ -8,4 +8,6 @@ task :install do
   sh "cp -r dbus-services/* /usr/share/dbus-1/system-services/"
   sh "mkdir -p /usr/share/systemagents/"
   sh "cp -r bin services /usr/share/systemagents/"
+  sh "chmod +x /usr/share/systemagents/bin/*/*.rb"
+  sh "pkill -f '/usr/share/systemagents/bin/.*/.*\.rb'"
 end

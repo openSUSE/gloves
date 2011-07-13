@@ -4,9 +4,9 @@ module SystemAgents
   class PamConfig < DbusServices::ScriptService
 
     # identification of relevant DBUS service
-    filename "pam-config"
+    filename "pam_config"
 
-    def self.execute(params)
+    def execute(params)
 
       exec_params	= params["exec_params"] || ""
 
