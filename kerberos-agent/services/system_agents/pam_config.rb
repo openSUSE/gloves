@@ -1,9 +1,7 @@
-$:.unshift(File::join("..", "dbus-infrastructure"))
-
-require 'script_service.rb'
+require 'dbus_services/script_service'
 
 module SystemAgents
-  class PamConfig < ScriptService
+  class PamConfig < DbusServices::ScriptService
 
     # identification of relevant DBUS service
     filename "pam-config"

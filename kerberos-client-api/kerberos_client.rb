@@ -4,7 +4,7 @@ require 'krb_conf'
 # module for kerberos-client configuration
 module KerberosClient
 
-  def self.read(params)
+  def self.read(params={})
     krb5_conf	= KrbConf.read({})
 
  #   pam_krb5	= PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
@@ -12,8 +12,8 @@ module KerberosClient
 
     return {
 	"pam_login"		=> {
-	    "use_kerberos"	=> !pam_krb5.empty?,
-	    "sssd"		=> !sssd.empty?,
+#	    "use_kerberos"	=> !pam_krb5.empty?,
+#	    "sssd"		=> !sssd.empty?,
 	},
 	"kerberos_client"	=> krb5_conf
     }

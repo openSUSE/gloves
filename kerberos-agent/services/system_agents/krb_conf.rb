@@ -1,11 +1,11 @@
 $:.unshift(File::join("../../..", "dbus-infrastructure"))
 
-require 'file_service.rb'
+require 'dbus_services/file_service'
 require 'rubygems'
 require 'augeas'
 
 module SystemAgents
-  class KrbConf < FileService
+  class KrbConf < DbusServices::FileService
 
     # identification of relevant DBUS service
     filename "_etc_krb5_conf"

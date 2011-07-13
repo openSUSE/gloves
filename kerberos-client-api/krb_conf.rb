@@ -1,4 +1,4 @@
-require "dbus_client/file_client"
+require "dbus_clients/file_client"
 
 class KrbConf < DbusClients::FileClient
   filename "_etc_krb5_conf"

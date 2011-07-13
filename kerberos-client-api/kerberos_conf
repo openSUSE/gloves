@@ -1,0 +1,3 @@
+#!/usr/sbin/env ruby
+require "kerberos_client"
+puts KerberosClient::read.inspect

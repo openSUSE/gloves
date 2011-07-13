@@ -30,6 +30,7 @@ module DbusClients
       bus = DBus::SystemBus.instance
       rb_service = bus.service service_name
       instance = rb_service.object object_path
+      instance.introspect
       iface = instance[FILE_INTERFACE]
     end
   end
