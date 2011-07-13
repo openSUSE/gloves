@@ -8,9 +8,9 @@ module SystemAgents
   class KrbConf < FileService
 
     # identification of relevant DBUS service
-    filename = "_etc_krb5_conf"
+    filename "_etc_krb5_conf"
 
-    def self.read(params)
+    def read(params)
 
       kdc			= ""
       default_domain	= ""
@@ -47,7 +47,7 @@ module SystemAgents
       return kerberos
     end
 
-    def self.write(params)
+    def write(params)
 
       aug			= Augeas::open
 

@@ -3,12 +3,12 @@ require "dbus_service"
 class FileService < DbusService
   FILE_INTERFACE = "org.opensuse.systemagents.file.interface"
   dbus_interface(FILE_INTERFACE) do
-    dbus_method :read, "out result:v{sv}, in params:v{sv}" do |result,params,user|
+    dbus_method :read, "out result:a{sv}, in params:a{sv}" do |params,user|
       #TODO permissions check
       [read(params)]
       #TODO exception rescue
     end
-    dbus_method :write, "out result:v{sv}, in params:v{sv}" do |result,params,user|
+    dbus_method :write, "out result:a{sv}, in params:a{sv}" do |params,user|
       #TODO permissions check
       [write(params)]
       #TODO exception rescue
@@ -20,11 +20,11 @@ class FileService < DbusService
   end
 
   def self.object_path
-    "org/opensuse/systemagents/file/#{filename}" #TODO check filename characters
+    "/org/opensuse/systemagents/file/#{filename}" #TODO check filename characters
   end
 
   def self.filename(value=nil)
-    instance_eval "def filename_for_service \"#{value}\" end" if value #FIXME escape VALUE!!
+    instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
     raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
     filename_for_service
   end

@@ -19,7 +19,7 @@ class ScriptService < DbusService
   end
 
   def self.filename(value=nil)
-    instance_eval "def filename_for_service \"#{value}\" end" if value #FIXME escape VALUE!!
+    instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
     raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
     filename_for_service
   end
