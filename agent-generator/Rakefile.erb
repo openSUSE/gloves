@@ -9,6 +9,8 @@ task :install do
   sh "mkdir -p /usr/share/systemagents/"
   sh "cp -r bin services /usr/share/systemagents/"
   sh "cp -r polkit-definitions /usr/share/polkit-1/actions/"
+  sh "cd /usr/lib*/ruby/vendor_ruby/1.*/; mkdir -p system_agent; cd -"
+  sh "cp -r clients/system_agent /usr/lib*/ruby/vendor_ruby/1.*/"
   sh "chmod +x /usr/share/systemagents/bin/*/*.rb"
   `pkill -f '/usr/share/systemagents/bin/.*/.*\.rb' || true`
 end

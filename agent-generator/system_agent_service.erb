@@ -1,6 +1,6 @@
 $:.unshift(File::join("../../..", "dbus-infrastructure"))
 
-require 'dbus_services/<%= type.to_s.downcase %>file_service'
+require 'dbus_services/<%= type.to_s.downcase %>_service'
 
 module SystemAgents
   class <%= agent_class %> < DbusServices::<%= type.to_s.capitalize %>Service
