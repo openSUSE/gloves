@@ -12,12 +12,13 @@ module KerberosClient
     pam_krb5	= PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
     sssd	= PamConfig.execute({ "exec_params" => "-q --sss" })["stdout"] || ""
 
+    # returning same structure as Kerberos::Export
     return {
       "pam_login"		=> {
-	      "use_kerberos"	=> !pam_krb5.empty?,
+	    "use_kerberos"	=> !pam_krb5.empty?,
   	    "sssd"		=> !sssd.empty?,
-	    },
-      "kerberos_client"	=> krb5_conf
+      },
+      "kerberos_client"		=> krb5_conf
     }
   end
 
