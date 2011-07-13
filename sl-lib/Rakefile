@@ -1,0 +1,50 @@
+#--
+# Copyright (c) 2009, 2010 Novell, Inc.
+# 
+# All Rights Reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of version 2 of the GNU General Public License
+# as published by the Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, contact Novell, Inc.
+# 
+# To contact Novell about this file by physical or electronic mail,
+# you may find current contact information at www.novell.com
+#++
+#
+# Add your own tasks in files placed in lib/tasks ending in .rake,
+# for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
+
+
+require 'rake'
+require 'rake/testtask'
+require 'fileutils'
+require 'etc'
+
+def grant(user, right)
+  sh "/usr/bin/polkit-auth --user #{user} --grant #{right} ||:"
+end
+
+desc "Deploy for development" 
+task :deploy_local, [:user] do |t, args|
+  args.with_defaults :user => Etc.getlogin
+
+  mkdir_p "/etc/dbus-1/system.d/"
+  cp_r    "permission_service/yast.permissions.conf", "/etc/dbus-1/system.d/"
+  cp_r    "permission_service/yastPermissionsService.rb", "/usr/sbin/"
+  chmod  0744, "/usr/sbin/yastPermissionsService.rb"
+  mkdir_p "/usr/share/dbus-1/system-services/"
+  cp_r    "permission_service/yast.permissions.service.service", "/usr/share/dbus-1/system-services/"
+  FileUtils.mkdir_p "/usr/share/PolicyKit/policy/"
+  # grant rights to him
+  grant args.user, "yast.permissions.service"
+  grant args.user, "org.freedesktop.policykit.read"
+end
+
