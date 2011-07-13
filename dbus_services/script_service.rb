@@ -1,4 +1,4 @@
-require "dbus_service"
+require "dbus_services/dbus_service"
 
 module DbusServices
   class ScriptService < DbusService
