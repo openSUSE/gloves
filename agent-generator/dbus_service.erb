@@ -1,0 +1,5 @@
+# DBus service activation config
+[D-BUS Service]
+Name=org.opensuse.systemagents.<%= type.to_s %>.<%= identifier %>
+Exec=/usr/share/systemagents/bin/<%= type.to_s %>_services/<%= service_script_name %>
+User=root

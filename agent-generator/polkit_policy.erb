@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+<policyconfig>
+
+  <vendor>YaST Project</vendor>
+  <vendor_url>http://en.opensuse.org/YAST</vendor_url>
+
+<!--
+Rights for setting/getting user permissions
+-->
+
+  <% if type == :file %>
+  <action id="org.opensuse.systemagents.file.<%= identifier %>.read">
+    <description>Reading file <%= file_name %></description>
+    <message>Authentication is required to read file <%= file_name %></message>
+    <defaults>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>no</allow_active>
+    </defaults>
+  </action>
+  <action id="org.opensuse.systemagents.file.<%= identifier %>.write">
+    <description>Writing to file <%= file_name %></description>
+    <message>Authentication is required to write to <%= file_name %></message>
+    <defaults>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>no</allow_active>
+    </defaults>
+  </action>
+  <% elsif type == :script %>
+  <action id="org.opensuse.systemagents.script.<%= identifier %>.execute">
+    <description>Execute script <%= file_name %></description>
+    <message>Authentication is required to execute script <%= file_name %></message>
+    <defaults>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>no</allow_active>
+    </defaults>
+  </action>
+  <% else
+      raise "Unknown type"
+     end %>
+
+</policyconfig>

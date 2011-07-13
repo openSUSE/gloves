@@ -1,0 +1,13 @@
+require "rake"
+
+desc "install all things on system"
+task :install do
+  sh "mkdir -p /etc/dbus-1/system.d/"
+  sh "cp -r dbus-policies/* /etc/dbus-1/system.d/"
+  sh "mkdir -p /usr/share/dbus-1/system-services/"
+  sh "cp -r dbus-services/* /usr/share/dbus-1/system-services/"
+  sh "mkdir -p /usr/share/systemagents/"
+  sh "cp -r bin services /usr/share/systemagents/"
+  sh "chmod +x /usr/share/systemagents/bin/*/*.rb"
+  `pkill -f '/usr/share/systemagents/bin/.*/.*\.rb' || true`
+end
