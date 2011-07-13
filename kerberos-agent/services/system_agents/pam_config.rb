@@ -10,7 +10,7 @@ module SystemAgents
 
       exec_params	= params["exec_params"] || ""
 
-      pam_krb5    = `pam-config #{exec_params}`
+      pam_krb5    = `/usr/sbin/pam-config #{exec_params}`
 
       ret	= {
         "stdout"	=> pam_krb5
