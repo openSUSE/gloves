@@ -1,16 +1,14 @@
-$:.unshift(File::join("..", "kerberos-agent"))
-
-require 'KrbConf.rb'
-require 'PamConfig.rb'
+require 'krb_conf'
+#require 'PamConfig.rb'
 
 # module for kerberos-client configuration
-module KerberosClientAPI
+module KerberosClient
 
   def self.read(params)
     krb5_conf	= KrbConf.read({})
 
-    pam_krb5	= PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
-    sssd	= PamConfig.execute({ "exec_params" => "-q --sss" })["stdout"] || ""
+ #   pam_krb5	= PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
+ #  sssd	= PamConfig.execute({ "exec_params" => "-q --sss" })["stdout"] || ""
 
     return {
 	"pam_login"		=> {
