@@ -1,3 +1,5 @@
+$LOAD_PATH << File.dirname(__FILE__)
+
 require 'krb_conf'
 require 'pam_config'
 
