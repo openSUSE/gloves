@@ -9,5 +9,5 @@ task :install do
   sh "mkdir -p /usr/share/systemagents/"
   sh "cp -r bin services /usr/share/systemagents/"
   sh "chmod +x /usr/share/systemagents/bin/*/*.rb"
-  sh "pkill -f '/usr/share/systemagents/bin/.*/.*\.rb'"
+  `pkill -f '/usr/share/systemagents/bin/.*/.*\.rb' || true`
 end
