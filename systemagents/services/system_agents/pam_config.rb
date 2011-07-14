@@ -4,10 +4,10 @@ module SystemAgents
   class PamConfig < DbusServices::ScriptService
 
     # identification of relevant DBUS service
-    filename "pam_config"
+    filename "usr_sbin_pam_config"
+
 
     def execute(params)
-
       exec_params	= params["exec_params"] || ""
 
       pam_krb5    = `/usr/sbin/pam-config #{exec_params}`

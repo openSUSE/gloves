@@ -11,7 +11,8 @@
 Rights for setting/getting user permissions
 -->
 
-  <action id="org.opensuse.systemagents.file._etc_krb5_conf.read">
+  
+  <action id="org.opensuse.systemagents.file.etc_krb5_conf.read">
     <description>Reading file /etc/krb5.conf</description>
     <message>Authentication is required to read file /etc/krb5.conf</message>
     <defaults>
@@ -19,7 +20,7 @@ Rights for setting/getting user permissions
       <allow_active>no</allow_active>
     </defaults>
   </action>
-  <action id="org.opensuse.systemagents.file._etc_krb5_conf.write">
+  <action id="org.opensuse.systemagents.file.etc_krb5_conf.write">
     <description>Writing to file /etc/krb5.conf</description>
     <message>Authentication is required to write to /etc/krb5.conf</message>
     <defaults>
@@ -27,5 +28,6 @@ Rights for setting/getting user permissions
       <allow_active>no</allow_active>
     </defaults>
   </action>
+  
 
 </policyconfig>

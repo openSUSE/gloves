@@ -1,17 +1,15 @@
-$:.unshift(File::join("../../..", "dbus-infrastructure"))
-
 require 'dbus_services/file_service'
 require 'rubygems'
 require 'augeas'
 
 module SystemAgents
-  class KrbConf < DbusServices::FileService
+  class Krb5Conf < DbusServices::FileService
 
     # identification of relevant DBUS service
-    filename "_etc_krb5_conf"
+    filename "etc_krb5_conf"
 
-    def read(params={})
 
+    def read(params)
       kdc		= ""
       default_domain	= ""
       default_realm	= ""
@@ -60,7 +58,6 @@ module SystemAgents
     end
 
     def write(params)
-
       aug			= Augeas::open
 
       # update libdefaults section
@@ -122,6 +119,5 @@ module SystemAgents
       aug.close
       return ret
     end
-
   end
 end
