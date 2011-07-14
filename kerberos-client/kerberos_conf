@@ -1,3 +1,6 @@
 #!/usr/sbin/env ruby
 require "kerberos_client"
-puts KerberosClient::read.inspect
+krb = KerberosClient::read
+puts krb.inspect
+krb["kerberos_client"]["kdc"]	= "kdc.suse.de"
+puts KerberosClient::write(krb)
