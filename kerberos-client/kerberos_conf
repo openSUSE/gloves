@@ -1,6 +1,8 @@
 #!/usr/sbin/env ruby
 require "kerberos_client"
-krb = KerberosClient::read
-puts krb.inspect
-krb["kerberos_client"]["kdc"]	= "kdc.suse.de"
-puts KerberosClient::write(krb)
+if ARGV.empty?
+  krb = KerberosClient::read
+  puts krb.inspect
+else
+  puts KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0]}})
+end
