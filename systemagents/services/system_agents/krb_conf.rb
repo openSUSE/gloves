@@ -10,7 +10,7 @@ module SystemAgents
     # identification of relevant DBUS service
     filename "_etc_krb5_conf"
 
-    def read(params)
+    def read(params={})
 
       kdc		= ""
       default_domain	= ""
@@ -66,34 +66,49 @@ module SystemAgents
       # update libdefaults section
       default_realm	= params["default_realm"]
       default_domain	= params["default_domain"]
-      kdc		= params["kdc"]
 
       aug.set("/files/etc/krb5.conf/libdefaults/default_realm", default_realm) unless default_realm.nil?
+      aug.set("/files/etc/krb5.conf/libdefaults/clockskew", params["clockskew"]) unless params["clockskew"].nil?
 
       # update existing realm section
-      save_path		= ""
+      realm_save_path		= ""
 
       realms		= aug.match("/files/etc/krb5.conf/realms/realm[*]")
       realms.each do |realm_path|
 	realm	= aug.get(realm_path)
 	if (!realm.nil? && realm == default_realm)
-	    save_path	= realm_path
+	    realm_save_path	= realm_path
 	    break
 	end
       end
-      puts "----------- save path: #{save_path}"
 
       # ... or create new realm section
-      if save_path.empty?
-	save_path	= "/files/etc/krb5.conf/realms/realm[#{realms.size + 1}]"
-	aug.set(save_path, default_realm)
+      if realm_save_path.empty? && !default_realm.nil?
+	realm_save_path	= "/files/etc/krb5.conf/realms/realm[#{realms.size + 1}]"
+	aug.set(realm_save_path, default_realm)
       end
 
-      aug.set(save_path + "/kdc", kdc)
-      aug.set(save_path + "/admin_server", kdc)
-      aug.set(save_path + "/default_domain", default_domain)
+      unless realm_save_path.empty?
+	unless params["kdc"].nil?
+	  aug.set(realm_save_path + "/kdc", params["kdc"])
+	  aug.set(realm_save_path + "/admin_server", params["kdc"])
+	end
+	aug.set(realm_save_path + "/default_domain", default_domain) unless default_domain.nil?
+      end
 
-      # FIXME write domain_realm, libdefaults and appdefaults sections
+      # write domain_realm section
+      unless (default_realm.nil? || default_domain.nil?)
+	aug.set("/files/etc/krb5.conf/domain_realm/." + default_domain, default_realm)
+      end
+      
+      # write appdefaults/pam section
+      ["ticket_lifetime", "renew_lifetime", "forwardable", "proxiable", "minimum_uid",
+       "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
+       "validate", "use_shmem", "addressless", "debug", "debug_sensitive", "initial_prompt",
+       "subsequent_prompt", "banner"].each do |pam_key|
+	  
+	aug.set("/files/etc/krb5.conf/appdefaults/application/" + pam_key, params[pam_key]) unless params[pam_key].nil?
+      end
 
       ret	= {
 	"success"	=> true
@@ -101,6 +116,7 @@ module SystemAgents
       unless aug.save
 	puts "saving /etc/krb5.conf failed"
 	ret["success"]	= false
+	ret["message"]	= aug.get("/augeas/files/etc/krb5.conf/error/message")
       end
 
       aug.close
