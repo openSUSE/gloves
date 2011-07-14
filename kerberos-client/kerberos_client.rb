@@ -1,16 +1,16 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
-require 'krb_conf'
-require 'pam_config'
+require 'system_agent/krb5_conf'
+require 'system_agent/pam_config'
 
 # module for kerberos-client configuration
 module KerberosClient
 
   def self.read(params={})
-    krb5_conf	= KrbConf.read({})
+    krb5_conf	= SystemAgent::Krb5Conf.read({})
 
-    pam_krb5	= PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
-    sssd	= PamConfig.execute({ "exec_params" => "-q --sss" })["stdout"] || ""
+    pam_krb5	= SystemAgent::PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
+    sssd	= SystemAgent::PamConfig.execute({ "exec_params" => "-q --sss" })["stdout"] || ""
     unless pam_krb5.empty?
       ignore_unknown	= false
       pam_krb5.split("\n").each do |line|
@@ -34,7 +34,7 @@ module KerberosClient
   def self.write(params)
     krb5_conf	= params["kerberos_client"]
     krb5_conf	= {} if krb5_conf.nil?
-    ret = KrbConf.write(krb5_conf)
+    ret = SystemAgent::Krb5Conf.write(krb5_conf)
     return ret
   end
 
