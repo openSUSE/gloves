@@ -3,5 +3,5 @@ Just playground. No production
 How to try it:
 install rubygem-ruby-augeas from OBS
 rake install (need root permissions so use sudo or be root)
-cd kerberos-client-api
+cd kerberos-client
 ruby kerberos_conf
