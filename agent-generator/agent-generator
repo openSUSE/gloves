@@ -16,8 +16,8 @@ identifier = file_name.gsub(/[-\.\/]/,"_").gsub(/^_/,"").downcase
 
 `mkdir -p bin/script_services bin/file_services dbus-policies dbus-services polkit-definitions services/system_agents clients/system_agent` #create dir structure
 
-agent_class = identifier.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase } #rails code of camelize
-agent_class_file = identifier
+agent_class_file = file_name.gsub(/^.*\//,"").gsub(/[-\.]/,"_").downcase
+agent_class = agent_class_file.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase } #rails code of camelize
 service_script_name = agent_class_file+"_service.rb"
 
 generated_files = {
