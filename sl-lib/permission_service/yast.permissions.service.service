@@ -1,5 +1,0 @@
-# DBus service activation config
-[D-BUS Service]
-Name=yast.permissions.service
-Exec=/usr/sbin/yastPermissionsService.rb
-User=root
