@@ -32,7 +32,9 @@ module KerberosClient
   end
 
   def self.write(params)
-    ret = {}
+    krb5_conf	= params["kerberos_client"]
+    krb5_conf	= {} if krb5_conf.nil?
+    ret = KrbConf.write(krb5_conf)
     return ret
   end
 
