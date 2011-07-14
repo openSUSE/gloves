@@ -10,9 +10,6 @@ module SystemAgents
 
 
     def read(params)
-      kdc		= ""
-      default_domain	= ""
-      default_realm	= ""
 
       aug			= Augeas::open
 
