@@ -11,7 +11,9 @@ module SystemAgents
 
     def read(params)
 
-      aug			= Augeas::open
+      aug		= Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+      aug.transform(:lens => "Krb5.lns", :incl => "/etc/krb5.conf")
+      aug.load
 
       default_realm	= aug.get("/files/etc/krb5.conf/libdefaults/default_realm")
       default_realm	= "" if default_realm.nil?
