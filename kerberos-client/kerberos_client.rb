@@ -6,7 +6,7 @@ require 'system_agent/pam_config'
 # module for kerberos-client configuration
 module KerberosClient
 
-  def self.read(params={})
+  def self.read(params)
     krb5_conf	= SystemAgent::Krb5Conf.read({})
 
     pam_krb5	= SystemAgent::PamConfig.execute({ "exec_params" => "-q --krb5" })["stdout"] || ""
