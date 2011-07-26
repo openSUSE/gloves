@@ -1,0 +1,7 @@
+{
+    // run the example with '/sbin/yast2 ./kerberos-example.ycp'
+
+    import "KerberosClient";
+
+    y2internal ("read: %1", KerberosClient::read ($[]));
+}
