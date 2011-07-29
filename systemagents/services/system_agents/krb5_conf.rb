@@ -52,12 +52,16 @@ module SystemAgents
 	end
       end
 
+      # FIXME read/write trusted_servers
+
       aug.close
       return krb5_conf
     end
 
     def write(params)
-      aug			= Augeas::open
+      aug		= Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+      aug.transform(:lens => "Krb5.lns", :incl => "/etc/krb5.conf")
+      aug.load
 
       # update libdefaults section
       default_realm	= params["default_realm"]
