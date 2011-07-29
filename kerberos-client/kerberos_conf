@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require "kerberos_client"
 if ARGV.empty?
-  krb = KerberosClient::read
+  krb = KerberosClient::read({})
   puts krb.inspect
 else
   puts KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0]}})
