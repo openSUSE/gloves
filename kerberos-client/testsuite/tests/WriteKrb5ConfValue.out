@@ -1,0 +1,10 @@
+Write	.etc.krb5_conf.v.libdefaults.default_realm ["SUSE"] true
+Return	true
+Write	.etc.krb5_conf.v.libdefaults.default_realm nil true
+Return	true
+Write	.etc.krb5_conf.v.libdefaults.default_realm nil true
+Return	true
+Write	.etc.krb5_conf.v.SUSE.kdc ["kdc.suse.cz", "kdc.suse.de"] true
+Return	true
+Write	.etc.krb5_conf.v.SUSE.kdc ["kdc.suse.cz", "kdc.suse.de"] true
+Return	true

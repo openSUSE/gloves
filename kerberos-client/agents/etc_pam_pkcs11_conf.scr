@@ -1,0 +1,33 @@
+/**
+ * File:
+ *   etc_pam_pkcs11_conf.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/pam_pkcs11/pam_pkcs11.conf
+ *
+ * $Id: etc_krb5_conf.scr 36303 2007-02-20 12:29:00Z jsuchome $
+ *
+ * Read/Sets the values defined in <tt>/etc/pam_pkcs11/pam_pkcs11.conf</tt>.
+ */
+.etc.pam_pkcs11_conf
+
+`ag_ini(
+  `IniAgent(
+   "/etc/pam_pkcs11/pam_pkcs11.conf",
+    $[
+      "options" : [ "comments_last" ],
+      "comments": [ "^[ \t]*#.*", "#.*", "^[ \t]*$" ],
+      "sections" : [
+        $[
+        "begin" : [ "^[ \t]*(.*[^ \t])[ \t]*[ \t]*\\{[ \t]*", "%s {" ],
+        "end" : [ "^[ \t]*[ \t]*\\}[ \t]*", "}" ]
+        ]
+      ],
+      "subindent": "\t",
+      "params" : [
+        $[
+        "match" : [ "^[ \t]*([^=]*[^ \t=])[ \t]*=[ \t]*(.*[^ \t]|)[ \t]*;[ \t]*$" , "%s = %s;"],
+      ],
+    ],
+    ]
+  )
+)

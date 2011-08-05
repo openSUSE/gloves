@@ -1,0 +1,124 @@
+/**
+ * File:	include/kerberos-client/wizards.ycp
+ * Package:	Configuration of kerberos-client
+ * Summary:	Wizards definitions
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id: wizards.ycp 52912 2008-11-05 12:15:06Z jsuchome $
+ */
+
+{
+
+textdomain "kerberos";
+
+import "Label";
+import "Popup";
+import "Sequencer";
+import "Stage";
+import "Wizard";
+
+
+include "kerberos-client/dialogs.ycp";
+
+/**
+ * Main workflow of the kerberos-client configuration
+ * @return sequence result
+ */
+define symbol MainSequence() ``{
+
+    map aliases = $[
+	"configure"	: ``( ConfigureDialog() ),
+	"advanced"	: ``( AdvancedDialog() ),
+    ];
+
+    map sequence = $[
+	"ws_start" : "configure",
+	"configure" : $[
+	    `abort	: `abort,
+	    `cancel	: `abort,
+	    `advanced	: "advanced",
+	    `next	: `next
+	],
+	"advanced" : $[
+	    `abort	: `abort,
+	    `cancel	: `abort,
+	    `next	: "configure",
+	],
+    ];
+
+    symbol ret = Sequencer::Run (aliases, sequence);
+    return ret;
+}
+
+/**
+ * Whole configuration of kerberos-client
+ * @return sequence result
+ */
+define symbol KerberosSequence() ``{
+
+    map aliases = $[
+	"read"	: [ ``( ReadDialog() ), true ],
+	"main"	:   ``( MainSequence() ),
+	"write"	: [ ``( WriteDialog() ), true ]
+    ];
+
+    map sequence = $[
+	"ws_start" : "read",
+	"read" : $[
+	    `abort	: `abort,
+	    `cancel	: `abort,
+	    `next	: "main"
+	],
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: "write"
+	],
+	"write" : $[
+	    `abort	: `abort,
+	    `cancel	: `abort,
+	    `next	: `next
+	]
+    ];
+
+    if (Stage::cont ())
+    {
+	Wizard::CreateDialog();
+    }
+    else
+    {
+	Wizard::OpenNextBackDialog ();
+	Wizard::HideAbortButton ();
+    }
+    Wizard::SetDesktopIcon("kerberos");
+    symbol ret = Sequencer::Run (aliases, sequence);
+    UI::CloseDialog();
+
+    return ret;
+}
+
+/**
+ * Whole configuration of kerberos-client but without reading and writing.
+ * For use with autoinstallation.
+ * @return sequence result
+ */
+define symbol KerberosAutoSequence() ``{
+
+    // dialog caption
+    string caption = _("Kerberos Client Configuration");
+
+    // label (init dialog)
+    term contents = `Label(_("Initializing..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("kerberos");
+    Wizard::SetContentsButtons(caption, contents, "",
+	    Label::BackButton(), Label::NextButton());
+
+    symbol ret = MainSequence();
+
+    UI::CloseDialog();
+    return ret;
+}
+
+/* EOF */
+}

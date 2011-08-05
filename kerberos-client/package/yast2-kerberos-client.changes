@@ -1,0 +1,772 @@
+-------------------------------------------------------------------
+Fri Jul 15 12:05:53 CEST 2011 - jsuchome@suse.cz
+
+- fixed typos in help texts (bnc#703166)
+- 2.21.2 
+
+-------------------------------------------------------------------
+Wed Mar 23 12:14:24 CET 2011 - jsuchome@suse.cz
+
+- aborting in Stage::cont does not abort installation (bnc#678650)
+- 2.21.1 
+
+-------------------------------------------------------------------
+Wed Mar 16 14:51:12 CET 2011 - jsuchome@suse.cz
+
+- show an info that sssd is configured (fate#308902)
+- 2.21.0
+
+-------------------------------------------------------------------
+Mon Jan 24 16:18:57 CET 2011 - jsuchome@suse.cz
+
+- do not install pam_krb5 if sssd is configured (bnc#666186)
+- 2.20.3 
+
+-------------------------------------------------------------------
+Fri Jan 21 12:26:47 CET 2011 - jsuchome@suse.cz
+
+- when sssd is configured, update sssd.conf's kerberos values
+- agent for krb5.conf moved to yast2-pam to be usable by ldap-client
+- 2.20.2
+
+-------------------------------------------------------------------
+Thu Jan 20 16:12:22 CET 2011 - jsuchome@suse.cz
+
+- do not use pam_krb5 when sssd is configured
+- 2.20.1 
+
+-------------------------------------------------------------------
+Fri Aug  6 11:05:12 CEST 2010 - jsuchome@suse.cz
+
+- testsuite adapted to changes in yast2-pam
+- 2.20.0
+
+-------------------------------------------------------------------
+Thu Jan 28 15:55:03 CET 2010 - jsuchome@suse.cz
+
+- leave DNS checkbox disabled when DNS info is not available
+  (bnc#574679)
+- 2.19.0 
+
+------------------------------------------------------------------
+Wed Jan 13 18:56:03 CET 2010 - kmachalkova@suse.cz
+
+- Adjusted .desktop file(s) to wrap /sbin/yast2/ calls in xdg-su
+  where root privileges are needed, removed X-KDE-SubstituteUID key 
+  (bnc#540627)
+
+-------------------------------------------------------------------
+Thu Sep  3 14:12:15 CEST 2009 - jsuchome@suse.cz
+
+- added keywords to desktop file
+- 2.18.3 
+
+-------------------------------------------------------------------
+Fri Jun 26 14:59:58 CEST 2009 - jsuchome@suse.cz
+
+- manual installation of 32bit packages packages no longer needed
+  (bnc#354164) 
+- 2.18.2  
+
+-------------------------------------------------------------------
+Thu Jun 18 09:16:18 CEST 2009 - jsuchome@suse.cz
+
+- 2.18.1 
+
+-------------------------------------------------------------------
+Tue Jun 16 14:27:40 CEST 2009 - mvidner@suse.cz
+
+- Using autodocs-ycp.ami, which contains a fix for automake 1.11.
+
+-------------------------------------------------------------------
+Fri Jun  5 14:13:22 CEST 2009 - jsuchome@suse.cz
+
+- fixed architecture dependent packages for PPC (bnc#505263) 
+- 2.18.0
+
+-------------------------------------------------------------------
+Wed Jan 14 15:43:01 CET 2009 - jsuchome@suse.cz
+
+- no exit confirmation popup if no changes were made (bnc#460157)
+
+-------------------------------------------------------------------
+Wed Dec 10 14:45:42 CET 2008 - jsuchome@suse.cz
+
+- write openssh enablement when Imported (bnc#457672)
+- 2.17.6 
+
+-------------------------------------------------------------------
+Wed Nov  5 13:14:02 CET 2008 - jsuchome@suse.cz
+
+- button labels adaped fro current style guide (bnc#440523)
+- 2.17.5 
+
+-------------------------------------------------------------------
+Wed Oct 15 12:46:25 CEST 2008 - jsuchome@suse.cz
+
+- use domainname to get the domain name (workaround for bnc#393951)
+- 2.17.4
+
+-------------------------------------------------------------------
+Thu Oct  9 11:08:58 CEST 2008 - jsuchome@suse.cz
+
+- fixed failing testsuite (Hostname.ycp)
+- 2.17.3
+
+-------------------------------------------------------------------
+Wed Sep 24 16:26:10 CEST 2008 - jsuchome@suse.cz
+
+- hide the option with "existing_ticket" from UI (bnc#429161)
+- 2.17.2 
+
+-------------------------------------------------------------------
+Tue Sep  9 11:15:55 CEST 2008 - jsuchome@suse.cz
+
+- merged texts from proofread
+- 2.17.1
+
+-------------------------------------------------------------------
+Mon Aug 25 09:51:36 CEST 2008 - jsuchome@suse.cz
+
+- added 3rd possible value to ComboBox with services (patch from mc)
+- different PAM configuration when LDAP is in use (patch from mc)
+- 2.17.0
+
+-------------------------------------------------------------------
+Fri May 16 16:40:22 CEST 2008 - jsrain@suse.cz
+
+- added categories Settings and System into desktop file
+  (bnc #382778)
+
+-------------------------------------------------------------------
+Wed May 14 16:01:06 CEST 2008 - jsuchome@suse.cz
+
+- added CLI options for ssh_support and ignore_unknown
+- options from "configure" command may be used in "pam" command
+- 2.16.11
+
+-------------------------------------------------------------------
+Tue Apr 15 13:58:36 CEST 2008 - jsuchome@suse.cz
+
+- merged texts from proofread
+- 2.16.10
+
+-------------------------------------------------------------------
+Tue Apr 15 09:58:52 CEST 2008 - jsuchome@suse.cz
+
+- disabling during installation makes sense with current workflow
+- 2.16.9
+
+-------------------------------------------------------------------
+Fri Apr 11 14:56:09 CEST 2008 - jsuchome@suse.cz
+
+- text fixes (bnc#375588)
+- 2.16.8 
+
+-------------------------------------------------------------------
+Thu Apr 10 15:42:32 CEST 2008 - jsuchome@suse.cz
+
+- if no KDC is defined, try to propose reasonable one (fate#302863)
+- 2.16.7 
+
+-------------------------------------------------------------------
+Wed Apr  2 15:42:01 CEST 2008 - ug@suse.de
+
+- rnc file fixed
+
+-------------------------------------------------------------------
+Tue Apr  1 15:29:54 CEST 2008 - jsuchome@suse.cz
+
+- added CLI option to (un)set DNS
+- 2.16.6
+
+-------------------------------------------------------------------
+Wed Mar 26 10:46:25 CET 2008 - jsuchome@suse.cz
+
+- use OK button label instead of Accept (fate #120373)
+- 2.16.5 
+
+-------------------------------------------------------------------
+Mon Mar 17 12:43:32 CET 2008 - jsrain@suse.cz
+
+- added 'StartupNotify=true' to the desktop file (bnc #304964)
+
+-------------------------------------------------------------------
+Fri Feb 22 13:39:35 CET 2008 - jsuchome@suse.cz
+
+- do not write "ssh_support" and "ignore_unknown" to /etc/krb5.conf
+  (bnc#363980)
+- 2.16.4
+
+-------------------------------------------------------------------
+Mon Feb 18 15:48:16 CET 2008 - jsuchome@suse.cz
+
+- now domain has the leading dot in domain_realm section (#298362)
+- 2.16.3
+
+-------------------------------------------------------------------
+Tue Jan 29 12:46:31 CET 2008 - jsuchome@suse.cz
+
+- added option to provide Kerberos data via DNS (F301812)
+- 2.16.2 
+
+-------------------------------------------------------------------
+Tue Dec 11 15:50:54 CET 2007 - jsuchome@suse.cz
+
+- removed obsolete retain_after_close option
+- implemented support for more pam_krb5 options (F302014)
+- 2.16.1
+
+-------------------------------------------------------------------
+Fri Oct 19 11:28:26 CEST 2007 - jsuchome@suse.cz
+
+- Use Kerberos checked by default during installation (#330054)
+- 2.16.0
+
+-------------------------------------------------------------------
+Tue Jul 31 12:25:15 CEST 2007 - jsuchome@suse.cz
+
+- Smart Card Integration (F302132):
+  - modify /etc/pam_pkcs11/pam_pkcs11.conf if it is present
+  - write domain without leading dot in domain_realm section
+- 2.15.7
+
+-------------------------------------------------------------------
+Tue Jun 19 09:26:50 CEST 2007 - jsuchome@suse.cz
+
+- added support for "pkinit" section in krb5.conf (F302132)
+- 2.15.6
+
+-------------------------------------------------------------------
+Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
+
+- removed outdated translations from .desktop-files (#271209)
+
+-------------------------------------------------------------------
+Fri Mar 30 12:52:51 CEST 2007 - jsuchome@suse.cz
+
+- correct using of krb5.conf file sections during write (#258840)
+- 2.15.5 
+
+-------------------------------------------------------------------
+Tue Feb 27 09:00:31 CET 2007 - jsuchome@suse.cz
+
+- added option to "Ignore Unknown Principles" (#217369)
+- 2.15.4
+
+-------------------------------------------------------------------
+Tue Feb 20 13:15:44 CET 2007 - jsuchome@suse.cz
+
+- support multiple values for KDC (#246241)
+- 2.15.3
+
+-------------------------------------------------------------------
+Fri Feb 16 15:45:45 CET 2007 - jsuchome@suse.cz
+
+- install required packages at the end of configuration (#233160)
+- 2.15.2 
+
+-------------------------------------------------------------------
+Mon Jan 15 11:00:12 CET 2007 - jsuchome@suse.cz
+
+- merged texts from proofread
+- 2.15.1 
+
+-------------------------------------------------------------------
+Fri Jan 12 12:58:59 CET 2007 - jsuchome@suse.cz
+
+- enable calling modules for NSS configuration (F5673)
+- fixed map with architecture dependent packages
+- 2.15.0 
+
+-------------------------------------------------------------------
+Wed Nov 29 16:46:30 CET 2006 - jsuchome@suse.cz
+
+- install more architecture-specific packages (#224510)
+- 2.14.5
+
+-------------------------------------------------------------------
+Tue Nov 14 15:23:47 CET 2006 - jsuchome@suse.cz
+
+- added RNC file for autoyast profile validation (#220775)
+- 2.14.4 
+
+-------------------------------------------------------------------
+Thu Sep 21 16:13:21 CEST 2006 - jsuchome@suse.cz
+
+- show Next instead of Finish during installation (F120214)
+- 2.14.3 
+
+-------------------------------------------------------------------
+Tue Sep 12 15:04:12 CEST 2006 - jsuchome@suse.cz
+
+- changed the default value of minimum_uid to 1
+- 2.14.2 
+
+-------------------------------------------------------------------
+Tue Sep 12 09:20:15 CEST 2006 - jsuchome@suse.cz
+
+- write use_shmem=sshd to pam section of krb5.conf (#201706)
+- 2.14.1 
+
+-------------------------------------------------------------------
+Fri Aug 25 12:59:27 CEST 2006 - jsuchome@suse.cz
+
+- adapted for pam-config usage (F300956)
+- API of PamSettings module is obsolete
+- 2.14.0 
+
+-------------------------------------------------------------------
+Wed Apr 12 13:19:32 CEST 2006 - jsuchome@suse.cz
+
+- fixed installing architecture-specific packages (#164313)
+- 2.13.4 
+
+-------------------------------------------------------------------
+Thu Mar  2 12:47:20 CET 2006 - jsuchome@suse.cz
+
+- reduced BuildRequires
+- 2.13.3 
+
+-------------------------------------------------------------------
+Mon Dec 19 12:39:08 CET 2005 - jsuchome@suse.cz
+
+- merged proofread texts
+- revert setting of "mappings" value (not needed)
+- 2.13.2
+
+-------------------------------------------------------------------
+Thu Dec  1 17:45:34 CET 2005 - jsuchome@suse.cz
+
+- support "mappings" value, necessary for samba-client config
+- 2.13.1
+
+-------------------------------------------------------------------
+Thu Nov 24 08:58:19 CET 2005 - jsuchome@suse.cz
+
+- removed AFS configuration (not supported: F100215)
+- added missing comments for translators 
+- 2.13.0
+
+-------------------------------------------------------------------
+Wed Sep  7 10:36:17 CEST 2005 - jsuchome@suse.cz
+
+- allow setting the port number in KDC entry (#115451)
+- 2.12.7 
+
+-------------------------------------------------------------------
+Tue Sep  6 15:39:31 CEST 2005 - jsuchome@suse.cz
+
+- adapted to the rename of openafs service and sysconfig file (#115335)
+- 2.12.6 
+
+-------------------------------------------------------------------
+Mon Aug 15 12:22:31 CEST 2005 - jsuchome@suse.cz
+
+- do not set use_authok (#104051)
+- 2.12.5 
+
+-------------------------------------------------------------------
+Thu Jul 28 11:23:07 CEST 2005 - jsuchome@suse.cz
+
+- updated desktop file
+- 2.12.4
+
+-------------------------------------------------------------------
+Tue Jun 21 16:08:58 CEST 2005 - jsuchome@suse.cz
+
+- fixed texts from proofreader (rwalter)
+- 2.12.3
+
+-------------------------------------------------------------------
+Thu May 19 10:23:09 CEST 2005 - jsuchome@suse.cz
+
+- add new default parameters (use_authtok, try_first_pass) to "pam"
+  section of /etc/krb5.conf to enable chaning the passwords (#76162)
+- 2.12.2
+
+-------------------------------------------------------------------
+Mon May  2 13:41:54 CEST 2005 - jsuchome@suse.cz
+
+- use FileUtils library
+- 2.12.1
+
+-------------------------------------------------------------------
+Tue Mar 29 12:52:32 CEST 2005 - jsuchome@suse.cz
+
+- better checks for defaults
+- 2.12.0
+
+-------------------------------------------------------------------
+Fri Mar 11 13:54:05 CET 2005 - jsuchome@suse.cz
+
+- new tests 
+
+-------------------------------------------------------------------
+Thu Mar  3 17:14:30 CET 2005 - jsuchome@suse.cz
+
+- replace new default values in /etc/krb5.conf (#67297)
+- do not write epmty values to /etc/krb5.conf
+
+-------------------------------------------------------------------
+Tue Mar  1 16:58:12 CET 2005 - jsuchome@suse.cz
+
+- use admin_server instead of kpasswd_server in /etc/krb5.conf
+  (#67034) 
+
+-------------------------------------------------------------------
+Mon Jan 31 12:41:21 CET 2005 - jsuchome@suse.cz
+
+- install also architecture-specific packages (#49808) 
+- 2.11.4
+
+-------------------------------------------------------------------
+Tue Jan 11 16:38:20 CET 2005 - jsuchome@suse.cz
+
+- switch from heimdal to MIT kerberos
+- check validity of KDC adress
+- 2.11.3 
+
+-------------------------------------------------------------------
+Wed Jan  5 15:54:55 CET 2005 - jsuchome@suse.cz
+
+- removed last select
+- switch Progress off in auto-client
+- 2.11.2
+
+-------------------------------------------------------------------
+Thu Dec 16 09:44:01 CET 2004 - jsuchome@suse.cz
+
+- do not ask for 'Abort Installation' when called from users
+- do not show Abort button in 'pseudo-popups'
+- 2.11.1
+
+-------------------------------------------------------------------
+Wed Oct 27 18:01:57 CEST 2004 - jsuchome@suse.cz
+
+- adapted for new Mode:: interface 
+- 2.11.0
+
+-------------------------------------------------------------------
+Mon Aug 30 13:03:16 CEST 2004 - jsuchome@suse.cz
+
+- Added GetModified function to _auto client (nashif)
+- 2.10.5
+
+-------------------------------------------------------------------
+Thu Aug 19 17:05:35 CEST 2004 - jsuchome@suse.cz
+
+- AFS support is back
+- 2.10.4
+
+-------------------------------------------------------------------
+Mon Aug 16 15:20:59 CEST 2004 - jsuchome@suse.cz
+
+- 2.10.3
+
+-------------------------------------------------------------------
+Tue Aug 10 09:03:16 CEST 2004 - jsuchome@suse.cz
+
+- merged proofread texts
+
+-------------------------------------------------------------------
+Wed Aug  4 13:34:59 CEST 2004 - jsuchome@suse.cz
+
+- use Package instead of Require
+- provide AFS texts for translation
+- 2.10.2
+
+-------------------------------------------------------------------
+Mon Jun 28 16:02:23 CEST 2004 - jsuchome@suse.cz
+
+- adapted to current yast2-pam behaviour
+- 2.10.1
+
+-------------------------------------------------------------------
+Wed Jun 16 16:59:41 CEST 2004 - jsuchome@suse.cz
+
+- updated testsuite (use Testsuite:: module, set testedfiles)
+- 2.10.0
+
+-------------------------------------------------------------------
+Thu Apr 22 17:23:02 CEST 2004 - jsuchome@suse.cz
+
+- fix of #39286 (configuration not saved during installation)
+- 2.9.9
+
+-------------------------------------------------------------------
+Fri Apr  2 15:51:52 CEST 2004 - jsuchome@suse.cz
+
+- changed license to GPL
+- 2.9.8
+
+-------------------------------------------------------------------
+Tue Mar 30 08:38:51 CEST 2004 - jsuchome@suse.cz
+
+- adapt to current 'continue' behaviour
+- 2.9.7
+
+-------------------------------------------------------------------
+Tue Mar 30 02:47:50 CEST 2004 - nashif@suse.de
+
+- #37426: Disable NTP Configuration in config mode (autoyast)
+
+-------------------------------------------------------------------
+Thu Mar 11 08:48:39 CET 2004 - jsuchome@suse.cz
+
+- set icon for wizard
+- testsuite enabled again
+- 2.9.6
+
+-------------------------------------------------------------------
+Wed Mar 10 10:40:56 CET 2004 - jsuchome@suse.de
+
+- disabled testsuite
+- 2.9.5
+
+-------------------------------------------------------------------
+Wed Mar 10 02:10:54 CET 2004 - nashif@suse.de
+
+- adapted for new wizard
+
+-------------------------------------------------------------------
+Mon Mar  8 17:05:40 CET 2004 - jsuchome@suse.cz
+
+- used Sequencer module
+- more type fixes
+
+-------------------------------------------------------------------
+Fri Mar  5 12:50:04 CET 2004 - jsuchome@suse.cz
+
+- correct type handling
+- removed AFS configuration
+- 2.9.4
+
+-------------------------------------------------------------------
+Mon Mar  1 14:51:11 CET 2004 - jsuchome@suse.cz
+
+- merged texts from proofread
+- 2.9.3
+
+-------------------------------------------------------------------
+Wed Feb 18 15:11:18 CET 2004 - jsuchome@suse.cz
+
+- added possibility to call ShortSummary function from auto-client
+
+-------------------------------------------------------------------
+Mon Feb  9 17:35:52 CET 2004 - jsuchome@suse.cz
+
+- removed config file (y2cc)
+
+-------------------------------------------------------------------
+Fri Jan 30 14:04:36 CET 2004 - jsuchome@suse.cz
+
+- fixed testsuite
+- 2.9.2
+
+-------------------------------------------------------------------
+Fri Nov 28 14:07:49 CET 2003 - jsuchome@suse.cz
+
+- syntax fixes for new interpreter
+- 2.9.1
+
+-------------------------------------------------------------------
+Tue Nov 25 14:24:19 CET 2003 - jsuchome@suse.cz
+
+- added possibility to run NTP client (new button in Advanced dialog)
+
+-------------------------------------------------------------------
+Tue Nov 18 14:22:07 CET 2003 - jsuchome@suse.cz
+
+- adapted to new Network types interface
+
+-------------------------------------------------------------------
+Thu Sep 25 13:44:52 CEST 2003 - jsuchome@suse.cz
+
+- changed button label in Advanced dialog: Next to Ok
+- 2.9.0
+
+-------------------------------------------------------------------
+Thu Sep 11 12:33:08 CEST 2003 - jsuchome@suse.cz
+
+- save value of kpasswd_server to /etc/krb5.conf (#30485)
+- do not try to read from non-existent /etc/sysconfig/afs-client
+
+-------------------------------------------------------------------
+Thu Sep 11 09:44:51 CEST 2003 - jsuchome@suse.cz
+
+- there is no Require::IsPackageAvailableTarget function (#30459)
+- 2.8.10
+
+-------------------------------------------------------------------
+Tue Sep  9 16:54:55 CEST 2003 - jsuchome@suse.cz
+
+- do not require KDC and realm entries when Kerberos is not
+  enabled (#30323)
+
+-------------------------------------------------------------------
+Tue Sep  9 01:06:27 CEST 2003 - nashif@suse.de
+
+- #30291: return list of required packages
+
+-------------------------------------------------------------------
+Fri Sep  5 09:50:33 CEST 2003 - jsuchome@suse.cz
+
+- merged in proofread texts
+- check packages correctly in autoyast config mode (#30014)
+
+-------------------------------------------------------------------
+Tue Sep  2 15:52:51 CEST 2003 - jsuchome@suse.cz
+
+- fixed testsuite
+
+-------------------------------------------------------------------
+Tue Sep  2 13:13:15 CEST 2003 - jsuchome@suse.cz
+
+- basic command-line interface (new texts)
+- ask before restarting/stopping afs-client
+- 2.8.8
+
+-------------------------------------------------------------------
+Mon Sep 01 12:13:07 CEST 2003 - arvin@suse.de
+
+- used Popup::ConfirmAbort
+
+-------------------------------------------------------------------
+Fri Aug 29 12:32:59 CEST 2003 - jsuchome@suse.de
+
+- updated desktop file
+
+-------------------------------------------------------------------
+Mon Aug 25 17:06:18 CEST 2003 - jsuchome@suse.cz
+
+- fixed AFS support
+- stop/start afs-client
+
+-------------------------------------------------------------------
+Fri Aug 22 09:38:37 CEST 2003 - jsuchome@suse.cz
+
+- Add variable for required packages and return them in auto client
+
+-------------------------------------------------------------------
+Wed Aug 20 14:31:17 CEST 2003 - jsuchome@suse.cz
+
+- removed redundant "initialization dialog" (#28779)
+- dialogs rearanged ("client enabled" together with basic settings)
+- required/optional applications are installed at the end
+- added testsuite
+- 2.8.6
+
+-------------------------------------------------------------------
+Mon Aug 18 16:00:00 CEST 2003 - jsuchome@suse.cz
+
+- fixed agent for /etc/ssh/ssh_config ("Host" sections allowed)
+
+-------------------------------------------------------------------
+Wed Aug 13 14:32:02 CEST 2003 - jsuchome@suse.de
+
+- do not ask for heimdal-tools in autoinst config (#28716)
+
+-------------------------------------------------------------------
+Wed Aug 13 08:06:11 CEST 2003 - jsuchome@suse.de
+
+- dialogs redesign, new helptext
+- 2.8.5
+
+-------------------------------------------------------------------
+Mon Aug 11 19:22:14 CEST 2003 - arvin@suse.de
+
+- fixed requires
+
+-------------------------------------------------------------------
+Mon Aug 11 17:48:48 CEST 2003 - jsuchome@suse.de
+
+- updated helptexts
+
+-------------------------------------------------------------------
+Mon Aug 11 10:28:56 CEST 2003 - jsuchome@suse.de
+
+- proofread texts (1st round)
+- pam_krb5, heimdal-libs checked in yast module (removed from spec file)
+- 2.8.3
+
+-------------------------------------------------------------------
+Wed Aug  6 13:44:39 CEST 2003 - jsuchome@suse.de
+
+- new workflow, enabled editing more settings
+- AFS support
+- new agents for /etc/sysconfig/afs-client, /etc/ssh/ssh_config
+- 2.8.2
+
+-------------------------------------------------------------------
+Mon Aug  4 15:59:08 CEST 2003 - jsuchome@suse.de
+
+- using new option for pam_unix2 (call_modules)
+- added .desktop file
+
+-------------------------------------------------------------------
+Fri Jul 18 16:01:57 CEST 2003 - jsuchome@suse.de
+
+- pam_krb is now set via PamSettings interface, not into /etc/pam.d/*
+- 2.8.1
+
+------------------------------------------------------------------
+Thu Jul 10 10:33:39 CEST 2003 - jsuchome@suse.de
+
+- ShortSummary
+- remove use_first_pass from pam files after disabling (bug #26985)
+
+-------------------------------------------------------------------
+Tue Mar 25 11:36:50 CET 2003 - jsuchome@suse.de
+
+- adapted to Require interface
+- 2.8.0
+
+-------------------------------------------------------------------
+Tue Feb 18 01:46:56 CET 2003 - nashif@suse.de
+
+- replaced functions in auto client: Result -> Export
+- 2.7.3
+
+-------------------------------------------------------------------
+Thu Feb  6 12:49:15 CET 2003 - jsuchome@suse.de
+
+- merged proofread texts
+
+-------------------------------------------------------------------
+Wed Jan 29 15:15:01 CET 2003 - jsuchome@suse.cz
+
+- merged proofread texts
+
+-------------------------------------------------------------------
+Fri Jan 24 11:32:33 CET 2003 - jsuchome@suse.cz
+
+- removed helps.ycp and complex.ycp
+  (do not include their texts in pot file)
+
+-------------------------------------------------------------------
+Fri Jan 17 13:39:11 CET 2003 - jsuchome@suse.de
+
+- fixes: agent added to package, global keys enabled in agent
+- added "required" control mode
+- heimdal-lib is required package
+- 2.7.2
+
+-------------------------------------------------------------------
+Mon Jan  6 17:12:27 CET 2003 - jsuchome@suse.de
+
+- splited to two dialogs: pam and klient configuration
+- autoinstallation
+- 2.7.1
+
+-------------------------------------------------------------------
+Tue Dec 17 15:46:20 CET 2002 - jsuchome@suse.de
+
+- proposing values for realm, kdc
+- enabled domain setting
+
+-------------------------------------------------------------------
+Mon Dec 16 11:05:40 CET 2002 - jsuchome@suse.de
+
+- initial version
+- moved from yast2-users module

@@ -1,0 +1,43 @@
+@HEADER-COMMENT@
+
+@HEADER@
+Group:	System/YaST
+License: GPL v2 or later
+BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-pam yast2-testsuite
+
+# etc_krb5_conf.scr 
+Requires:	yast2-pam >= 2.20.0
+
+# Hostname::CurrentDomain, CurrentHostname
+Requires:	yast2 >= 2.16.48
+
+BuildArchitectures:	noarch
+
+Summary:	YaST2 - Kerberos Client Configuration
+
+%description
+With this YaST2 module, you can configure a Kerberos client so that a
+Kerberos server will be used for user authentication.
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+@clientdir@/kerberos.ycp
+@clientdir@/kerberos-client.ycp
+@clientdir@/kerberos-client_auto.ycp
+@moduledir@/Kerberos.ycp
+@moduledir@/Kerberos.ybc
+@desktopdir@/kerberos.desktop
+@scrconfdir@/*.scr
+@schemadir@/autoyast/rnc/kerberos.rnc
+%dir @yncludedir@/kerberos-client
+@yncludedir@/kerberos-client/dialogs.ycp
+@yncludedir@/kerberos-client/wizards.ycp
+%doc @docdir@

@@ -1,0 +1,50 @@
+/**
+ *  ReadKrb5ConfValue.ycp
+ *  Test of Kerberos::ReadKrb5ConfValue function
+ *  Author:	Jiri Suchomel <jsuchome@suse.cz>
+ *  $Id: ReadKrb5ConfValue.ycp 36303 2007-02-20 12:29:00Z jsuchome $
+ */
+
+{
+    // testedfiles: Kerberos.ycp
+    import "Testsuite";
+    import "Kerberos";
+
+    map READ = $[
+	"etc": $[
+	    // /etc/krb5.conf
+	    "krb5_conf" : $[
+		"v" : $[
+		    "libdefaults": $[
+			"default_realm": ["SUSE.CZ"],
+			"clockskew": ["500"]
+		    ],
+		    "SUSE.CZ": $[
+			"kdc": ["chimera.suse.cz"],
+			"default_domain": nil,
+		    ],
+		    "pam" : $[
+			"ticket_lifetime": nil,
+		    ],
+		    "SUSE.DE": nil
+		],
+	    ],
+	]
+    ];
+
+    path p = .etc.krb5_conf.v.libdefaults.default_realm;
+
+    string realm = (string)Testsuite::Test(``(Kerberos::ReadKrb5ConfValue (p, "")), [ READ, $[], $[] ], 0);
+
+    p = add ( add (.etc.krb5_conf.v, realm), "kdc");
+
+    Testsuite::Test(``(Kerberos::ReadKrb5ConfValue (p, "test.suse.cz")), [ READ, $[], $[] ], 0);
+
+    p = add ( add (.etc.krb5_conf.v, "SUSE.DE"), "kdc");
+
+    Testsuite::Test(``(Kerberos::ReadKrb5ConfValue (p, "test.suse.de")), [ READ, $[], $[] ], 0);
+
+    p = .etc.krb5_conf.v.pam.ticket_lifetime;
+
+    Testsuite::Test(``(Kerberos::ReadKrb5ConfValue (p, "1d")), [ READ, $[], $[] ], 0);
+}

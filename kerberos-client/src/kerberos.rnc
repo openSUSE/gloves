@@ -1,0 +1,34 @@
+default namespace = "http://www.suse.com/1.0/yast2ns"
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+namespace config = "http://www.suse.com/1.0/configns"
+
+kerberos = element kerberos {
+    pam_login? &
+    kerberos_client?
+}
+
+
+pam_login = element pam_login {
+    element use_kerberos { BOOLEAN }? &
+    element sssd { BOOLEAN }?
+}
+
+kerberos_client = element kerberos_client {
+    element clockskew          { text }? &
+    element default_domain     { text }? &
+    element default_realm      { text }? &
+    element forwardable        { BOOLEAN }? &
+    element ignore_unknown     { BOOLEAN }? &
+    element kdc_server         { text }? &
+    element minimum_uid        { text }? &
+    element proxiable          { BOOLEAN }? &
+    element renew_lifetime     { text }? &
+    element retain_after_close { BOOLEAN }? &
+    element ssh_support        { BOOLEAN }? &
+    element ticket_lifetime    { text }? &
+    element ExpertSettings     {
+        element external  { text }? &
+        element use_shmem { text }?
+    }?
+}
+

@@ -1,0 +1,109 @@
+/**
+ * File:	clients/kerberos-client_auto.ycp
+ * Package:	Configuration of kerberos-client
+ * Summary:	Client for autoinstallation
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id: kerberos-client_auto.ycp 20654 2005-01-05 15:20:22Z jsuchome $
+ *
+ * This is a client for autoinstallation. It takes its arguments,
+ * goes through the configuration and return the setting.
+ * Does not do any changes to the configuration.
+ */
+
+/**
+ * @param first a map of kerberos-client settings
+ * @return map edited settings or an empty map if canceled
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example map ret = WFM::CallModule ("kerberos-client_auto", [ mm ]);
+ */
+
+{
+
+textdomain "kerberos";
+
+y2milestone("----------------------------------------");
+y2milestone("Kerberos-client auto started");
+
+import "Kerberos";
+include "kerberos-client/wizards.ycp";
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+/* Check arguments */
+if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
+    func = (string) WFM::Args(0);
+    if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+	param = (map) WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+
+/* create a  summary*/
+if(func == "Import") {
+    ret = Kerberos::Import(param);
+}
+/* create a  summary*/
+else if(func == "Summary") {
+    ret = Kerberos::Summary()[0]:"";
+}
+// ShortSummary is used by Users module
+else if(func == "ShortSummary") {
+    ret = Kerberos::ShortSummary();
+}
+else if (func == "Reset") {
+    Kerberos::Import($[]);
+    Kerberos::modified = false;
+    ret =  $[];
+}
+else if (func == "Change") {
+    ret = KerberosAutoSequence();
+}
+else if (func == "Read") {
+    ret = Kerberos::Read();
+}
+else if (func == "Export") {
+    ret = Kerberos::Export();
+}
+else if (func == "Write") {
+	import "Progress";
+	Kerberos::write_only = true;
+	boolean progress_orig = Progress::set (false);
+	ret = Kerberos::Write();
+	Progress::set (progress_orig);
+}
+else if (func == "Packages") {
+        ret = Kerberos::AutoPackages();
+}
+/**
+ * Return if configuration  was changed
+ * return boolean
+ */
+else if (func == "GetModified") {
+    ret = Kerberos::Modified ();
+}
+/**
+ * Set modified flag
+ * return boolean
+ */
+else if (func == "SetModified") {
+    Kerberos::modified = true;
+    ret = true;
+}
+/* unknown function */
+else {
+    y2error("unknown function: %1", func);
+    ret = false;
+}
+
+y2debug("ret=%1", ret);
+y2milestone("Kerberos-client auto finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}

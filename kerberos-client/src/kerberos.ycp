@@ -1,0 +1,421 @@
+/**
+ * File:	clients/kerberos.ycp
+ * Package:	Configuration of kerberos-client
+ * Summary:	Main file
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id: kerberos.ycp 63647 2011-03-23 11:34:51Z jsuchome $
+ *
+ * Main file for kerberos-client configuration. Uses all other files.
+ */
+
+{
+
+/***
+ * <h3>Configuration of the kerberos-client</h3>
+ */
+
+textdomain "kerberos";
+
+/* The main () */
+y2milestone ("----------------------------------------");
+y2milestone ("Kerberos-client module started");
+
+import "Kerberos";
+import "Wizard";
+import "Report";
+import "RichText";
+import "CommandLine";
+
+include "kerberos-client/wizards.ycp";
+
+/* is this proposal or not? */
+boolean propose = false;
+list args = WFM::Args();
+if(size(args) > 0) {
+    if(is(WFM::Args(0), path) && WFM::Args(0) == .propose) {
+        y2milestone("Using PROPOSE mode");
+        propose = true;
+    }
+}
+
+/* main ui function */
+any ret = nil;
+
+// --------------------------------------------------------------------------
+// --------------------------------- cmd-line handlers
+
+/**
+ * Print summary of basic options
+ * @return boolean false
+ */
+define boolean KerberosSummaryHandler (map options ) {
+
+    CommandLine::Print (RichText::Rich2Plain("<br>"+Kerberos::ShortSummary ()));
+    return false; // do not call Write...
+}
+
+/**
+ * Change basic configuration of Kerberos client (server, realm, domain)
+ * @param options  a list of parameters passed as args
+ * @return boolean true on success
+ */
+define boolean KerberosChangeConfiguration (map options ) {
+
+    boolean ret = false;
+    if (options["clockskew"]:"" != "" &&
+	options["clockskew"]:"" != Kerberos::clockskew)
+    {
+	integer value = tointeger (options["clockskew"]:"");
+	if (value == nil || value < 0)
+	{
+	    // error: wrong input (probably string or negative integer)
+	    Report::Error (_("The value for clock skew must be a positive integer."));
+	    return false;
+	}
+	if (!Kerberos::ValidateTimeEntries("clockskew",options["clockskew"]:""))
+	    return false;
+	Kerberos::clockskew = options ["clockskew"]:"";
+	ret = true;
+    }
+    if (options ["kdc"]:nil != nil && options ["kdc"]:"" != Kerberos::kdc)
+    {
+	Kerberos::kdc = options ["kdc"]:"";
+	ret = true;
+    }
+    if (options ["domain"]:nil != nil &&
+	options ["domain"]:"" != Kerberos::default_domain)
+    {
+	Kerberos::default_domain = options ["domain"]:"";
+	ret = true;
+    }
+    if (options ["realm"]:nil != nil &&
+	options ["realm"]:"" != Kerberos::default_realm)
+    {
+	Kerberos::default_realm = options ["realm"]:"";
+	ret = true;
+    }
+    if (options["minimum_uid"]:"" != "" &&
+	options["minimum_uid"]:"" != Kerberos::minimum_uid)
+    {
+	Kerberos::minimum_uid	= options ["minimum_uid"]:"";
+	ret = true;
+    }
+    if (options["forwardable"]:"" != "" &&
+	options["forwardable"]:"" != Kerberos::forwardable)
+    {
+	Kerberos::forwardable	= options["forwardable"]:"";
+	ret	= true;
+    }
+    if (options["proxiable"]:"" != "" &&
+	options["proxiable"]:"" != Kerberos::proxiable)
+    {
+	Kerberos::proxiable	= options["proxiable"]:"";
+	ret	= true;
+    }
+    if (options["ticket_lifetime"]:"" != "" &&
+	options["ticket_lifetime"]:"" != Kerberos::ticket_lifetime)
+    {
+	string val	= options["ticket_lifetime"]:"";
+	if (!Kerberos::ValidateTimeEntries ("ticket_lifetime", val))
+	    return false;
+	Kerberos::ticket_lifetime	= val;
+	ret	= true;
+    }
+    if (options["renew_lifetime"]:"" != "" &&
+	options["renew_lifetime"]:"" != Kerberos::renew_lifetime)
+    {
+	string val	= options["renew_lifetime"]:"";
+	if (!Kerberos::ValidateTimeEntries ("renew_lifetime", val))
+	    return false;
+	Kerberos::renew_lifetime	= options["renew_lifetime"]:"";
+	ret	= true;
+    }
+    if (options["ignore_unknown"]:"" != "")
+    {
+	boolean ignore_unknown	= (options["ignore_unknown"]:"" == "yes");
+	if (ignore_unknown != Kerberos::ignore_unknown)
+	{
+	    Kerberos::ignore_unknown	= ignore_unknown;
+	    ret				= true;
+	}
+    }
+    if (options["ssh_support"]:"" != "")
+    {
+	boolean ssh_support	= (options["ssh_support"]:"" == "yes");
+	if (ssh_support != Kerberos::ssh_support)
+	{
+	    Kerberos::ssh_support	= ssh_support;
+	    Kerberos::ssh_modified	= true;
+	    ret				= true;
+	}
+    }
+
+    foreach (string expert_key, [
+	"keytab", "ccache_dir", "ccname_template",
+	"mappings", "existing_ticket", "external", "validate", "use_shmem",
+	"addressless", "debug", "debug_sensitive",
+	"initial_prompt", "subsequent_prompt" ],
+    {
+	string val	= options[expert_key]:"";
+	if (val != "" && Kerberos::ExpertSettings[expert_key]:"" != val)
+	{
+	    Kerberos::ExpertSettings[expert_key]	= val;
+	    ret	= true;
+	}
+    });
+    if (options["dns"]:"" != "")
+    {
+	boolean dns	= (options["dns"]:"" == "yes");
+	if (dns != Kerberos::dns_used)
+	{
+	    if (dns && !Kerberos::dns_available)
+	    {
+		y2warning ("DNS does not provide config, ignoring");
+	    }
+	    else
+	    {
+		Kerberos::dns_used	= true;
+		ret			= true;
+	    }
+	}
+    }
+
+    if (ret)
+	Kerberos::modified = true;
+    return ret;
+}
+
+/**
+ * Enable or disable Kerberos authentication
+ * @param options  a list of parameters passed as args
+ * @return boolean true on success
+ */
+define boolean KerberosEnableHandler( map<string,string> options ) {
+    // check the "command" to be present exactly once
+    string command = CommandLine::UniqueOption( options,
+	["enable", "disable" ] );
+    if( command == nil ) return false;
+
+    if ((Kerberos::use_pam_krb && command == "disable") ||
+	(!Kerberos::use_pam_krb && command == "enable"))
+	Kerberos::pam_modified = true;
+
+    Kerberos::use_pam_krb = ( command == "enable" );
+
+    KerberosChangeConfiguration (options);
+    return Kerberos::modified || Kerberos::pam_modified;
+}
+
+
+/**
+ * Wrapper for writing Kerberos configuration
+ */
+define boolean KerberosWrite ()
+{
+    if (!Package::InstallAll (Kerberos::RequiredPackages ()))
+	return false;
+    return Kerberos::Write ();
+}
+
+/* the command line description map */
+map cmdline = $[
+    "id"		: "kerberos",
+    // translators: command line help text for Kerberos client module
+    "help"		: _("Kerberos client configuration module"),
+    "guihandler"	: KerberosSequence,
+    "initialize"	: Kerberos::Read,
+    "finish"		: KerberosWrite,
+    "actions"		: $[
+	"pam" :$[
+	    "handler"	: KerberosEnableHandler,
+	    // translators: command line help text for pam action
+	    "help"	: _("Enable or disable Kerberos authentication")
+	],
+	"summary" :$[
+	    "handler"	: KerberosSummaryHandler,
+	    // translators: command line help text for summary action
+	    "help"	: _("Configuration summary of Kerberos client")
+	],
+	"configure"	: $[
+	    "handler"	: KerberosChangeConfiguration,
+	    // translators: command line help text for configure action
+	    "help"	: _("Change the global settings of Kerberos client")
+	]
+    ],
+    "options"		: $[
+	"enable"	:$[
+	    // translators: command line help text for pam enable option
+	    "help"	: _("Enable the service")
+	],
+	"disable"	:$[
+	    // translators: command line help text for pam disable option
+	    "help"	: _("Disable the service")
+	],
+	"dns"		: $[
+	    "help"	: _("Use DNS to acquire the configuration at runtime"),
+	    "type"      : "enum",
+	    "typespec"  : [ "yes", "no" ],
+	],
+	"kdc"	:$[
+	    // translators: command line help text for the kdc option
+	    "help"	: _("The Key Distribution Center (KDC) address"),
+	    "type"	: "string"
+	],
+	"domain"	:$[
+	    // translators: command line help text for the domain option
+	    "help"	: _("Default domain"),
+	    "type"	: "string"
+	],
+	"realm"	:$[
+	    // translators: command line help text for the realm option
+	    "help"	: _("Default realm"),
+	    "type"	: "string"
+	],
+	"minimum_uid"	:$[
+	    // translators: command line help text for the minimum_uid option
+	    "help"	: _("Minimum UID used for Kerberos authentication"),
+	    "type"	: "string"
+	],
+	"clockskew"	:$[
+	    // translators: command line help text for the clockskew option
+	    "help"	: _("Clock skew (in seconds)"),
+	    "type"	: "string"
+	],
+	"ticket_lifetime": $[
+	    // help text for command line option
+	    "help"	: _("Default ticket lifetime"),
+	    "type"	: "string",
+	],
+	"renew_lifetime": $[
+	    // help text for command line option
+	    "help"	: _("Default renewable lifetime"),
+	    "type"	: "string",
+	],
+	"forwardable": $[
+	    // help text for command line option
+	    "help"	: _("Forwardable credentials"),
+	    "type"	: "string",
+	],
+	"proxiable": $[
+	    // help text for command line option
+	    "help"	: _("Proxiable credentials"),
+	    "type"	: "string",
+	],
+	"keytab"	: $[
+	    // help text for command line option
+	    "help"	: _("Keytab File Location"),
+	    "type"	: "string",
+	],
+	"ccache_dir"	: $[
+	    // help text for command line option
+	    "help"	: _("Credential Cache Directory"),
+	    "type"	: "string",
+	],
+	"ccname_template"	: $[
+	    // help text for command line option
+	    "help"	: _("Credential Cache Template"),
+	    "type"	: "string",
+	],
+	"mappings"	: $[
+	    // help text for command line option
+	    "help"	: _("Mappings"),
+	    "type"	: "string",
+	],
+	"existing_ticket"	: $[
+	    // help text for command line option
+	    "help"	: _("Accept Existing Ticket"),
+	    "type"	: "string",
+	],
+	"external"	: $[
+	    // help text for command line option
+	    "help"	: _("External credentials"),
+	    "type"	: "string",
+	],
+	"validate"	: $[
+	    // help text for command line option
+	    "help"	: _("Validate Initial Ticket"),
+	    "type"	: "string",
+	],
+	"use_shmem"	: $[
+	    // help text for command line option
+	    "help"	: _("Use Shared Memory"),
+	    "type"	: "string",
+	],
+	"addressless"	: $[
+	    // help text for command line option
+	    "help"	: _("Addressless Initial Tickets"),
+	    "type"	: "string",
+	],
+	"debug"		: $[
+	    // help text for command line option
+	    "help"	: _("Debug"),
+	    "type"	: "string",
+	],
+	"debug_sensitive"	: $[
+	    // help text for command line option
+	    "help"	: _("Sensitive Debug"),
+	    "type"	: "string",
+	],
+	"initial_prompt"	: $[
+	    // help text for command line option
+	    "help"	: _("Initial Prompt"),
+	    "type"	: "string",
+	],
+	"subsequent_prompt"	: $[
+	    // help text for command line option
+	    "help"	: _("Subsequent Prompt"),
+	    "type"	: "string",
+	],
+	"ssh_support"	: $[
+	    // help text for command line option
+	    "help"	: deletechars(_("Kerberos Support for Open&SSH Client"),
+		"&"),
+	    "type"      : "enum",
+	    "typespec"  : [ "yes", "no" ],
+	],
+	"ignore_unknown"	: $[
+	    // help text for command line option
+	    "help"	: deletechars (_("&Ignore Unknown Users"),"&"),
+	    "type"      : "enum",
+	    "typespec"  : [ "yes", "no" ],
+	],
+    ],
+    "mappings"		: $[
+	"pam"		: [ "enable", "disable",
+	    "kdc", "domain", "realm", "minimum_uid","clockskew",
+	    "ticket_lifetime", "renew_lifetime", "forwardable", "proxiable",
+	    "keytab", "ccache_dir", "ccname_template",
+	    "mappings", "existing_ticket", "external", "validate", "use_shmem",
+	    "addressless", "debug", "debug_sensitive",
+	    "initial_prompt", "subsequent_prompt", "dns",
+	    "ignore_unknown", "ssh_support",
+	],
+	"summary"	: [],
+	"configure"	: ["kdc", "domain", "realm", "minimum_uid","clockskew",
+	    "ticket_lifetime", "renew_lifetime", "forwardable", "proxiable",
+	    "keytab", "ccache_dir", "ccname_template",
+	    "mappings", "existing_ticket", "external", "validate", "use_shmem",
+	    "addressless", "debug", "debug_sensitive",
+	    "initial_prompt", "subsequent_prompt", "dns",
+	    "ignore_unknown", "ssh_support",
+	],
+    ]
+];
+
+// --------------------------------------------------------------------------
+
+if(propose)
+    ret = KerberosAutoSequence();
+else
+    ret = CommandLine::Run (cmdline);
+
+y2debug("ret == %1", ret);
+
+/* Finish */
+y2milestone("Kerberos-client module finished");
+y2milestone("----------------------------------------");
+return ret;
+
+/* EOF */
+}

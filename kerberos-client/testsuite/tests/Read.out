@@ -1,0 +1,54 @@
+Dump	==== reading... ============================
+Execute	.target.bash_output "/usr/sbin/pam-config -q --krb5" $["stdout":"password: "]
+Dir	.etc.krb5_conf.s: []
+Read	.etc.krb5_conf.v.libdefaults.default_realm ["SUSE.CZ"]
+Read	.etc.krb5_conf.v.libdefaults.clockskew ["500"]
+Read	.etc.krb5_conf.v."SUSE.CZ"."kdc" ["chimera.suse.cz", "kdc.suse.cz"]
+Read	.etc.krb5_conf.v."SUSE.CZ"."admin_server" nil
+Read	.etc.krb5_conf.v."SUSE.CZ"."default_domain" nil
+Read	.etc.krb5_conf.v.pam."ticket_lifetime" nil
+Read	.etc.krb5_conf.v.pam."renew_lifetime" nil
+Read	.etc.krb5_conf.v.pam."forwardable" nil
+Read	.etc.krb5_conf.v.pam."proxiable" nil
+Read	.etc.krb5_conf.v.pam."minimum_uid" ["1"]
+Read	.etc.krb5_conf.v.pam."keytab" nil
+Read	.etc.krb5_conf.v.pam."ccache_dir" nil
+Read	.etc.krb5_conf.v.pam."ccname_template" nil
+Read	.etc.krb5_conf.v.pam."mappings" nil
+Read	.etc.krb5_conf.v.pam."existing_ticket" ["true"]
+Read	.etc.krb5_conf.v.pam."external" ["false"]
+Read	.etc.krb5_conf.v.pam."validate" nil
+Read	.etc.krb5_conf.v.pam."use_shmem" nil
+Read	.etc.krb5_conf.v.pam."addressless" ["false"]
+Read	.etc.krb5_conf.v.pam."debug" nil
+Read	.etc.krb5_conf.v.pam."debug_sensitive" nil
+Read	.etc.krb5_conf.v.pam."initial_prompt" nil
+Read	.etc.krb5_conf.v.pam."subsequent_prompt" nil
+Read	.etc.krb5_conf.v.pam."banner" ["haha"]
+Read	.etc.krb5_conf.v.pkinit.trusted_servers nil
+Dir	.etc.ssh.ssh_config.s: ["*"]
+Dir	.etc.ssh.ssh_config.s: ["*"]
+Dir	.etc.ssh.ssh_config.v."*": ["GSSAPIAuthentication", "GSSAPIDelegateCredentials"]
+Read	.etc.ssh.ssh_config.v."*"."GSSAPIAuthentication" "yes"
+Read	.etc.ssh.ssh_config.v."*"."GSSAPIDelegateCredentials" "yes"
+Execute	.target.bash_output "/usr/sbin/pam-config -q --sss" $["stdout":"password: "]
+Return	true
+Dump	============================================
+Dump	kerberos used: true
+Dump	default realm: SUSE.CZ
+Dump	kdc: chimera.suse.cz kdc.suse.cz
+Dump	
+Dump	ssh support: true
+Dump	============================================
+Dump	==== reading... ============================
+Execute	.target.bash_output "/usr/sbin/pam-config -q --krb5" $["stdout":"password: "]
+Execute	.target.bash "/usr/bin/touch /etc/krb5.conf" 0
+Dir	.etc.ssh.ssh_config.s: ["*"]
+Dir	.etc.ssh.ssh_config.s: ["*"]
+Dir	.etc.ssh.ssh_config.v."*": ["GSSAPIAuthentication", "GSSAPIDelegateCredentials"]
+Read	.etc.ssh.ssh_config.v."*"."GSSAPIAuthentication" "yes"
+Read	.etc.ssh.ssh_config.v."*"."GSSAPIDelegateCredentials" "yes"
+Execute	.target.bash_output "/usr/sbin/pam-config -q --sss" $["stdout":"password: "]
+Return	true
+Dump	default realm: SUSE.CZ
+Dump	============================================

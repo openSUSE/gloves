@@ -1,0 +1,33 @@
+/**
+ * File:
+ *   etc_ssh_ssh_config.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/ssh/ssh_config using the ini-agent
+ *   For the config file format, see man ssh (1).
+ *
+ * $Id: etc_ssh_ssh_config.scr 13007 2003-12-10 13:20:01Z jsuchome $
+ *
+ * Read/Sets the values defined in <tt>/etc/ssh/ssh_config</tt>.
+ */
+.etc.ssh.ssh_config
+
+`ag_ini(
+  `IniAgent(
+   "/etc/ssh/ssh_config",
+    $[
+      "options" : [ "global_values"],
+      "comments": [ "^[ \t]*#.*", "#.*", "^[ \t]*$" ],
+      "sections" : [
+        $[
+        "begin" : [ "^[ \t]*Host[ \t]*(.+)[ \t]*$", "Host %s" ],
+        ],
+      ],
+      "params" : [
+	$[
+	  "match" : [ "^[ \t]*([a-zA-Z0-9_]+)[ \t]*[=]*[ \t]*(.+)[ \t]*$",
+		      "%s %s" ]
+	]
+      ]
+    ]
+  )
+)

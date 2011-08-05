@@ -1,0 +1,42 @@
+--- Kerberos-client module proposal
+
+While we have new authentication dialog, where user can choose sets of users
+and type authetication, there is a chance to manage various auth. types.
+
+So here comes ... the kerberos-client module!
+
+--- What is it for?
+
+To set just a basic settings of Kerberos client, the first version is good for
+learning Kerberos principes.
+
+- 1. Configuration of client:
+
+This is done via /etc/krb5.conf file, so the YaST2 module has to enable some 
+change of this file.
+
+- 2. Authentification with kerberes
+
+For this, the pam_krb5 module is used. User should be able to set 
+    - if he wants to use this module
+    - how should it work (primary or optional authenication etc.)
+
+--- Workflow
+
+It is simple. Let's use only one dialog, where the minimal settings should be
+shown. These are:
+
+- use pam_krb5 for auth. (radiobuttons)
+- which way? (combobox)
+
+- configuration of client, necessary values are
+    - realm
+    - server adress
+
+--- Future
+
+- use two dialogs: for PAM and client configuration
+
+- PAM: choose the files to modificate, choose the options
+
+- client: more variables

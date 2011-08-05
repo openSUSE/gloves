@@ -1,0 +1,25 @@
+/**
+ *  WriteKrb5ConfValue.ycp
+ *  Test of Kerberos::WriteKrb5ConfValue function
+ *  Author:	Jiri Suchomel <jsuchome@suse.cz>
+ *  $Id: WriteKrb5ConfValue.ycp 36303 2007-02-20 12:29:00Z jsuchome $
+ */
+
+{
+    // testedfiles: Kerberos.ycp
+    import "Testsuite";
+    import "Kerberos";
+
+    path p = .etc.krb5_conf.v.libdefaults.default_realm;
+
+    Testsuite::Test(``(Kerberos::WriteKrb5ConfValue (p, "SUSE")), [ $[], $[], $[] ], 0);
+
+    Testsuite::Test(``(Kerberos::WriteKrb5ConfValue (p, "")), [ $[], $[], $[] ], 0);
+
+    Testsuite::Test(``(Kerberos::WriteKrb5ConfValue (p, nil)), [ $[], $[], $[] ], 0);
+
+    p = .etc.krb5_conf.v.SUSE.kdc;
+    Testsuite::Test(``(Kerberos::WriteKrb5ConfValues (p, ["kdc.suse.cz", "kdc.suse.de"])), [ $[], $[], $[] ], 0);
+
+    Testsuite::Test(``(Kerberos::WriteKrb5ConfValuesAsString (p, "kdc.suse.cz kdc.suse.de")), [ $[], $[], $[] ], 0);
+}

@@ -1,0 +1,896 @@
+/**
+ * File:	include/kerberos-client/dialogs.ycp
+ * Package:	Configuration of kerberos-client
+ * Summary:	Dialogs definitions
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id: dialogs.ycp 64833 2011-07-15 10:11:03Z jsuchome $
+ */
+
+{
+
+textdomain "kerberos";
+
+import "Address";
+import "CWM";
+import "CWMTab";
+import "IP";
+import "Kerberos";
+import "Label";
+import "Mode";
+import "Package";
+import "Popup";
+import "Report";
+import "Stage";
+import "String";
+import "Wizard";
+
+// map of current expert settings
+map<string,any> ExpertSettings	= $[];
+
+boolean	text_mode	= false;
+
+/******************************************************************************
+ * widget handlers
+ ******************************************************************************/
+
+  /**
+   * universal widget: initialize the string value of widget @param
+   */
+  define void InitDescription (string id) {
+    string val	= ExpertSettings[id]:"";
+    if (id == "minimum_uid")
+	UI::ChangeWidget (`id (id), `Value, tointeger (val));
+    else
+	UI::ChangeWidget (`id (id), `Value, val);
+  }
+
+  /**
+   * store the string value of given widget
+   */
+  define void StoreDescription (string key, map event) {
+    if (key == "minimum_uid")
+	ExpertSettings[key]	= tostring (UI::QueryWidget (`id(key), `Value));
+    else
+	ExpertSettings[key]	= UI::QueryWidget (`id(key), `Value);
+  }
+
+  /**
+   * handler for general string-value widgets: store their value on exit/save
+   */
+  define symbol HandleDescription (string key, map event) {
+    // store the value on exiting
+    if (event["ID"]:nil == `next) StoreDescription (key, event);
+    return nil;
+  }
+
+  /**
+   * universal widget: initialize the string value of widget @param
+   */
+  define void InitCheckBox (string id) {
+    UI::ChangeWidget (`id (id), `Value, ExpertSettings[id]:false);
+  }
+
+  /**
+   * handler for Configure User Data menubutton + NTP client button
+   */
+  symbol HandleClientCallButton (string key, map event) {
+    any ID	= event["ID"]:nil;
+    if ((key != "nss_client" || event["EventType"]:"" != "MenuEvent") &&
+	(key != "ntp" || ID != key))
+	return nil;
+    if (ID == "ldap" || ID == "nis" || ID == "ntp")
+    {
+	if (Package::Install (sformat ("yast2-%1-client", ID)))
+	    WFM::CallFunction ((string)ID + "-client", []);
+    }
+    return nil;
+  }
+
+  /**
+   * Validation function for widgets with time values
+   */
+  define boolean ValidateTimeEntries (string key, map event) {
+    string val	= (string) UI::QueryWidget (`id(key), `Value);
+    if (val == "" || Kerberos::ValidateTimeEntries (key, val))
+	return true;
+    UI::SetFocus (`id(key));
+    return false;
+  }
+
+  /**
+   * universal handler for directory browsing
+   */
+  symbol HandleBrowseDirectory (string key, map event) {
+
+    if (event["ID"]:nil != key) return nil;
+    string val		= substring (key, 7);
+    string current	= (string) UI::QueryWidget (`id (val), `Value);
+    if (current == nil) current = "";
+    // directory location popup label
+    string dir	= UI::AskForExistingDirectory (current, _("Path to Directory"));
+    if (dir!= nil)
+    {
+	UI::ChangeWidget (`id (val), `Value, dir);
+	StoreDescription (val, $[]);
+    }
+    return nil;
+  }
+
+  /**
+   * universal handler for looking up files
+   */
+  symbol HandleBrowseFile (string key, map event) {
+
+    if (event["ID"]:nil != key) return nil;
+    string val		= substring (key, 7);
+    string current	= (string) UI::QueryWidget (`id (val), `Value);
+    if (current == nil) current = "";
+    // file location popup label
+    string dir	= UI::AskForExistingFile (current, "", _("Path to File"));
+    if (dir!= nil)
+    {
+	UI::ChangeWidget (`id (val), `Value, dir);
+	StoreDescription (val, $[]);
+    }
+    return nil;
+  }
+
+  /**
+   * initialize the value of combo box
+   */
+  define void InitCombo (string id) {
+    string value	= ExpertSettings[id]:"";
+    list items	=  [
+	// combo box item
+	`item (`id ("true"), _("All services"), "true" == value),
+	// combo box item
+	`item (`id ("false"), _("No services"), "false" == value),
+	// combo box item
+	`item (`id (""), _("Not set"), value == "")
+    ];
+    if (! contains (["true", "false", ""], value))
+	items	= add (items, `item (`id (value), value, true));
+    UI::ChangeWidget (`id (id), `Items, items);
+  }
+
+/******************************************************************************
+ * end of widget handlers
+ ******************************************************************************/
+
+/**
+ * The dialog that appears when the [Abort] button is pressed.
+ * @return `abort if user really wants to abort, `back otherwise
+ */
+define symbol ReallyAbort () {
+
+    boolean ret = (Kerberos::Modified() || Stage::cont ()) ? Popup::ReallyAbort (true) : true;
+
+    if ( ret )	return `abort;
+    else	return `back;
+}
+
+/**
+ * Read settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+define symbol ReadDialog() ``{
+    boolean ret = Kerberos::Read();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Write settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+define symbol WriteDialog() ``{
+    // help text
+    Wizard::RestoreHelp(_("Writing Kerberos client settings..."));
+    boolean ret = Kerberos::Write();
+    return ret ? `next : `abort;
+}
+
+/**
+ * check the validity of the entered address
+ * enhanced for setting the port number after colon
+ */
+define boolean check_address (string address) {
+
+    list address_l = splitstring (address, ":");
+    if (size (address_l) == 1)
+	return Address::Check (address);
+    else if (size (address_l) == 2)
+    {
+	return
+	    Address::Check (address_l[0]:"") &&
+	    regexpmatch (address_l[1]:"0", "^[0-9]+$");
+    }
+    else return false;
+}
+
+/**
+ * Dialog for configuring Kerberos client (values in /etc/krb5.conf)
+ * @return dialog result
+ */
+define symbol ConfigureDialog() {
+
+    // help text 1/5
+    string help_text = _("<p>
+<b><big>Authentication with Kerberos</big></b><br>
+The Kerberos client configuration updates your PAM settings to enable Kerberos authentication.  Your system needs access to a Kerberos server in the network for this to work.
+</p>
+") +
+    // help text 2/5
+    _("<p>
+<b>Basic Client Settings</b>:
+Enter your <b>Default Domain</b>, <b>Default Realm</b>, and the hostname or address of your Key Distribution Center (<b>KDC Server Address</b>). To specify more values for KDC, separate them by spaces.</p>") +
+
+    // help text 3/5
+    _("<p>
+It is common practice to use the domain name in uppercase as your default realm name, but you can select freely. If the realm is not available on the server, you cannot log in.  Ask your server administrator if you need more information.</p>
+") +
+
+    // help text for Use DNS to acquire the configuration data at runtime
+    _("Check <b>Use DNS to Acquire the Configuration Data at Runtime</b> to let your client use the Kerberos authentication data provided by DNS. This option cannot be selected if the DNS server does not provide such data.</p>") +
+
+    // help text 5/5
+    _("<p>To configure more settings, click <b>Advanced Settings</b>.</p>");
+
+    // during installation, star ldap is default value
+    boolean installation    =
+	Stage::cont () && !contains (WFM::Args (), "from_users");
+    string default_realm = Kerberos::default_realm;
+    string kdc = Kerberos::kdc;
+    string default_domain = Kerberos::default_domain;
+    boolean use_pam_krb = Kerberos::use_pam_krb || installation;
+    boolean dns_used		= Kerberos::dns_used;
+    boolean dns_available	= Kerberos::dns_available;
+
+    term con = `HBox (`HSpacing (3), `VBox (
+        `VSpacing (0.5),
+        `RadioButtonGroup(`id(`rd),
+	    `Left(`HVSquash(`VBox (
+		// radio button label
+                `Left (`RadioButton(`id(`pamno), `opt (`notify), _("Do No&t Use Kerberos"), !use_pam_krb)),
+		// radio button label
+                `Left(`RadioButton(`id(`pamyes), `opt (`notify), _("&Use Kerberos"), use_pam_krb)))))
+	),
+	`VSpacing (0.2),
+	`Left (`HBox (
+	    `HSpacing (2),
+	    `CheckBox (`id (`dns), `opt (`notify),
+		// checkbox label
+		_("Use DN&S to acquire the configuration data at runtime"),
+		dns_used)
+	)),
+        `VSpacing (),
+	// frame label
+	`Frame (_("Basic Kerberos Settings"), `HBox(`HSpacing (0.5), `VBox(
+	    `VSpacing (0.5),
+	    `HBox(
+		// textentry label
+		`TextEntry (`id (`domain), _("Default &Domain"),default_domain),
+		// textentry label
+		`TextEntry (`id (`realm), _("Default Real&m"), default_realm)
+	    ),
+	    // textentry label
+	    `TextEntry (`id (`kdc), _("&KDC Server Address"), kdc),
+            // infield label
+	    `VSpacing (0.5)), `HSpacing (0.5)
+	)),
+        `VSpacing (0.6),
+	// pushbutton label
+	`Right(`PushButton (`id(`advanced), _("Ad&vanced Settings..."))),
+        `VSpacing (0.2)
+    ), `HSpacing(3));
+
+    Wizard::SetContentsButtons (
+        // dialog title
+        _("Kerberos Client Configuration"), con, help_text,
+        Stage::cont () ? Label::BackButton () : Label::CancelButton (),
+	Stage::cont () ? Label::NextButton () : Label::OKButton ()
+    );
+    if (Stage::cont ())
+	Wizard::RestoreAbortButton ();
+    else
+	Wizard::HideAbortButton ();
+
+    UI::ChangeWidget (`id (`dns), `Enabled, dns_available && use_pam_krb);
+    foreach (symbol widget, [`realm, `domain, `kdc, `advanced], ``{
+	UI::ChangeWidget (`id (widget), `Enabled, use_pam_krb);
+	if (widget != `advanced && use_pam_krb)
+	    UI::ChangeWidget (`id (widget), `Enabled, !dns_used);
+    });
+
+    symbol result = nil;
+    do
+    {
+        result	= (symbol) UI::UserInput ();
+
+        if (result == `pamyes || result == `pamno)
+	{
+            use_pam_krb = (result == `pamyes);
+	    foreach (symbol widget, [`realm, `domain, `kdc, `advanced],``{
+		UI::ChangeWidget (`id (widget), `Enabled, use_pam_krb);
+	    });
+	    UI::ChangeWidget (`id (`dns), `Enabled, dns_available && use_pam_krb);
+	}
+	if (result == `dns)
+	{
+	    dns_used	= (boolean) UI::QueryWidget (`id (`dns), `Value);
+	    foreach (symbol widget, [`realm, `domain, `kdc ], {
+		UI::ChangeWidget (`id (widget), `Enabled, !dns_used);
+	    });
+	    // fill the values with the ones provided by DNS...
+	    UI::ChangeWidget (`id(`realm), `Value, Kerberos::dns_default_realm);
+	    UI::ChangeWidget (`id(`kdc), `Value, Kerberos::dns_kdc);
+	}
+
+        if (result == `next || result == `advanced) {
+
+            default_realm = (string) UI::QueryWidget (`id(`realm), `Value);
+            default_domain = (string) UI::QueryWidget (`id(`domain), `Value);
+            kdc = (string) UI::QueryWidget (`id(`kdc), `Value);
+	    dns_used	= (boolean) UI::QueryWidget (`id (`dns), `Value);
+
+            if (use_pam_krb && default_realm == "")
+            {
+		// error popup label
+		Report::Error(_("Enter the default realm name."));
+		UI::SetFocus (`id(`realm));
+		result = `not_next;
+		continue;
+            }
+
+	    if (use_pam_krb && kdc == "")
+            {
+                // error popup label
+                Report::Error(_("Enter the address of the KDC server."));
+		UI::SetFocus (`id(`kdc));
+		result = `not_next;
+                continue;
+            }
+	    if (use_pam_krb)
+	    {
+		list<string> kdcs	= splitstring (kdc, " \t");
+		boolean checked		= true;
+		foreach (string k, kdcs, {
+		    checked	= checked && check_address (k);
+		});
+		if (!checked)
+		{
+		    // error popup label
+		    Report::Error (_("The KDC server address is invalid.") +
+			"\n\n" + Address::Valid4 ());
+		    UI::SetFocus (`id(`kdc));
+		    result = `not_next;
+		    continue;
+		}
+	    }
+        }
+	if ((result == `abort || result == `cancel || result == `back) &&
+	    ReallyAbort () != `abort)
+	{
+	    result = `not_next;
+	}
+	if (result == `next && use_pam_krb)
+	{
+	    if (!Package::InstallAll (Kerberos::RequiredPackages ()))
+	    {
+		result = `not_next;
+		use_pam_krb	= false;
+		UI::ChangeWidget (`id (`rd), `Value, `pamno);
+		foreach (symbol widget, [`realm, `domain, `kdc,`advanced,`dns],{
+		    UI::ChangeWidget (`id (widget), `Enabled, use_pam_krb);
+		});
+	    }
+	    if (Kerberos::sssd)
+	    {
+		// popup message
+		Popup::Message ("System Security Services Daemon (SSSD) is configured.
+It is in use for Kerberos authentication instead of pam_krb5.
+
+You can disable SSSD in yast2 ldap-client module.");
+	    }
+	}
+    } while (!contains ([`back, `cancel, `abort, `next, `advanced], result));
+
+    if (result == `next || result == `advanced)
+    {
+        Kerberos::modified = true;
+        Kerberos::default_domain = default_domain;
+	Kerberos::default_realm = default_realm;
+	Kerberos::kdc = kdc;
+	Kerberos::dns_used = dns_used;
+
+        if (use_pam_krb != Kerberos::use_pam_krb)
+        {
+            Kerberos::pam_modified = true;
+            Kerberos::use_pam_krb = use_pam_krb;
+        }
+    }
+    return result;
+}
+
+map<string, map> widget_description	= $[
+    // ---------------- widgtes for ("main") tab
+    "ticket_lifetime" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("&Default Lifetime"),
+	// help text (do not transl. values "m","h", "d")
+	"help"		: _("<p>By default, the time unit of <b>Default Lifetime</b>, <b>Default Renewable Lifetime</b>, and <b>Clock Skew</b> is set to seconds. Alternatively, specify the time unit (<tt>m</tt> for minutes, <tt>h</tt> for hours, or <tt>d</tt> for days) and use it as a value suffix, as in <tt>1d</tt> or <tt>24h</tt> for one day.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"validate_type"	: `function,
+	"validate_function"	: ValidateTimeEntries,
+	"valid_chars"	: String::CDigit () + "dmh",
+    ],
+    "renew_lifetime" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("De&fault Renewable Lifetime"),
+	"no_help"	: true,
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"validate_type"	: `function,
+	"validate_function"	: ValidateTimeEntries,
+	"valid_chars"	: String::CDigit () + "dmh",
+    ],
+    "forwardable" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// checkbox label
+	"label"		: _("For&wardable"),
+	// help text
+	"help"		: _("<p><b>Forwardable</b> lets you transfer your complete identity (TGT) to another machine. <b>Proxiable</b> only lets you transfer particular tickets. Select if the options should be applied to all PAM services, none of them or enter a list of services separated by spaces.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "proxiable" : $[
+//	"widget"	: `checkbox,
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// checkbox label
+	"label"		: _("&Proxiable"),
+	"no_help"	: true,
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "retain_after_close" : $[
+	"widget"	: `checkbox,
+	// checkbox label
+	"label"		: _("R&etained"),
+	// help text
+	"help"		: _("<p>If <b>Retained</b> is enabled, a PAM module keeps the tickets after closing the session.</p>"),
+	"init"		: InitCheckBox,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "ssh_support" : $[
+	"widget"	: `checkbox,
+	// checkbox label
+	"label"		: _("Kerberos Support for Open&SSH Client"),
+	// help text
+	"help"		: _("<p>To enable Kerberos support for your OpenSSH client, select <b>Kerberos Support for OpenSSH Client</b>. In such a case, Kerberos tickets are used for user authentication on the SSH server.</p>"),
+	"init"		: InitCheckBox,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "ignore_unknown" : $[
+	"widget"	: `checkbox,
+	// checkbox label
+	"label"		: _("&Ignore Unknown Users"),
+	// help text
+	"help"		: _("<p>Check <b>Ignore Unknown Users</b> to have Kerberos ignore authentication attempts by users it does not know.</p>"),
+	"init"		: InitCheckBox,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "minimum_uid" : $[
+	"widget"	: `intfield,
+	"opt"		: [ `hstretch ],
+	// intfield label
+	"label"		: _("Minimum &UID"),
+	 // help text
+	"help"		: _("<p>When the <b>Minimum UID</b> is greater than 0, authentication attempts by users with UIDs below the specified number are ignored. This is useful for disabling Kerberos authentication for the system administrator root.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "clockskew" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("C&lock Skew"),
+	// help text
+	"help"		: _("<p>The <b>Clock Skew</b> is the tolerance for time stamps not exactly matching the host's system clock. The value is in seconds.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"validate_type"	: `function,
+	"validate_function"	: ValidateTimeEntries,
+	"valid_chars"	: String::CDigit () + "dmh",
+    ],
+    "ntp"	: $[
+	"widget"	: `push_button,
+	// push button label
+	"label"		: _("&NTP Configuration..."),
+	"help"		: _("<p>
+To synchronize your time with an NTP server, configure your computer
+as an NTP client. Access the configuration with <b>NTP Configuration</b>.
+</p>
+"),
+	"handle"	: HandleClientCallButton
+    ],
+    "nss_client"	: $[
+	"widget"	: `menu_button,
+	// push button label
+	"label"		: _("C&onfigure User Data"),
+	// help text
+	"help"		: _("<p>To configure the source of user accounts, select the appropriate configuration module in <b>Configure User Data</b>.</p>"),
+	"items"		: [
+	    // menu item
+	    [ "ldap", _("LDAP Client") ],
+	    // menu item
+	    [ "nis", _("NIS Client") ],
+	],
+	"handle"	: HandleClientCallButton
+    ],
+
+    // ---------------- widgtes for Expert Pam Settings ("pam_expert") tab
+    "ccache_dir" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("Credential Cac&he Directory"),
+	// help text for "Credential Cac&he Directory"
+	"help"		: _("<p>Specify the directory where to place credential cache files as <b>Credential Cache Directory</b>.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "browse_ccache_dir"	: $[
+	"widget"	: `push_button,
+	// push button label
+	"label"		: _("&Browse..."),
+	"no_help"	: true,
+	"handle"	: HandleBrowseDirectory,
+    ],
+    "ccname_template" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("Credential Cache &Template"),
+	// help text
+	"help"		: _("<p><b>Credential Cache Template</b> specifies the location in which to place the user's session-specific credential cache.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"no_help"	: true,
+    ],
+    "keytab" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("&Keytab File Location"),
+	// help text
+	"help"		: _("<p>Specify the location of the file with the keys of principals in <b>Keytab File Location</b>.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "browse_keytab"	: $[
+	"widget"	: `push_button,
+	// push button label
+	"label"		: _("Bro&wse..."),
+	"no_help"	: true,
+	"handle"	: HandleBrowseFile,
+    ],
+    "mappings" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("&Mappings"),
+	// help text
+	"help"		: _("<p>With <b>Mappings</b>, specify how the PAM module should derive the principal's name from the system user name.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "banner" : $[
+	"widget"	: `textentry,
+	// textentry label
+	"label"		: _("Ba&nner"),
+	// help text
+	"help"		: _("<p>The value of <b>Banner</b> is a text that should be shown before a password questions.</p>"),
+	"init"		: InitDescription,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    // ---------------- widgets for Services tab
+    "services_help"		:$[
+	"widget"	: `empty,
+	// generic help for Services tab
+	"help"		: _("<p>All settings in this dialog can be applied for all PAM services, no service or a specific list of services separated by commas.</p>"),
+    ],
+    "addressless" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// textentry label
+	"label"		: _("Add&ressless Initial Tickets"),
+	// help text
+	"help"		: _("<p>When <b>Addressless Initial Tickets</b> is set, initial tickets (TGT) with no address information are requested.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "debug" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `notify, `editable ],
+	// textentry label
+	"label"		: _("&Debug"),
+	// help text
+	"help"		: _("<p>Check <b>Debug</b> to turn on debugging for selected services via syslog.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "debug_sensitive" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `notify, `editable ],
+	// textentry label
+	"label"		: _("&Sensitive Debug"),
+	// help text
+	"help"		: _("<p><b>Sensitive Debug</b> turns  on  debugging  of  sensitive  information.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "existing_ticket" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// textentry label
+	"label"		: _("Accept &Existing Ticket"),
+	// help text
+	"help"		: _("<p>Check <b>Accept Existing Ticket</b> to tell PAM module to accept the presence of pre-existing Kerberos credentials as sufficient to authenticate the user.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"items"		: [],
+    ],
+    "external" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// textentry label
+	"label"		: _("E&xternal credentials"),
+	// help text
+	"help"		: _("<p>List the services allowed to provide credentials in <b>External credentials</b>.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"items"		: [],
+    ],
+    "use_shmem" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// textentry label
+	"label"		: _("Use Shared Mem&ory"),
+	// help text
+	"help"		: _("<p><b>Use Shared Memory</b> describes the services for which the shared memory is used during authentication.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"items"		: [],
+    ],
+    "validate" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `hstretch, `notify, `editable ],
+	// textentry label
+	"label"		: _("&Validate Initial Ticket"),
+	// help text
+	"help"		: _("<p>Select the services for which TGT should be validated by changing the value of <b>Validate Initial Ticket</b>."),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+	"items"		: [],
+    ],
+    "initial_prompt" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `notify, `editable ],
+	// textentry label
+	"label"		: _("&Initial Prompt"),
+	// help text
+	"help"		: _("<p>With <b>Initial Prompt</b> checked, the PAM module asks for a password before the authentication attempt.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+    "subsequent_prompt" : $[
+	"widget"	: `combobox,
+	"opt"		: [ `notify, `editable ],
+	// textentry label
+	"label"		: _("Subsequent &Prompt"),
+	// help text
+	"help"		: _("<p>If <b>Subsequent Prompt</b> is enabled, the PAM module may ask the user for a password, in case the previously-entered  password  was  somehow  insufficient for authentication.</p>"),
+	"init"		: InitCombo,
+	"store"		: StoreDescription,
+	"handle"	: HandleDescription,
+    ],
+];
+
+// description of tab layouts
+map get_tabs_descr () {
+    return $[
+    "main" : $[
+	// tab header
+	"header"	: _("PAM Settings"),
+	"contents"	: `Top (`HBox (`HSpacing (3), `VBox (
+	    `VSpacing (0.4),
+	    // frame label
+	    `Frame (_("Ticket Attributes"), `HBox (`HSpacing (0.5), `VBox(
+		`VSpacing (0.4),
+		"ticket_lifetime",
+		"renew_lifetime",
+		`HBox ("forwardable", `HSpacing (0.5), "proxiable"),
+		`VSpacing (0.4)), `HSpacing (0.5)
+	    )),
+	    `VSpacing (0.4),
+	    `Left ("ssh_support"),
+	    `VSpacing (0.2),
+	    `Left ("ignore_unknown"),
+	    `VSpacing (0.4),
+	    "minimum_uid",
+	    `HBox (
+		"clockskew",
+		`VBox (`Label (""), "ntp")
+	    ),
+	    `VSpacing (0.6),
+	    `Left ("nss_client")
+	), `HSpacing(3))),
+	"widget_names" : [
+	    "ticket_lifetime", "renew_lifetime",
+	    "forwardable", "proxiable", 
+	    "ssh_support", "ignore_unknown", "minimum_uid", "clockskew", "ntp",
+	    "nss_client",
+	],
+    ],
+    "pam_expert" : $[
+	// tab header
+	"header"	: _("Expert PAM Settings"),
+	"contents"	: `HBox (`HSpacing(2), `VBox (
+	    `VSpacing (0.4),
+	    `HBox ("keytab", `VBox (`Label (""), "browse_keytab")),
+	    `HBox ("ccache_dir", `VBox (`Label (""), "browse_ccache_dir")),
+	    "ccname_template",
+	    "mappings",
+	    "banner",
+	    `VStretch ()
+	), `HSpacing (2)),
+	"widget_names" : [
+	    "keytab", "browse_keytab", "ccache_dir", "browse_ccache_dir",
+	    "ccname_template", "mappings", "banner",
+	],
+    ],
+    "services"	: $[
+	// tab header
+	"header"	: _("PAM Services"),
+	"contents"	: `HBox (`HSpacing(2), `VBox (
+	    "services_help",
+	    `VSpacing (0.4),
+	    "addressless",
+	    /*
+	    `VSpacing (0.4),
+	    "existing_ticket",
+	    */
+	    `VSpacing (0.4),
+	    "external",
+	    `VSpacing (0.4),
+	    "use_shmem",
+	    `VSpacing (0.4),
+	    "validate",
+	    `VSpacing (0.4),
+	    `HBox (
+		`HWeight (1, "debug"),
+		`HSpacing (0.5),
+		`HWeight (1, "debug_sensitive")
+	    ),
+	    `VSpacing (0.4),
+	    `HBox (
+		`HWeight (1, "initial_prompt"),
+		`HSpacing (0.5),
+		`HWeight (1, "subsequent_prompt")
+	    ),
+	    `VSpacing (0.4),
+	    `VStretch ()
+	), `HSpacing (2)),
+	"widget_names" : [
+	    "services_help", "addressless",
+	    "external", "use_shmem", "validate",
+	    "debug", "debug_sensitive",
+	    "initial_prompt", "subsequent_prompt",
+	],
+    ],
+    "realms"	: $[
+	// tab header
+	"header"	: _("Realm Settings"),
+	"contents"	: `HBox (`HSpacing(2), `VBox (
+	    `VSpacing (0.4),
+	    `Empty (`opt (`hstretch, `vstretch))
+	), `HSpacing (2)),
+	"widget_names" : [
+	],
+    ],
+    ];
+}
+
+/**
+ * Kerberos advanced configuration
+ * @return dialog result
+ */
+define symbol AdvancedDialog() {
+
+    map display_info        = UI::GetDisplayInfo ();
+    text_mode               = display_info["TextMode"]:false;
+
+    ExpertSettings	= (map<string,any>) union (Kerberos::ExpertSettings, $[
+	"minimum_uid"		: Kerberos::minimum_uid,
+	"ticket_lifetime"	: Kerberos::ticket_lifetime,
+	"renew_lifetime"	: Kerberos::renew_lifetime,
+	"forwardable"		: Kerberos::forwardable,
+	"proxiable"		: Kerberos::proxiable,
+	"ignore_unknown"	: Kerberos::ignore_unknown,
+	"clockskew"		: Kerberos::clockskew,
+	"ssh_support"		: Kerberos::ssh_support,
+    ]);
+
+    widget_description["tab"] = CWMTab::CreateWidget($[
+	"tab_order"	: [ "main", "pam_expert", "services" ],
+	"tabs"		: get_tabs_descr (),
+	"widget_descr"	: widget_description,
+	"initial_tab"	: "main",
+    ]);
+
+    Wizard::SetContentsButtons("", `VBox (), "",
+	Label::CancelButton(), Label::OKButton());
+
+    symbol ret = CWM::ShowAndRun ($[
+	"widget_names"		: [
+	    "tab"
+	],
+	"widget_descr"		: widget_description,
+	"contents"		: `VBox ("tab"),
+	// default dialog caption
+	"caption"		: _("Advanced Kerberos Client Configuration"),
+	"back_button"		: Label::CancelButton (),
+	"next_button"		: Label::OKButton (),
+	"abort_button"		: nil,
+    ]);
+    y2milestone ("Returning %1", ret);
+    if (ret == `next)
+    {
+        Kerberos::minimum_uid		= ExpertSettings["minimum_uid"]:"1";
+	Kerberos::ticket_lifetime = ExpertSettings["ticket_lifetime"]:"1d";
+	Kerberos::renew_lifetime	= ExpertSettings["renew_lifetime"]:"1d";
+        Kerberos::clockskew		= ExpertSettings["clockskew"]:"300";
+	Kerberos::forwardable		= ExpertSettings["forwardable"]:"false";
+	Kerberos::proxiable		= ExpertSettings["proxiable"]:"false";
+	if (ExpertSettings["ssh_support"]:false != Kerberos::ssh_support)
+	{
+	    Kerberos::ssh_modified	= true;
+	    Kerberos::ssh_support	= ExpertSettings["ssh_support"]:false;
+	}
+        if (ExpertSettings["ignore_unknown"]:false != Kerberos::ignore_unknown)
+        {
+            Kerberos::pam_modified	= true;
+	    Kerberos::ignore_unknown	=ExpertSettings["ignore_unknown"]:false;
+	}
+	// ssh_support, ignore_unknown are not from /etc/krb5.conf
+	ExpertSettings	= remove (ExpertSettings, "ssh_support");
+	Kerberos::ExpertSettings = remove (ExpertSettings, "ignore_unknown");
+    }
+    return ret;
+}
+
+
+/* EOF */
+}

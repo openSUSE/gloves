@@ -1,0 +1,787 @@
+/**
+ * File:	modules/Kerberos.ycp
+ * Package:	Configuration of kerberos-client
+ * Summary:	Data for configuration of kerberos-client, i/o functions.
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id: Kerberos.ycp 64832 2011-07-15 10:10:28Z jsuchome $
+ *
+ * Representation of the configuration of kerberos-client.
+ * Input and output routines.
+ */
+
+{
+
+module "Kerberos";
+
+textdomain "kerberos";
+
+import "FileUtils";
+import "Hostname";
+import "Label";
+import "Mode";
+import "Package";
+import "Pam";
+import "Progress";
+import "Report";
+import "Service";
+import "Stage";
+import "Summary";
+
+/**
+ * Required packages for this module to operate
+ */
+global list<string> required_packages = ["pam_krb5", "krb5", "krb5-client"];
+
+global boolean write_only = false;
+
+// if pam_krb5 module is used for login
+global boolean use_pam_krb = false;
+
+// if pam_unix is in /etc/pam.d/login
+boolean pam_unix_present = false;
+
+// default realm and domain name
+global string default_realm = "";
+global string default_domain = "";
+
+global string dns_default_realm = "";
+global string dns_kdc		= "";
+
+// adress of KDC (key distribution centre) server for default realm
+global string kdc = "";
+string admin_server = "";
+
+// used for pkinit-nss (feature 302132)
+global string trusted_servers	= "";
+
+global string clockskew = "300";
+
+global boolean pam_modified = false;
+global boolean ssh_modified = false;
+global boolean modified = false;
+
+// advanced krb5.conf settings (pam section)
+global string ticket_lifetime = "1d";
+global string renew_lifetime = "1d";
+global string forwardable = "true";
+global string proxiable = "false";
+// obsolete, do not use
+global string retain_after_close = "false";
+global boolean ssh_support = false;
+global string minimum_uid = "1";
+
+// deprecated at this scope: now present in ExpertSettings map
+global string use_shmem	= "sshd";
+global string mappings	= "";
+
+// --krb5-ignore_unknown_principals for pam-config
+global boolean ignore_unknown	= true;
+
+// section in /etc/ssh/ssh_config file for storing krb support
+string ssh_section = "*";
+
+// packages to install (openssh etc.)
+global list<string> packages = [];
+
+// if DNS can be used for retrieving configuration data
+global boolean dns_available	= false;
+
+// if DNS is used for retrieving configuration data
+global boolean dns_used		= false;
+
+// if sssd is configured, do not use pam_krb5
+global boolean sssd		= false;
+
+/**
+  map with the settings configurable in the expert tabs
+ */
+global map<string,any> ExpertSettings	= $[];
+
+// backup of original ExpertSettings
+map<string,any> OrigExpertSettings	= $[];
+
+/**
+ * Data was modified?
+ * @return true if modified
+ */
+global define boolean Modified() ``{
+    y2debug("modified=%1",modified);
+    return (modified || pam_modified || ssh_modified);
+};
+
+
+/**
+ * Get all the Kerberos configuration from a map.
+ * @param settings imported map
+ * @return	success
+ */
+global define boolean Import (map settings) ``{
+    use_pam_krb		= settings["pam_login", "use_kerberos"]:false;
+    map client		= settings["kerberos_client"]:$[];
+
+    default_domain	= client["default_domain"]:"";
+    default_realm	= client["default_realm"]:"";
+    kdc			= client["kdc_server"]:"";
+    clockskew		= client["clockskew"]:clockskew;
+    ssh_support		= client["ssh_support"]:false;
+    ignore_unknown	= client["ignore_unknown"]:ignore_unknown;
+    ticket_lifetime	= client["ticket_lifetime"]:"1d";
+    renew_lifetime	= client["renew_lifetime"]:"1d";
+    minimum_uid		= client["minimum_uid"]:minimum_uid;
+    forwardable		= (client["forwardable"]:true) ? "true": "false";
+    proxiable		= (client["proxiable"]:false) ?   "true" :  "false";
+    use_shmem		= client["use_shmem"]:use_shmem;
+    mappings		= client["mappings"]:"";
+    trusted_servers	= client["trusted_servers"]:"";
+    ExpertSettings	= client["ExpertSettings"]:$[];
+    if (!haskey (ExpertSettings, "use_shmem") && haskey (client, "use_shmem"))
+	ExpertSettings["use_shmem"]	= use_shmem;
+
+    sssd		= settings["sssd"]:sssd;
+    pam_modified	= true;
+    modified		= true;
+    ssh_modified	= true;
+    return true;
+}
+
+
+/**
+ * Dump the Kerberos settings to a map, for autoinstallation use.
+ * @return map with settings
+ */
+global define map Export () ``{
+
+    map export_map	= $[
+	"pam_login": $[
+		"use_kerberos"		: use_pam_krb,
+		"sssd"			: sssd,
+	],
+	"kerberos_client": $[
+		"default_domain"	: default_domain,
+		"default_realm"		: default_realm,
+		"kdc_server"		: kdc,
+		"clockskew"		: clockskew,
+		"ssh_support"		: ssh_support,
+		"ignore_unknown"	: ignore_unknown,
+		"ticket_lifetime"	: ticket_lifetime,
+                "renew_lifetime"	: renew_lifetime,
+                "minimum_uid"		: minimum_uid,
+		"forwardable"		: forwardable == "true",
+                "proxiable"		: proxiable == "true",
+		"ExpertSettings"	: ExpertSettings,
+	]
+    ];
+    if (mappings != "")
+	export_map["kerberos_client","mappings"]	= mappings;
+    if (trusted_servers	!= "")
+	export_map["kerberos_client","trusted_servers"]	= trusted_servers;
+    return export_map;
+}
+
+/**
+ * Reads the item values from the /etc/krb5.conf via ini agent
+ * If the item doesn't exist, returns the default value
+ * @param path_to_value path for agent (.etc.krb5_conf)
+ * @param def_value default value for the key (path)
+ * @return list string the values for given key
+ */
+global list<string> ReadKrb5ConfValues (path path_to_value, string def_value) ``{
+
+    list<string> value = (list<string>) SCR::Read (path_to_value);
+    if (value == nil)
+        value = [def_value];
+    return value;
+}
+
+/**
+ * Reads the item value from the /etc/krb5.conf via ini agent
+ * If the item doesn't exist, returns the default value
+ * @param path_to_value path for agent (.etc.krb5_conf)
+ * @param def_value default value for the key (path)
+ * @return string the value
+ */
+global string ReadKrb5ConfValue (path path_to_value, string def_value) {
+
+    list vals	= ReadKrb5ConfValues (path_to_value, def_value);
+    return vals[0]:def_value;
+}
+
+/**
+ * Deprecated variant to ReadKrb5ConfValue
+ * @deprecated
+ */
+global string ReadFile (path path_to_value, string def_value) {
+
+    y2warning ("This function is deprecated, use ReadKrb5ConfValue instead.");
+    return ReadKrb5ConfValue (path_to_value, def_value);
+}
+
+/**
+ * Write list of values for given key to /etc/krb5.conf
+ * Do not write anything for empty and nil values
+ * @param path_to_value path for agent (.etc.krb5_conf)
+ * @param value
+ * @return false when nothing was written, success of write otherwise
+ */
+global boolean WriteKrb5ConfValues (path path_to_value, list<string> values) {
+
+    if (values == nil || values == [])
+	return SCR::Write (path_to_value, nil);
+    return SCR::Write (path_to_value, values);
+}
+
+/**
+ * Write (possible) multiple values of given key to /etc/krb5.conf
+ * @param values values separated by spaces
+ */
+global boolean WriteKrb5ConfValuesAsString (path path_to_value, string values) {
+
+    return WriteKrb5ConfValues (path_to_value,
+	filter (string val, splitstring (values, " \t"), ``(val != "")));
+}
+/**
+ * Write the item value to /etc/krb5.conf
+ * Do not write anything for empty and nil values
+ * @param path_to_value path for agent (.etc.krb5_conf)
+ * @param value
+ * @return false when nothing was written, success of write otherwise
+ */
+global boolean WriteKrb5ConfValue (path path_to_value, string value) {
+
+    if (value == nil || value == "")
+	return SCR::Write (path_to_value, nil);
+    return WriteKrb5ConfValues (path_to_value, [value]);
+}
+
+/**
+ * Deprecated variant to WriteKrb5ConfValue
+ * @deprecated
+ */
+global define boolean WriteFile (path path_to_value, string value) {
+
+    y2warning ("This function is deprecated, use WriteKrb5ConfValue instead.");
+    return WriteKrb5ConfValue (path_to_value, value);
+}
+
+
+
+/**
+ * Reads Kerberos settings from the SCR
+ * @return success
+ */
+global define boolean Read () ``{
+
+    map pam_query	= Pam::Query ("krb5");
+    use_pam_krb		= size (pam_query) > 0;
+    if (use_pam_krb) // if krb is not enabled, ignore_unknown is true by default
+	ignore_unknown	= contains (pam_query["account"]:[], "ignore_unknown_principals");
+
+    // now read the settings from /etc/krb5.conf
+    if (FileUtils::Exists ("/etc/krb5.conf"))
+    {
+        y2debug("krb5.conf sections: %1", SCR::Dir(.etc.krb5_conf.s));
+
+        default_realm = ReadKrb5ConfValue(.etc.krb5_conf.v.libdefaults.default_realm,"");
+
+        clockskew = ReadKrb5ConfValue (.etc.krb5_conf.v.libdefaults.clockskew, "300");
+
+	if (size (default_realm) > 0)
+	{
+	    path realm	= add (.etc.krb5_conf.v, default_realm);
+	    kdc		= mergestring (ReadKrb5ConfValues (add (realm, "kdc"),""), " ");
+	    admin_server = mergestring (ReadKrb5ConfValues(add (realm, "admin_server"),""), " ");
+	    default_domain = ReadKrb5ConfValue (add (realm,"default_domain"), "");
+	}
+	if (admin_server == kdc)
+	    admin_server = ""; // we could replace it in Write in this case...
+
+	path pam_p	= .etc.krb5_conf.v.pam;
+	ticket_lifetime = ReadKrb5ConfValue (add(pam_p,"ticket_lifetime"),"1d");
+	renew_lifetime	= ReadKrb5ConfValue (add (pam_p,"renew_lifetime"),"1d");
+	forwardable	= ReadKrb5ConfValue (add (pam_p,"forwardable"), "true");
+	proxiable	= ReadKrb5ConfValue (add (pam_p,"proxiable"), "false");
+	minimum_uid	= ReadKrb5ConfValue (add (pam_p, "minimum_uid"), "1");
+
+	foreach (string key, [ "keytab", "ccache_dir", "ccname_template",
+	    "mappings", "existing_ticket", "external", "validate", "use_shmem",
+	    "addressless", "debug", "debug_sensitive",
+	    "initial_prompt", "subsequent_prompt", "banner"],
+	{
+	    string val	= ReadKrb5ConfValue (add (pam_p, key), nil);
+	    if (val != nil)
+		ExpertSettings[key]	= val;
+	});
+	if (!haskey (ExpertSettings, "use_shmem"))
+	    ExpertSettings["use_shmem"]	= "sshd";
+	use_shmem	= ExpertSettings["use_shmem"]:"sshd";
+	if (!haskey (ExpertSettings, "external"))
+	    ExpertSettings["external"]	= "sshd";
+
+	OrigExpertSettings	= ExpertSettings;
+
+	trusted_servers	= ReadKrb5ConfValue (.etc.krb5_conf.v.pkinit.trusted_servers, "");
+    }
+    else
+        SCR::Execute (.target.bash, sformat("/usr/bin/touch /etc/krb5.conf"));
+
+    // propose some good values, if there are install defaults
+    if (default_domain == "")
+    {
+	default_domain	= Hostname::CurrentDomain ();
+	// workaround for bug#393951
+	if (default_domain == "" && Stage::cont ())
+	{
+	    map out = (map) SCR::Execute (.target.bash_output, "domainname");
+	    if (out["exit"]:0 == 0)
+		default_domain	= deletechars (out["stdout"]:"", "\n");
+	}
+    }
+
+    // now, check DNS status (Fate 301812)
+    if (FileUtils::Exists ("/usr/bin/dig") && default_domain != "" &&
+	!Mode::test ())
+    {
+	map out = (map) SCR::Execute (.target.bash_output, sformat ("dig TXT _kerberos.%1 +short", default_domain));
+	dns_default_realm = deletechars (out["stdout"]:"", "\n\"");
+	if (dns_default_realm != "")
+	{
+	    out = (map) SCR::Execute (.target.bash_output, sformat ("dig SRV _kerberos._udp.%1 +short", default_domain));
+	    list split = splitstring (deletechars (out["stdout"]:"", "\n")," ");
+	    dns_kdc	= split[3]:"";
+	    if (dns_kdc != "" &&
+		substring (dns_kdc, size (dns_kdc) - 1, 1) == ".")
+		dns_kdc	= substring (dns_kdc, 0, size (dns_kdc) - 1);
+	    if (dns_kdc != "")
+		dns_available = true;
+	    // empty domain_realm section and no kdc entry defined and
+	    // values via DNS are available -> DNS is used
+	    if (kdc == "" &&
+		(!contains ((list)SCR::Dir(.etc.krb5_conf.s), "domain_realm") ||
+		SCR::Dir(.etc.krb5_conf.v.domain_realm) == []))
+	    {
+		dns_used	= true;
+		kdc		= dns_kdc;
+		default_realm	= dns_default_realm;
+		y2milestone ("kdc by DNS %1, default_domain: %2",
+		    dns_kdc, dns_default_realm);
+		y2milestone ("DNS is used for Kerberos data");
+	    }
+	}
+    }
+
+    if ((default_realm == "" || default_realm == "MY.REALM" ||
+	 default_realm == "EXAMPLE.COM") &&
+        default_domain != "")
+    {
+        default_realm = toupper (default_domain);
+    }
+    if ((kdc == "" || kdc == "MY.COMPUTER" || kdc == "kerberos.example.com") &&
+	FileUtils::Exists ("/usr/bin/ypwhich"))
+    {
+        map out = (map) SCR::Execute (.target.bash_output, "/usr/bin/ypwhich");
+        kdc = deletechars (out["stdout"]:"", "\n");
+    }
+    if ((kdc == "" || kdc == "MY.COMPUTER" || kdc == "kerberos.example.com") &&
+	FileUtils::Exists ("/usr/bin/host"))
+    {
+	string proposed	= "kdc." + Hostname::CurrentDomain ();
+	map m = (map)SCR::Execute (.target.bash_output,
+            sformat ("LANG=C /usr/bin/host %1 | /bin/grep address", proposed));
+        if (m["exit"]:1 == 0)
+	    kdc	= proposed;
+	y2milestone ("no kdc defined, proposing: %1", kdc);
+    }
+
+    // read ssh support
+    y2debug ("ssh_config sections: %1", SCR::Dir (.etc.ssh.ssh_config.s));
+    string hostname = Hostname::CurrentHostname ();
+
+    ssh_support = nil;
+    foreach (string sec, SCR::Dir (.etc.ssh.ssh_config.s), ``{
+	// according to ssh man page, first value is taken:
+	if (ssh_support != nil)
+	    return;
+
+	list cont = SCR::Dir (add(.etc.ssh.ssh_config.v, sec));
+	y2debug ("section %1 contains: %2", sec, cont);
+
+	if ((sec == "*" || sec == hostname) &&
+	   (contains (cont, "GSSAPIAuthentication") &&
+	    contains (cont, "GSSAPIDelegateCredentials")))
+	{
+	    ssh_support =
+		(SCR::Read (add (add (.etc.ssh.ssh_config.v, sec),
+		    "GSSAPIAuthentication")) == "yes") &&
+		(SCR::Read (add (add (.etc.ssh.ssh_config.v, sec),
+		    "GSSAPIDelegateCredentials")) == "yes");
+	    ssh_section = sec;
+	}
+    });
+    if (ssh_support == nil)
+	ssh_support = false;
+
+    sssd	= Pam::Enabled ("sss");
+
+    return true;
+}
+
+
+/**
+ * Saves Kerberos configuration.
+ * (No parameters because it is too short to abort)
+ * @return true on success
+ */
+global define boolean Write () ``{
+
+    boolean pam_installed = false;
+    boolean ret = true;
+
+    // dialog caption
+    string caption = _("Saving Kerberos Client Configuration");
+
+    integer no_stages = 3;
+    list<string> stages =  [
+	    // progress stage label
+	    _("Write PAM settings"),
+	    // progress stage label
+	    _("Write Kerberos client settings"),
+	    // progress stage label
+	    _("Write OpenSSH settings"),
+    ];
+    list steps = [
+	    // progress step label
+	    _("Writing PAM settings..."),
+	    // progress step label
+	    _("Writing Kerberos client settings..."),
+	    // progress step label
+	    _("Writing OpenSSH settings..."),
+	    // final progress step label
+	    _("Finished")
+    ];
+    if (packages != [])
+    {
+	// progress stage label
+	stages = prepend (stages, _("Install required packages"));
+	// progress step label
+	steps = prepend (steps, _("Installing required packages..."));
+	no_stages = no_stages + 1;
+    }
+
+    Progress::New(caption, " ", no_stages, stages, steps, "");
+
+    if (packages != [])
+    {
+	y2debug ("packages to install: %1", packages);
+	Progress::NextStage ();
+	list<string> to_install = [];
+	// check if packages are avialable...
+	foreach (string p, packages, ``{
+	    if (Package::Available (p) == true)
+		to_install = add (to_install, p);
+	});
+	Package::DoInstallAndRemove (to_install, []);
+
+	packages = [];
+    }
+
+    Progress::NextStage ();
+
+    // -- pam settings
+    if (pam_modified || write_only)
+    {
+	// whem sssd is configured, do not use pam_krb5 and update sssd.conf
+	// fate#308902
+	if (sssd)
+	{
+	    y2milestone ("not using pam_krb5 because sssd is configured");
+	    Pam::Remove ("krb5");
+
+	    y2milestone ("updating sssd.conf with new kerberos values");
+
+	    path domain     = add (.etc.sssd_conf.v, "domain/default");
+	    SCR::Write (add (domain, "auth_provider"), "krb5");
+	    SCR::Write (add (domain, "chpass_provider"), "krb5");
+	    SCR::Write (add (domain, "krb5_realm"), default_realm);
+	    SCR::Write (add (domain, "krb5_kdcip"), kdc);
+	    if (!SCR::Write(.etc.sssd_conf, nil))
+	    {
+		y2error ("error writing ldap.conf file");
+	    }
+	}
+        else if (use_pam_krb)
+        {
+	    Pam::Add ("krb5");
+	    // If ldap is configured we need to change it to ldap-account_only
+	    if (Pam::Enabled("ldap"))
+		Pam::Add("ldap-account_only");
+	    if (ignore_unknown)
+		Pam::Add ("krb5-ignore_unknown_principals");
+	    else
+		Pam::Remove ("krb5-ignore_unknown_principals");
+        }
+        else
+        {
+	    // if ldap-account_only is used we need to change it to ldap
+	    if (Pam::Enabled("ldap-account_only"))
+		Pam::Add("ldap");
+	    Pam::Remove ("krb5");
+        }
+    }
+
+    // -- write to /etc/krb5.conf
+    Progress::NextStage ();
+
+    if (modified && !dns_used)
+    {
+	// change the default realm name
+	WriteKrb5ConfValue (.etc.krb5_conf.v.libdefaults.default_realm, default_realm);
+
+	// write the mapping domain-realm
+	if (default_domain != "")
+	{
+	    string domain = default_domain;
+	    if ( findfirstof (domain, ".") != 0)
+		domain = "." + domain;
+	    WriteKrb5ConfValue (add(.etc.krb5_conf.v.domain_realm,domain),
+		default_realm);
+	}
+
+	WriteKrb5ConfValue (.etc.krb5_conf.v.libdefaults.clockskew, clockskew);
+
+	if (contains (SCR::Dir(.etc.krb5_conf.s), default_realm))
+	{
+	    // update the default realm settings
+	    WriteKrb5ConfValuesAsString (add (add (.etc.krb5_conf.v, default_realm),"kdc"),kdc);
+	    if (default_domain != "" && default_domain != nil)
+		WriteKrb5ConfValue (add (add (.etc.krb5_conf.v, default_realm),
+		    "default_domain"), default_domain);
+	    if (admin_server == "")
+		// save only when the entry was mising or same as KDC
+		WriteKrb5ConfValuesAsString (add (add (.etc.krb5_conf.v, default_realm),
+		    "admin_server"),kdc);
+	}
+	else if (default_realm != "")
+	{
+	    // specify the type of this subsection
+	    SCR::Write( add (.etc.krb5_conf.st.realms, default_realm), [1]);
+	    // write the settings of the new default realm
+	    WriteKrb5ConfValuesAsString (
+		add (add(.etc.krb5_conf.v.realms,default_realm),"kdc"), kdc);
+	    if (default_domain != "" && default_domain != nil)
+		WriteKrb5ConfValue (add (add (.etc.krb5_conf.v.realms, default_realm),
+		    "default_domain"), default_domain);
+	    if (admin_server == "")
+		WriteKrb5ConfValuesAsString (add (add (.etc.krb5_conf.v.realms, default_realm),
+		    "admin_server"), kdc);
+	}
+    }
+    if (modified)
+    {
+	/*
+	    3. Yes, if the user chooses DNS you need to remove the domain_realm
+	    section (so that the domain->realm mapping can be read through DNS)
+	    and at least the complete sub-section describing the realm
+	    (maybe even the whole [realms]-section).
+	*/
+	if (dns_used)
+	{
+	    y2milestone ("DNS set to use: removing domain info from krb5.conf");
+	    WriteKrb5ConfValue (.etc.krb5_conf.s.domain_realm, nil);
+	    WriteKrb5ConfValue (add (.etc.krb5_conf.s, default_realm), nil);
+	    // write the default realm name
+	    WriteKrb5ConfValue (.etc.krb5_conf.v.libdefaults.default_realm,
+		default_realm);
+	}
+
+	// write advanced settings
+	path pam_sect = .etc.krb5_conf.v.pam;
+	if (!contains (SCR::Dir(.etc.krb5_conf.s), "pam"))
+	{
+	    // specify the type of new subsection
+	    SCR::Write(.etc.krb5_conf.st.appdefaults.pam, [1]);
+	    pam_sect = .etc.krb5_conf.v.appdefaults.pam;
+	}
+
+	WriteKrb5ConfValue (add (pam_sect, "ticket_lifetime"), ticket_lifetime);
+	WriteKrb5ConfValue (add (pam_sect, "renew_lifetime"), renew_lifetime);
+	WriteKrb5ConfValue (add (pam_sect, "forwardable"), forwardable);
+	WriteKrb5ConfValue (add (pam_sect, "proxiable"), proxiable);
+	WriteKrb5ConfValue (add (pam_sect, "minimum_uid"), minimum_uid);
+
+	foreach (string key, any value, ExpertSettings, {
+	    path pth	= add (pam_sect, key);
+	    if (is (value, boolean))
+	    {
+		WriteKrb5ConfValue (pth, value == true ? "true" : "false");
+		return;
+	    }
+	    // rest is string
+	    if (value != "")
+		WriteKrb5ConfValue (pth, (string) value);
+	    // removin
+	    else if (OrigExpertSettings[key]:"" != "")
+		WriteKrb5ConfValue (pth, nil);
+	});
+
+	if (trusted_servers != "" &&
+	    Package::Installed ("krb5-plugin-preauth-pkinit-nss"))
+	{
+	    path pkinit_sect	= .etc.krb5_conf.v.pkinit;
+	    if (!contains (SCR::Dir(.etc.krb5_conf.s), "pkinit"))
+	    {
+		SCR::Write (.etc.krb5_conf.st.appdefaults.pkinit, [1]);
+		pkinit_sect	= .etc.krb5_conf.v.appdefaults.pkinit;
+	    }
+	    WriteKrb5ConfValue (
+		add (pkinit_sect, "trusted_servers"), trusted_servers);
+	    if (FileUtils::Exists ("/etc/pam_pkcs11/pam_pkcs11.conf"))
+	    {
+		SCR::Write (add (add (.etc.pam_pkcs11_conf.v.pam_pkcs11, "mapper ms"), "domainname"), default_realm);
+		SCR::Write (add (add (.etc.pam_pkcs11_conf.v.pam_pkcs11, "mapper ms"), "domainnickname"), default_domain);
+		SCR::Write (.etc.pam_pkcs11_conf, nil);
+	    }
+	}
+
+	// write the changes now
+	SCR::Write (.etc.krb5_conf, nil);
+
+	// unmount agent; otherwise it won't be available to read new created
+	// sections (it will treat DEFAULT_REALM as a subsection of [realms])
+	SCR::UnmountAgent (.etc.krb5_conf);
+    }
+
+    // -- write openssh settings
+    Progress::NextStage ();
+
+    if (ssh_modified)
+    {
+	string write = ssh_support ? "yes": "no";
+	SCR::Write (add (add (.etc.ssh.ssh_config.v, ssh_section),
+	    "GSSAPIAuthentication"), write);
+	SCR::Write (add (add (.etc.ssh.ssh_config.v, ssh_section),
+	    "GSSAPIDelegateCredentials"), write);
+	SCR::Write (.etc.ssh.ssh_config, nil);
+	y2milestone ("/etc/ssh/ssh_config modified");
+    }
+
+    // final stage
+    Progress::NextStage ();
+
+    return ret;
+}
+
+/**
+ * Create a textual summary
+ * @return summary of the current configuration
+ */
+global define list Summary() ``{
+
+    string summary = "";
+    string nc = Summary::NotConfigured ();
+    // summary header
+    summary = Summary::AddHeader(summary, _("PAM Login"));
+
+    // summary item
+    summary = Summary::AddLine(summary, (use_pam_krb) ? _("Use Kerberos") :
+	// summary item
+	_("Do Not Use Kerberos"));
+
+    // summary header
+    summary = Summary::AddHeader(summary, _("Default Realm"));
+    summary = Summary::AddLine(summary, (default_realm != "") ? default_realm : nc);
+
+    // summary header
+    summary = Summary::AddHeader(summary, _("Default Domain"));
+    summary = Summary::AddLine(summary, (default_domain != "") ? default_domain : nc);
+
+    // summary header
+    summary = Summary::AddHeader(summary, _("KDC Server Address"));
+    summary = Summary::AddLine(summary, (kdc != "") ? kdc : nc);
+
+    // summary header
+    summary = Summary::AddHeader(summary, _("Clock Skew"));
+    summary = Summary::AddLine(summary, (clockskew != "") ? clockskew : nc);
+
+    return [ summary, [] ];
+}
+
+/**
+ * Create a short textual summary
+ * @return summary of the current configuration
+ */
+global define string ShortSummary() ``{
+
+    string summary = "";
+    string nc = Summary::NotConfigured ();
+    // summary text, %1 is value
+    summary = sformat(_("<b>KDC Server</b>: %1<br>"), (kdc != "") ? kdc : nc) +
+    // summary text, %1 is value
+    sformat (_("<b>Default Domain</b>: %1<br>"), (default_domain != "") ?
+	default_domain : nc) +
+    // summary text, %1 is value
+    sformat (_("<b>Default Realm</b>: %1<br>"), (default_realm != "") ?
+	default_realm : nc) +
+    // summary text (yes/no follows)
+    sformat(_("<b>Kerberos Authentication Enabled</b>: %1"), use_pam_krb ?
+	// summary value
+	_("Yes") :
+	// summary value
+	_("No"));
+    if (dns_used)
+	// summary line
+	summary	= summary + "<br>" + _("Configuration Acquired via DNS");
+
+    return summary;
+}
+
+/**
+ * Return the list of packages for kerberos configuration
+ */
+global list<string> RequiredPackages () {
+
+    list<string> pkgs	= required_packages;
+    // do not install pam_krb5 if sssd is configured
+    if (sssd)
+    {
+	pkgs	= filter (string p, pkgs, ``(p != "pam_krb5"));
+    }
+    return pkgs;
+}
+
+
+/**
+ * Return required packages for auto-installation
+ * @return map of packages to be installed and to be removed
+ */
+global define map AutoPackages() {
+    return ($[
+	"install": RequiredPackages (),
+	"remove": []
+    ]);
+}
+
+/**
+ * Validation function for time-related values
+ */
+global boolean ValidateTimeEntries (string key, string val) {
+    if (!regexpmatch (val, "^([0-9]+)[dmh]$") &&
+	!regexpmatch (val, "^([0-9]+)$"))
+    {
+	if (key == "clockskew")
+	    // error popup (wrong format of entered value)
+	    Report::Error (_("Clock skew is invalid.
+Try again.
+"));
+	else
+	    // error popup (wrong format of entered value)
+	    Report::Error (_("Lifetime is invalid.
+Try again."));
+	return false;
+    }
+    return true;
+}
+
+
+/* EOF */
+}

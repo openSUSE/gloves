@@ -1,0 +1,12 @@
+/**
+ * File:	clients/kerberos-client.ycp
+ * Package:	Configuration of kerberos-client
+ * Summary: Just a redirection
+ * Authors:  Jiri Suchomel <jsuchome@suse.cz>
+ * $Id: kerberos-client.ycp 7628 2003-01-09 09:34:35Z jsuchome $
+ */
+
+{
+    string target = "kerberos";
+    return WFM::CallFunction (target, WFM::Args ());
+}
