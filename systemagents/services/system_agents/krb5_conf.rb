@@ -52,7 +52,10 @@ module SystemAgents
 	end
       end
 
-      # FIXME read/write trusted_servers
+      # read trusted_servers
+      unless aug.get("/files/etc/krb5.conf/pkinit/trusted_servers").nil?
+	krb5_conf["trusted_servers"]	= aug.get("/files/etc/krb5.conf/pkinit/trusted_servers")
+      end
 
       aug.close
       return krb5_conf
@@ -100,7 +103,10 @@ module SystemAgents
       unless (default_realm.nil? || default_domain.nil?)
 	aug.set("/files/etc/krb5.conf/domain_realm/." + default_domain, default_realm)
       end
-      
+# FIXME remove domain_realm  default_realm sections in case DNS is used
+# (should this be on agent level?)
+            
+# FIXME when yast2-kerberos-client wrote ExpertSettings, there was a chance to remove the key
       # write appdefaults/pam section
       ["ticket_lifetime", "renew_lifetime", "forwardable", "proxiable", "minimum_uid",
        "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
@@ -109,6 +115,8 @@ module SystemAgents
 	  
 	aug.set("/files/etc/krb5.conf/appdefaults/application/" + pam_key, params[pam_key]) unless params[pam_key].nil?
       end
+
+# FIXME write trusted_servers
 
       ret	= {
 	"success"	=> true
