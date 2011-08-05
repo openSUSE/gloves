@@ -47,12 +47,18 @@ module KerberosClient
 
   def self.write(params)
 
+    ret		= {
+	"success"	=> true
+    }
     # save config file settings
     krb5_conf	= params["kerberos_client"]
-    krb5_conf	= {} if krb5_conf.nil?
-    ret = SystemAgent::Krb5Conf.write(krb5_conf)
+    unless krb5_conf.nil? && krb5_conf.empty?
+      ret	= SystemAgent::Krb5Conf.write(krb5_conf)
+      return ret unless ret["success"] 
+    end
 
-    return ret unless ret["success"] 
+    # no changes in PAM config
+    return ret if params["pam_login"].nil? || params["pam_login"].empty?
 
     # update PAM configuration
     sssd	= params["pam_login"]["sssd"]
@@ -75,7 +81,6 @@ module KerberosClient
       pam_delete("krb5")
       # Kerberos removed from combined LDAP+Kerberos setup
       pam_add("ldap") if pam_query("ldap-account_only")
-
     end
 
     return ret
