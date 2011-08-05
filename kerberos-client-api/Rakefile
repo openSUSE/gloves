@@ -1,0 +1,7 @@
+require "rake"
+
+desc "install all things on system"
+task :install do
+  sh "cp kerberos_client.rb /usr/share/YaST2/modules"
+  sh "ln -s /usr/share/YaST2/modules/kerberos_client.rb /usr/share/YaST2/modules/KerberosClient.rb"
+end
