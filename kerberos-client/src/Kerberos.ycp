@@ -21,12 +21,14 @@ import "Hostname";
 import "Label";
 import "Mode";
 import "Package";
-import "Pam";
 import "Progress";
 import "Report";
 import "Service";
 import "Stage";
 import "Summary";
+
+// ruby API
+import "KerberosClient";
 
 /**
  * Required packages for this module to operate
@@ -129,8 +131,22 @@ global define boolean Import (map settings) ``{
     ticket_lifetime	= client["ticket_lifetime"]:"1d";
     renew_lifetime	= client["renew_lifetime"]:"1d";
     minimum_uid		= client["minimum_uid"]:minimum_uid;
-    forwardable		= (client["forwardable"]:true) ? "true": "false";
-    proxiable		= (client["proxiable"]:false) ?   "true" :  "false";
+    if (is (client["forwardable"]:nil, string))
+    {
+	forwardable	= client["forwardable"]:forwardable;
+    }
+    else
+    {
+	forwardable	= (client["forwardable"]:true) ? "true": "false";
+    }
+    if (is (client["proxiable"]:nil, string))
+    {
+	proxiable	= client["proxiable"]:proxiable;
+    }
+    else
+    {
+	proxiable	= (client["proxiable"]:false) ?   "true" :  "false";
+    }
     use_shmem		= client["use_shmem"]:use_shmem;
     mappings		= client["mappings"]:"";
     trusted_servers	= client["trusted_servers"]:"";
@@ -138,7 +154,7 @@ global define boolean Import (map settings) ``{
     if (!haskey (ExpertSettings, "use_shmem") && haskey (client, "use_shmem"))
 	ExpertSettings["use_shmem"]	= use_shmem;
 
-    sssd		= settings["sssd"]:sssd;
+    sssd		= settings["pam_login","sssd"]:sssd;
     pam_modified	= true;
     modified		= true;
     ssh_modified	= true;
@@ -180,150 +196,38 @@ global define map Export () ``{
 }
 
 /**
- * Reads the item values from the /etc/krb5.conf via ini agent
- * If the item doesn't exist, returns the default value
- * @param path_to_value path for agent (.etc.krb5_conf)
- * @param def_value default value for the key (path)
- * @return list string the values for given key
- */
-global list<string> ReadKrb5ConfValues (path path_to_value, string def_value) ``{
-
-    list<string> value = (list<string>) SCR::Read (path_to_value);
-    if (value == nil)
-        value = [def_value];
-    return value;
-}
-
-/**
- * Reads the item value from the /etc/krb5.conf via ini agent
- * If the item doesn't exist, returns the default value
- * @param path_to_value path for agent (.etc.krb5_conf)
- * @param def_value default value for the key (path)
- * @return string the value
- */
-global string ReadKrb5ConfValue (path path_to_value, string def_value) {
-
-    list vals	= ReadKrb5ConfValues (path_to_value, def_value);
-    return vals[0]:def_value;
-}
-
-/**
- * Deprecated variant to ReadKrb5ConfValue
- * @deprecated
- */
-global string ReadFile (path path_to_value, string def_value) {
-
-    y2warning ("This function is deprecated, use ReadKrb5ConfValue instead.");
-    return ReadKrb5ConfValue (path_to_value, def_value);
-}
-
-/**
- * Write list of values for given key to /etc/krb5.conf
- * Do not write anything for empty and nil values
- * @param path_to_value path for agent (.etc.krb5_conf)
- * @param value
- * @return false when nothing was written, success of write otherwise
- */
-global boolean WriteKrb5ConfValues (path path_to_value, list<string> values) {
-
-    if (values == nil || values == [])
-	return SCR::Write (path_to_value, nil);
-    return SCR::Write (path_to_value, values);
-}
-
-/**
- * Write (possible) multiple values of given key to /etc/krb5.conf
- * @param values values separated by spaces
- */
-global boolean WriteKrb5ConfValuesAsString (path path_to_value, string values) {
-
-    return WriteKrb5ConfValues (path_to_value,
-	filter (string val, splitstring (values, " \t"), ``(val != "")));
-}
-/**
- * Write the item value to /etc/krb5.conf
- * Do not write anything for empty and nil values
- * @param path_to_value path for agent (.etc.krb5_conf)
- * @param value
- * @return false when nothing was written, success of write otherwise
- */
-global boolean WriteKrb5ConfValue (path path_to_value, string value) {
-
-    if (value == nil || value == "")
-	return SCR::Write (path_to_value, nil);
-    return WriteKrb5ConfValues (path_to_value, [value]);
-}
-
-/**
- * Deprecated variant to WriteKrb5ConfValue
- * @deprecated
- */
-global define boolean WriteFile (path path_to_value, string value) {
-
-    y2warning ("This function is deprecated, use WriteKrb5ConfValue instead.");
-    return WriteKrb5ConfValue (path_to_value, value);
-}
-
-
-
-/**
  * Reads Kerberos settings from the SCR
  * @return success
  */
 global define boolean Read () ``{
 
-    map pam_query	= Pam::Query ("krb5");
-    use_pam_krb		= size (pam_query) > 0;
-    if (use_pam_krb) // if krb is not enabled, ignore_unknown is true by default
-	ignore_unknown	= contains (pam_query["account"]:[], "ignore_unknown_principals");
 
-    // now read the settings from /etc/krb5.conf
-    if (FileUtils::Exists ("/etc/krb5.conf"))
-    {
-        y2debug("krb5.conf sections: %1", SCR::Dir(.etc.krb5_conf.s));
+    map read	= (map) KerberosClient::read ($[]);
 
-        default_realm = ReadKrb5ConfValue(.etc.krb5_conf.v.libdefaults.default_realm,"");
+    y2internal ("read: %1", read);
 
-        clockskew = ReadKrb5ConfValue (.etc.krb5_conf.v.libdefaults.clockskew, "300");
+    Import (read);
 
-	if (size (default_realm) > 0)
-	{
-	    path realm	= add (.etc.krb5_conf.v, default_realm);
-	    kdc		= mergestring (ReadKrb5ConfValues (add (realm, "kdc"),""), " ");
-	    admin_server = mergestring (ReadKrb5ConfValues(add (realm, "admin_server"),""), " ");
-	    default_domain = ReadKrb5ConfValue (add (realm,"default_domain"), "");
-	}
-	if (admin_server == kdc)
-	    admin_server = ""; // we could replace it in Write in this case...
+    // Expert settings are directly in 'read' map
 
-	path pam_p	= .etc.krb5_conf.v.pam;
-	ticket_lifetime = ReadKrb5ConfValue (add(pam_p,"ticket_lifetime"),"1d");
-	renew_lifetime	= ReadKrb5ConfValue (add (pam_p,"renew_lifetime"),"1d");
-	forwardable	= ReadKrb5ConfValue (add (pam_p,"forwardable"), "true");
-	proxiable	= ReadKrb5ConfValue (add (pam_p,"proxiable"), "false");
-	minimum_uid	= ReadKrb5ConfValue (add (pam_p, "minimum_uid"), "1");
-
-	foreach (string key, [ "keytab", "ccache_dir", "ccname_template",
+    foreach (string key, [ "keytab", "ccache_dir", "ccname_template",
 	    "mappings", "existing_ticket", "external", "validate", "use_shmem",
 	    "addressless", "debug", "debug_sensitive",
 	    "initial_prompt", "subsequent_prompt", "banner"],
-	{
-	    string val	= ReadKrb5ConfValue (add (pam_p, key), nil);
-	    if (val != nil)
-		ExpertSettings[key]	= val;
-	});
-	if (!haskey (ExpertSettings, "use_shmem"))
-	    ExpertSettings["use_shmem"]	= "sshd";
-	use_shmem	= ExpertSettings["use_shmem"]:"sshd";
-	if (!haskey (ExpertSettings, "external"))
-	    ExpertSettings["external"]	= "sshd";
+    {
+	if (read[key]:nil != nil)
+	    ExpertSettings[key]	= read[key]:nil;
+    });
+    if (!haskey (ExpertSettings, "use_shmem"))
+	ExpertSettings["use_shmem"]	= "sshd";
+    use_shmem	= ExpertSettings["use_shmem"]:"sshd";
 
-	OrigExpertSettings	= ExpertSettings;
+    if (!haskey (ExpertSettings, "external"))
+	ExpertSettings["external"]	= "sshd";
 
-	trusted_servers	= ReadKrb5ConfValue (.etc.krb5_conf.v.pkinit.trusted_servers, "");
-    }
-    else
-        SCR::Execute (.target.bash, sformat("/usr/bin/touch /etc/krb5.conf"));
+
+    // FIXME trusted_servers not read
+    // trusted_servers	= ReadKrb5ConfValue (.etc.krb5_conf.v.pkinit.trusted_servers, "");
 
     // propose some good values, if there are install defaults
     if (default_domain == "")
@@ -421,7 +325,10 @@ global define boolean Read () ``{
     if (ssh_support == nil)
 	ssh_support = false;
 
-    sssd	= Pam::Enabled ("sss");
+    // nothing modified after pure read (negate Import's setting)
+    pam_modified	= false;
+    modified		= false;
+    ssh_modified	= false;
 
     return true;
 }
@@ -487,143 +394,27 @@ global define boolean Write () ``{
 
     Progress::NextStage ();
 
-    // -- pam settings
-    if (pam_modified || write_only)
+    map write	= Export ();
+
+    y2internal ("export map: %1", write);
+
+    if (!(pam_modified || write_only))
     {
-	// whem sssd is configured, do not use pam_krb5 and update sssd.conf
-	// fate#308902
-	if (sssd)
-	{
-	    y2milestone ("not using pam_krb5 because sssd is configured");
-	    Pam::Remove ("krb5");
-
-	    y2milestone ("updating sssd.conf with new kerberos values");
-
-	    path domain     = add (.etc.sssd_conf.v, "domain/default");
-	    SCR::Write (add (domain, "auth_provider"), "krb5");
-	    SCR::Write (add (domain, "chpass_provider"), "krb5");
-	    SCR::Write (add (domain, "krb5_realm"), default_realm);
-	    SCR::Write (add (domain, "krb5_kdcip"), kdc);
-	    if (!SCR::Write(.etc.sssd_conf, nil))
-	    {
-		y2error ("error writing ldap.conf file");
-	    }
-	}
-        else if (use_pam_krb)
-        {
-	    Pam::Add ("krb5");
-	    // If ldap is configured we need to change it to ldap-account_only
-	    if (Pam::Enabled("ldap"))
-		Pam::Add("ldap-account_only");
-	    if (ignore_unknown)
-		Pam::Add ("krb5-ignore_unknown_principals");
-	    else
-		Pam::Remove ("krb5-ignore_unknown_principals");
-        }
-        else
-        {
-	    // if ldap-account_only is used we need to change it to ldap
-	    if (Pam::Enabled("ldap-account_only"))
-		Pam::Add("ldap");
-	    Pam::Remove ("krb5");
-        }
+	write	= remove (write, "pam_login");
     }
+    if (!modified)
+    {
+	write	= remove (write, "kerberos_client");
+    }
+    y2internal ("map to write: %1", write);
 
     // -- write to /etc/krb5.conf
     Progress::NextStage ();
 
-    if (modified && !dns_used)
-    {
-	// change the default realm name
-	WriteKrb5ConfValue (.etc.krb5_conf.v.libdefaults.default_realm, default_realm);
+    KerberosClient::write (write);
 
-	// write the mapping domain-realm
-	if (default_domain != "")
-	{
-	    string domain = default_domain;
-	    if ( findfirstof (domain, ".") != 0)
-		domain = "." + domain;
-	    WriteKrb5ConfValue (add(.etc.krb5_conf.v.domain_realm,domain),
-		default_realm);
-	}
 
-	WriteKrb5ConfValue (.etc.krb5_conf.v.libdefaults.clockskew, clockskew);
-
-	if (contains (SCR::Dir(.etc.krb5_conf.s), default_realm))
-	{
-	    // update the default realm settings
-	    WriteKrb5ConfValuesAsString (add (add (.etc.krb5_conf.v, default_realm),"kdc"),kdc);
-	    if (default_domain != "" && default_domain != nil)
-		WriteKrb5ConfValue (add (add (.etc.krb5_conf.v, default_realm),
-		    "default_domain"), default_domain);
-	    if (admin_server == "")
-		// save only when the entry was mising or same as KDC
-		WriteKrb5ConfValuesAsString (add (add (.etc.krb5_conf.v, default_realm),
-		    "admin_server"),kdc);
-	}
-	else if (default_realm != "")
-	{
-	    // specify the type of this subsection
-	    SCR::Write( add (.etc.krb5_conf.st.realms, default_realm), [1]);
-	    // write the settings of the new default realm
-	    WriteKrb5ConfValuesAsString (
-		add (add(.etc.krb5_conf.v.realms,default_realm),"kdc"), kdc);
-	    if (default_domain != "" && default_domain != nil)
-		WriteKrb5ConfValue (add (add (.etc.krb5_conf.v.realms, default_realm),
-		    "default_domain"), default_domain);
-	    if (admin_server == "")
-		WriteKrb5ConfValuesAsString (add (add (.etc.krb5_conf.v.realms, default_realm),
-		    "admin_server"), kdc);
-	}
-    }
-    if (modified)
-    {
-	/*
-	    3. Yes, if the user chooses DNS you need to remove the domain_realm
-	    section (so that the domain->realm mapping can be read through DNS)
-	    and at least the complete sub-section describing the realm
-	    (maybe even the whole [realms]-section).
-	*/
-	if (dns_used)
-	{
-	    y2milestone ("DNS set to use: removing domain info from krb5.conf");
-	    WriteKrb5ConfValue (.etc.krb5_conf.s.domain_realm, nil);
-	    WriteKrb5ConfValue (add (.etc.krb5_conf.s, default_realm), nil);
-	    // write the default realm name
-	    WriteKrb5ConfValue (.etc.krb5_conf.v.libdefaults.default_realm,
-		default_realm);
-	}
-
-	// write advanced settings
-	path pam_sect = .etc.krb5_conf.v.pam;
-	if (!contains (SCR::Dir(.etc.krb5_conf.s), "pam"))
-	{
-	    // specify the type of new subsection
-	    SCR::Write(.etc.krb5_conf.st.appdefaults.pam, [1]);
-	    pam_sect = .etc.krb5_conf.v.appdefaults.pam;
-	}
-
-	WriteKrb5ConfValue (add (pam_sect, "ticket_lifetime"), ticket_lifetime);
-	WriteKrb5ConfValue (add (pam_sect, "renew_lifetime"), renew_lifetime);
-	WriteKrb5ConfValue (add (pam_sect, "forwardable"), forwardable);
-	WriteKrb5ConfValue (add (pam_sect, "proxiable"), proxiable);
-	WriteKrb5ConfValue (add (pam_sect, "minimum_uid"), minimum_uid);
-
-	foreach (string key, any value, ExpertSettings, {
-	    path pth	= add (pam_sect, key);
-	    if (is (value, boolean))
-	    {
-		WriteKrb5ConfValue (pth, value == true ? "true" : "false");
-		return;
-	    }
-	    // rest is string
-	    if (value != "")
-		WriteKrb5ConfValue (pth, (string) value);
-	    // removin
-	    else if (OrigExpertSettings[key]:"" != "")
-		WriteKrb5ConfValue (pth, nil);
-	});
-
+	/* FIXME trusted_servers not done yet
 	if (trusted_servers != "" &&
 	    Package::Installed ("krb5-plugin-preauth-pkinit-nss"))
 	{
@@ -642,14 +433,7 @@ global define boolean Write () ``{
 		SCR::Write (.etc.pam_pkcs11_conf, nil);
 	    }
 	}
-
-	// write the changes now
-	SCR::Write (.etc.krb5_conf, nil);
-
-	// unmount agent; otherwise it won't be available to read new created
-	// sections (it will treat DEFAULT_REALM as a subsection of [realms])
-	SCR::UnmountAgent (.etc.krb5_conf);
-    }
+    */
 
     // -- write openssh settings
     Progress::NextStage ();
