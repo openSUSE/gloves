@@ -1,7 +1,9 @@
-Just playground. No production
+Just a playground. Not for production use.
 
 How to try it:
 install rubygem-ruby-augeas from OBS
-rake install (need root permissions so use sudo or be root)
-cd kerberos-client
+    sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_11.4/ rubyext
+    sudo zypper in rubygem-ruby-augeas
+sudo rake install
+cd kerberos-client-api
 ruby kerberos_conf
