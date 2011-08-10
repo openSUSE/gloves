@@ -4,15 +4,23 @@ module DbusServices
   class FileService < DbusService
     FILE_INTERFACE = "org.opensuse.systemagents.file"
     dbus_interface(FILE_INTERFACE) do
-      dbus_method :read, "out result:a{sv}, in params:a{sv}" do |params,user|
-        #TODO permissions check
-        [read(params)]
-        #TODO exception rescue
+      dbus_method :read, "out result:a{sv}, in params:a{sv}" do |params,sender|
+        begin
+          permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.read"
+          check_permissions sender, permission_name, params
+          [read(params)]
+        rescue Exception => e
+          [{ "error" => e.message }]
+        end
       end
       dbus_method :write, "out result:a{sv}, in params:a{sv}" do |params,user|
-        #TODO permissions check
-        [write(params)]
-        #TODO exception rescue
+        begin
+          permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.write"
+          check_permissions sender, permission_name, params
+          [write(params)]
+        rescue Exception => e
+          [{ "error" => e.message }]
+        end
       end
     end
 

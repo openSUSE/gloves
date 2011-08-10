@@ -1,7 +1,10 @@
 module DbusServices
-  module PolkitChecker
-    def check_permissions permission, options={}
+  module PolicykitChecker
+    def check_permissions sender,permission, options={}
       bus = DBus::SystemBus.instance
+      uid = bus.proxy.GetConnectionUnixUser(sender)[0]
+      return if uid == 0 #skip check of permission for root
+      pid = bus.proxy.GetConnectionUnixProcessID(sender)[0]
       rb_service = bus.service "org.freedesktop.PolicyKit1"
       instance = rb_service.object "/org/freedesktop/PolicyKit/Authority"
       instance.introspect #to get interfaces
@@ -9,8 +12,7 @@ module DbusServices
       interactive = !(options.delete "only_noninteractive_permission_check")
       flags = 0
       flags &= 1 if interactive
-      #TODO get somehow correct subject
-      result = iface.CheckAuthorization SUBJECT,permission, {}, flags,""
+      result = iface.CheckAuthorization ["unix-process",{"pid"=> pid,"start-time" => Time.now.to_i}],permission, {}, flags,""
       #result structure http://hal.freedesktop.org/docs/polkit/eggdbus-interface-org.freedesktop.PolicyKit1.Authority.html#eggdbus-struct-AuthorizationResult
       raise "invalid permission" unless result[0] 
     end

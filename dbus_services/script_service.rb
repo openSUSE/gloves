@@ -5,10 +5,14 @@ module DbusServices
   class ScriptService < DbusService
     FILE_INTERFACE = "org.opensuse.systemagents.script"
     dbus_interface(FILE_INTERFACE) do
-      dbus_method :execute, "out result:a{sv}, in params:a{sv}" do |params,user|
-        #TODO permissions check
-        [execute(params)]
-        #TODO exception rescue
+      dbus_method :execute, "out result:a{sv}, in params:a{sv}" do |params,sender|
+        begin
+          permission_name = "org.opensuse.systemagents.script.#{self.class.filename}.execute"
+          check_permissions sender, permission_name, params
+          [execute(params)]
+        rescue Exception => e
+          [{ "error" => e.message }]
+        end
       end
     end
 
