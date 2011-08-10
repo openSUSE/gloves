@@ -9,13 +9,7 @@ module SystemAgents
 
     def execute(params)
       exec_params	= params["exec_params"] || ""
-
-      pam_krb5    = `/usr/sbin/pam-config #{exec_params}`
-
-      ret	= {
-        "stdout"	=> pam_krb5
-      }
-      return ret
+      run "/usr/sbin/pam-config #{exec_params}" #FIXME escape parameters
     end
 
   end
