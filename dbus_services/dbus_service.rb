@@ -1,5 +1,6 @@
 require "rubygems"
 require "dbus"
+require "dbus_services/policykit_checker"
 
 module DbusServices
   class DbusService < DBus::Object
