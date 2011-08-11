@@ -4,6 +4,8 @@ How to try it:
 install rubygem-ruby-augeas from OBS
     sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_11.4/ rubyext
     sudo zypper in rubygem-ruby-augeas
+install rubygem-open4
+    sudo zypper in rubygem-open4
 sudo rake install
 cd kerberos-client-api
 ruby kerberos_conf
