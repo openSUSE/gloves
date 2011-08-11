@@ -113,6 +113,7 @@ module SystemAgents
       if params["trusted_servers"]
 	appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
 	pkinit_exists = appdefaults.any? {|sub_path| aug.get(sub_path) == "pkinit" }
+	pkinit_path	= "/files/etc/krb5.conf/appdefaults/application"
 	unless pkinit_exists
 	  # create new subsection
 	  pkinit_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
