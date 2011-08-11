@@ -9,3 +9,10 @@ install rubygem-open4
 sudo rake install
 cd kerberos-client-api
 ruby kerberos_conf
+
+
+How to obtain permission for common user:
+  su
+  mkdir -p /etc/polkit-1/localauthority/
+  mv doc/org.opensuse.systemagents.pkla /etc/polkit-1/localauthority/
+#replace <yourcooluser> with real user in /etc/polkit-1/localauthority/org.opensuse.systemagents.pkla
