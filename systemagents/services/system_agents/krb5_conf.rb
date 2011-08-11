@@ -15,6 +15,12 @@ module SystemAgents
       aug.transform(:lens => "Krb5.lns", :incl => "/etc/krb5.conf")
       aug.load
 
+      # possible error: parse_failed
+      unless aug.get("/augeas/files/etc/krb5.conf/error").nil?
+	aug.close
+	return {}
+      end
+
       default_realm	= aug.get("/files/etc/krb5.conf/libdefaults/default_realm")
       default_realm	= "" if default_realm.nil?
 
@@ -27,8 +33,6 @@ module SystemAgents
 
       realms = aug.match("/files/etc/krb5.conf/realms/realm[*]")
     
-      puts "found realms: #{realms.inspect}"
-
       # read data from relevant realm section
       realms.each do |realm_path|
 	realm	= aug.get(realm_path)
@@ -43,18 +47,12 @@ module SystemAgents
 	end
       end
 
-      # read data from appdefaults/pam section (called 'application' by augeas)
-      unless aug.get("/files/etc/krb5.conf/appdefaults/application").nil?
-	aug.match("/files/etc/krb5.conf/appdefaults/application/*").each do |pam_path|
-	    key	= pam_path.split("/").last
-	    next if key.index("#comment") == 0
-	    krb5_conf[key]	= aug.get(pam_path)
-	end
-      end
-
-      # read trusted_servers
-      unless aug.get("/files/etc/krb5.conf/pkinit/trusted_servers").nil?
-	krb5_conf["trusted_servers"]	= aug.get("/files/etc/krb5.conf/pkinit/trusted_servers")
+      # read data from appdefaults sections (called 'application' by augeas)
+      # there could be 'pam' and 'pkinit' subsections
+      aug.match("/files/etc/krb5.conf/appdefaults/application/*").each do |sub_path|
+	key	= sub_path.split("/").last
+	next if key.index("#comment") == 0
+	krb5_conf[key]	= aug.get(sub_path)
       end
 
       aug.close
@@ -107,6 +105,7 @@ module SystemAgents
 # (should this be on agent level?)
             
 # FIXME when yast2-kerberos-client wrote ExpertSettings, there was a chance to remove the key
+
       # write appdefaults/pam section
       ["ticket_lifetime", "renew_lifetime", "forwardable", "proxiable", "minimum_uid",
        "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
@@ -116,13 +115,25 @@ module SystemAgents
 	aug.set("/files/etc/krb5.conf/appdefaults/application/" + pam_key, params[pam_key]) unless params[pam_key].nil?
       end
 
-# FIXME write trusted_servers
+      # write appdefaults/pkinit section
+      unless unless["trusted_servers"].nil?
+	pkinit_exists	= false
+	appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
+	appdefaults.each do |sub_path|
+	  pkinit_exists	= true if aug.get(sub_path) == "pkinit"
+	end
+	unless pkinit_exists
+	  # create new subsection
+	  pkinit_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
+	  aug.set(pkinit_path, "pkinit")
+	end
+	aug.set(pkinit_path + "/trusted_servers", params["trusted_servers"])
+      end
 
       ret	= {
 	"success"	=> true
       }
       unless aug.save
-	puts "saving /etc/krb5.conf failed"
 	ret["success"]	= false
 	ret["message"]	= aug.get("/augeas/files/etc/krb5.conf/error/message")
       end
