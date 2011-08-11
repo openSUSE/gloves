@@ -78,14 +78,14 @@ module SystemAgents
       realms_save_path ||= ""
 
       # ... or create new realm section
-      if realm_save_path.empty? && !default_realm.nil?
+      if realm_save_path.empty? && default_realm
 	realm_save_path	= "/files/etc/krb5.conf/realms/realm[#{realms.size + 1}]"
 	aug.set(realm_save_path, default_realm)
       end
 
       default_domain	= params["default_domain"]
       unless realm_save_path.empty?
-	unless params["kdc"].nil?
+	if params["kdc"]
 	  aug.set(realm_save_path + "/kdc", params["kdc"])
 	  aug.set(realm_save_path + "/admin_server", params["kdc"])
 	end
@@ -93,7 +93,7 @@ module SystemAgents
       end
 
       # write domain_realm section
-      unless (default_realm.nil? || default_domain.nil?)
+      if default_realm && default_domain
 	aug.set("/files/etc/krb5.conf/domain_realm/." + default_domain, default_realm)
       end
 # FIXME remove domain_realm  default_realm sections in case DNS is used
@@ -106,17 +106,13 @@ module SystemAgents
        "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
        "validate", "use_shmem", "addressless", "debug", "debug_sensitive", "initial_prompt",
        "subsequent_prompt", "banner"].each do |pam_key|
-	  
 	aug.set("/files/etc/krb5.conf/appdefaults/application/" + pam_key, params[pam_key]) unless params[pam_key].nil?
       end
 
       # write appdefaults/pkinit section
-      unless params["trusted_servers"].nil?
-	pkinit_exists	= false
+      if params["trusted_servers"]
 	appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
-	appdefaults.each do |sub_path|
-	  pkinit_exists	= true if aug.get(sub_path) == "pkinit"
-	end
+	pkinit_exists = appdefaults.any? {|sub_path| aug.get(sub_path) == "pkinit" }
 	unless pkinit_exists
 	  # create new subsection
 	  pkinit_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
