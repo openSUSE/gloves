@@ -116,7 +116,7 @@ module SystemAgents
       end
 
       # write appdefaults/pkinit section
-      unless unless["trusted_servers"].nil?
+      unless params["trusted_servers"].nil?
 	pkinit_exists	= false
 	appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
 	appdefaults.each do |sub_path|
