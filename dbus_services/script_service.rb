@@ -11,7 +11,7 @@ module DbusServices
           check_permissions sender, permission_name, params
           [execute(params)]
         rescue Exception => e
-          [{ "error" => e.message }]
+          [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end
       end
     end

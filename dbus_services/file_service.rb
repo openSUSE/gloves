@@ -10,7 +10,7 @@ module DbusServices
           check_permissions sender, permission_name, params
           [read(params)]
         rescue Exception => e
-          [{ "error" => e.message }]
+          [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end
       end
       dbus_method :write, "out result:a{sv}, in params:a{sv}" do |params,user|
@@ -19,7 +19,7 @@ module DbusServices
           check_permissions sender, permission_name, params
           [write(params)]
         rescue Exception => e
-          [{ "error" => e.message }]
+          [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end
       end
     end

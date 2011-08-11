@@ -14,7 +14,8 @@ module DbusServices
       flags &= 1 if interactive
       result = iface.CheckAuthorization ["unix-process",{"pid"=> ["u",pid],"start-time" => ["t",Time.now.to_i]}],permission, {}, flags,""
       #result structure http://hal.freedesktop.org/docs/polkit/eggdbus-interface-org.freedesktop.PolicyKit1.Authority.html#eggdbus-struct-AuthorizationResult
-      raise "invalid permission" unless result[0] 
+      log.info result.inspect
+      raise "Permission not granted - #{permission}" unless result[0][0]
     end
   end
 end
