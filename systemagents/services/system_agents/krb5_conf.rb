@@ -66,22 +66,16 @@ module SystemAgents
 
       # update libdefaults section
       default_realm	= params["default_realm"]
-      default_domain	= params["default_domain"]
 
-      aug.set("/files/etc/krb5.conf/libdefaults/default_realm", default_realm) unless default_realm.nil?
-      aug.set("/files/etc/krb5.conf/libdefaults/clockskew", params["clockskew"]) unless params["clockskew"].nil?
+      aug.set("/files/etc/krb5.conf/libdefaults/default_realm", default_realm) if default_realm
+      aug.set("/files/etc/krb5.conf/libdefaults/clockskew", params["clockskew"]) if params["clockskew"]
 
       # update existing realm section
       realm_save_path		= ""
 
       realms		= aug.match("/files/etc/krb5.conf/realms/realm[*]")
-      realms.each do |realm_path|
-	realm	= aug.get(realm_path)
-	if (!realm.nil? && realm == default_realm)
-	    realm_save_path	= realm_path
-	    break
-	end
-      end
+      realms_save_path = realms.detect { |realm_path| aug.get(realm_path) == default_realm }
+      realms_save_path ||= ""
 
       # ... or create new realm section
       if realm_save_path.empty? && !default_realm.nil?
@@ -89,6 +83,7 @@ module SystemAgents
 	aug.set(realm_save_path, default_realm)
       end
 
+      default_domain	= params["default_domain"]
       unless realm_save_path.empty?
 	unless params["kdc"].nil?
 	  aug.set(realm_save_path + "/kdc", params["kdc"])
