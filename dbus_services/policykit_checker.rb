@@ -12,7 +12,7 @@ module DbusServices
       interactive = !(options.delete "only_noninteractive_permission_check")
       flags = 0
       flags &= 1 if interactive
-      result = iface.CheckAuthorization ["unix-process",{"pid"=> ["u",pid],"start-time" => ["t",Time.now.to_i]}],permission, {}, flags,""
+      result = iface.CheckAuthorization ["system-bus-name",{"name"=> sender}],permission, {}, flags,""
       #result structure http://hal.freedesktop.org/docs/polkit/eggdbus-interface-org.freedesktop.PolicyKit1.Authority.html#eggdbus-struct-AuthorizationResult
       log.info result.inspect
       raise "Permission not granted - #{permission}" unless result[0][0]
