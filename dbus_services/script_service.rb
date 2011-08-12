@@ -10,6 +10,8 @@ module DbusServices
           permission_name = "org.opensuse.systemagents.script.#{self.class.filename}.execute"
           check_permissions sender, permission_name, params
           [execute(params)]
+        rescue BackendException => e
+          [ e.to_hash ]
         rescue Exception => e
           [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end

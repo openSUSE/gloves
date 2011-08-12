@@ -1,4 +1,5 @@
 require "dbus_services/dbus_service"
+require "dbus_services/backend_exception"
 
 module DbusServices
   class FileService < DbusService
@@ -9,6 +10,8 @@ module DbusServices
           permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.read"
           check_permissions sender, permission_name, params
           [read(params)]
+        rescue BackendException => e
+          [ e.to_hash ]
         rescue Exception => e
           [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end
@@ -18,6 +21,8 @@ module DbusServices
           permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.write"
           check_permissions sender, permission_name, params
           [write(params)]
+        rescue BackendException => e
+          [ e.to_hash ]
         rescue Exception => e
           [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end

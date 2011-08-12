@@ -11,7 +11,15 @@ module DbusClients
     end
 
     def self.execute (options)
-      dbus_object.execute(options).first #ruby dbus return array of return values
+      ret = dbus_object.execute(options).first #ruby dbus return array of return values
+      if ret["error"]
+        if ret["error_type"]
+          BackendException.raise_from_hash ret
+        else
+          raise BackendException.new(ret["error"],ret["backtrace"])
+        end
+      end
+      return ret
     end
 
     def self.service_name
