@@ -17,7 +17,7 @@ module DbusServices
       result = iface.CheckAuthorization ["system-bus-name",{"name"=> sender}],permission, {}, flags,""
       #result structure http://hal.freedesktop.org/docs/polkit/eggdbus-interface-org.freedesktop.PolicyKit1.Authority.html#eggdbus-struct-AuthorizationResult
       log.info result.inspect
-      raise InsufficientPermission.new(permission)# unless result[0][0]
+      raise InsufficientPermission.new(permission) unless result[0][0]
     end
   end
 end
