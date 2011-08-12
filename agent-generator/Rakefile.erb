@@ -1,4 +1,5 @@
 require "rake"
+require "rake/testtask"
 
 desc "install all things on system"
 task :install do
@@ -13,4 +14,9 @@ task :install do
   sh "cp -r clients/system_agent /usr/lib*/ruby/vendor_ruby/1.*/"
   sh "chmod +x /usr/share/systemagents/bin/*/*.rb"
   `pkill -f '/usr/share/systemagents/bin/.*/.*\.rb' || true`
+end
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/*.rb']
+  t.verbose = true
 end

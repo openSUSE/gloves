@@ -3,7 +3,7 @@ require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "system_agents/krb5_conf"
 
-class Krb5Conf < Test::Unit::TestCase
+class TestKrb5Conf < Test::Unit::TestCase
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
   end
@@ -15,4 +15,4 @@ class Krb5Conf < Test::Unit::TestCase
   end
 end
 
-Test::Unit::UI::Console::TestRunner.run(Krb5Conf)
+Test::Unit::UI::Console::TestRunner.run(TestKrb5Conf)
