@@ -109,18 +109,7 @@ module SystemAgents
 	aug.set("/files/etc/krb5.conf/appdefaults/application/" + pam_key, params[pam_key]) unless params[pam_key].nil?
       end
 
-      # write appdefaults/pkinit section
-      if params["trusted_servers"]
-	appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
-	pkinit_exists = appdefaults.any? {|sub_path| aug.get(sub_path) == "pkinit" }
-	pkinit_path	= "/files/etc/krb5.conf/appdefaults/application"
-	unless pkinit_exists
-	  # create new subsection
-	  pkinit_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
-	  aug.set(pkinit_path, "pkinit")
-	end
-	aug.set(pkinit_path + "/trusted_servers", params["trusted_servers"])
-      end
+      write_trusted_servers aug, params
 
       ret	= {
 	"success"	=> true
@@ -132,6 +121,21 @@ module SystemAgents
 
       aug.close
       return ret
+    end
+
+private
+    def write_trusted_servers aug, params
+      # write appdefaults/pkinit section
+      return unless params["trusted_servers"]
+      appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
+      pkinit_exists = appdefaults.any? {|sub_path| aug.get(sub_path) == "pkinit" }
+      pkinit_path	= "/files/etc/krb5.conf/appdefaults/application"
+      unless pkinit_exists
+        # create new subsection
+        pkinit_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
+        aug.set(pkinit_path, "pkinit")
+      end
+      aug.set(pkinit_path + "/trusted_servers", params["trusted_servers"])
     end
   end
 end
