@@ -23,11 +23,16 @@ class TestKrb5Conf < Test::Unit::TestCase
     params	= {
 	"_aug_internal" => Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
 	"default_domain"	=> "example.de",
-	"default_realm"		=> "EXAMPLE.DE"
+	"default_realm"		=> "EXAMPLE.DE",
+	"kdc"			=> "kdc.example.de", # sets also admin_server
+	"trusted_servers"	=> "ad.example.de",
+	"proxiable"		=> "true"
     }
     ret = file.write params
     assert_equal true, ret["success"]
+    assert_equal nil, ret["message"]
   end
+
 end
 
 Test::Unit::UI::Console::TestRunner.run(TestKrb5Conf)
