@@ -24,13 +24,9 @@ module KerberosClient
     sssd	= pam_query("sss")
 
     unless pam_krb5.empty?
-      ignore_unknown	= false
-      pam_krb5.split("\n").each do |line|
-	if line.index("account") == 0
-	    ignore_unknown	= !line.index("ignore_unknown_principals").nil?
-	end
+      krb5_conf["ignore_unknown"] = pam_krb5.split("\n").any? do |line|
+        line.start_with?("account") and line.include? "ignore_unknown_principals"
       end
-      krb5_conf["ignore_unknown"] = ignore_unknown
     end
 
     # returning same structure as Kerberos::Export
