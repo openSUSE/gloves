@@ -14,15 +14,15 @@ module KerberosClient
     # read config files    
     begin
       krb5_conf	= SystemAgent::Krb5Conf.read({})
+    # FIXME read /etc/ssh/ssh_config
+
+      pam_krb5	= pam_query("krb5")
+      sssd	= pam_query("sss")
+
     rescue DbusClients::InsufficientPermission => e
       @error	= "User has no permission for action '#{e.permission}'."
       return nil
     end
-    # FIXME read /etc/ssh/ssh_config
-
-    pam_krb5	= pam_query("krb5")
-    sssd	= pam_query("sss")
-
     unless pam_krb5.empty?
       krb5_conf["ignore_unknown"] = pam_krb5.split("\n").any? do |line|
         line.start_with?("account") and line.include? "ignore_unknown_principals"
