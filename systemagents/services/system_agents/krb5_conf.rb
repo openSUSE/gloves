@@ -101,14 +101,7 @@ module SystemAgents
             
 # FIXME when yast2-kerberos-client wrote ExpertSettings, there was a chance to remove the key
 
-      # write appdefaults/pam section
-      ["ticket_lifetime", "renew_lifetime", "forwardable", "proxiable", "minimum_uid",
-       "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
-       "validate", "use_shmem", "addressless", "debug", "debug_sensitive", "initial_prompt",
-       "subsequent_prompt", "banner"].each do |pam_key|
-	aug.set("/files/etc/krb5.conf/appdefaults/application/" + pam_key, params[pam_key]) unless params[pam_key].nil?
-      end
-
+      write_pam aug, params
       write_trusted_servers aug, params
 
       ret	= {
@@ -124,8 +117,8 @@ module SystemAgents
     end
 
 private
+    # write appdefaults/pkinit section
     def write_trusted_servers aug, params
-      # write appdefaults/pkinit section
       return unless params["trusted_servers"]
       appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
       pkinit_exists = appdefaults.any? {|sub_path| aug.get(sub_path) == "pkinit" }
@@ -137,5 +130,27 @@ private
       end
       aug.set(pkinit_path + "/trusted_servers", params["trusted_servers"])
     end
+
+    # write appdefaults/pam section
+    def write_pam aug, params
+      appdefaults	= aug.match("/files/etc/krb5.conf/appdefaults/*")
+      pam_exists = appdefaults.any? {|sub_path| aug.get(sub_path) == "pam" }
+      pam_path	= "/files/etc/krb5.conf/appdefaults/application"
+
+      ["ticket_lifetime", "renew_lifetime", "forwardable", "proxiable", "minimum_uid",
+       "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
+       "validate", "use_shmem", "addressless", "debug", "debug_sensitive", "initial_prompt",
+       "subsequent_prompt", "banner"].each do |pam_key|
+	if params[pam_key]
+	  unless pam_exists
+	    pam_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
+	    aug.set(pam_path, "pam")
+	    pam_exists	= true
+	  end
+	  aug.set(pam_path + "/" + pam_key, params[pam_key])
+	end
+      end
+    end
+
   end
 end
