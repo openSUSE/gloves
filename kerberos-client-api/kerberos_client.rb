@@ -6,8 +6,18 @@ require 'system_agent/pam_config'
 # module for kerberos-client configuration
 module KerberosClient
 
+  def self.last_error
+    return @error
+  end
+
   def self.read(params)
-    krb5_conf	= SystemAgent::Krb5Conf.read({})
+    # read config files    
+    begin
+      krb5_conf	= SystemAgent::Krb5Conf.read({})
+    rescue DbusClients::InsufficientPermission => e
+      @error	= "User has no permission for action '#{e.permission}'."
+      return nil
+    end
     # FIXME read /etc/ssh/ssh_config
 
     pam_krb5	= pam_query("krb5")
@@ -41,7 +51,12 @@ module KerberosClient
     # save config file settings
     krb5_conf	= params["kerberos_client"]
     unless krb5_conf.nil? && krb5_conf.empty?
-      ret	= SystemAgent::Krb5Conf.write(krb5_conf)
+      begin
+	ret	= SystemAgent::Krb5Conf.write(krb5_conf)
+      rescue DbusClients::InsufficientPermission => e
+	@error	= "User has no permission for action '#{e.permission}'."
+	return nil
+      end
       return ret unless ret["success"] 
     end
 
@@ -53,8 +68,13 @@ module KerberosClient
 
     # sssd was set up (from different place)
     if sssd
-      # FIXME update sssd.conf file here
       pam_delete("krb5")
+      # FIXME update sssd.conf file here
+#              path domain     = add (.etc.sssd_conf.v, "domain/default");
+#              SCR::Write (add (domain, "auth_provider"), "krb5");
+#              SCR::Write (add (domain, "chpass_provider"), "krb5");
+#              SCR::Write (add (domain, "krb5_realm"), default_realm);
+#              SCR::Write (add (domain, "krb5_kdcip"), kdc);
     # standard authentication (krb5) is on
     elsif params["pam_login"]["use_kerberos"]
       # combined LDAP+Kerberos setup
@@ -70,6 +90,8 @@ module KerberosClient
       # Kerberos removed from combined LDAP+Kerberos setup
       pam_add("ldap") if pam_query("ldap-account_only")
     end
+    # FIXME write pam_pkcs11.conf
+    # FIXME write /etc/ssh/ssh_config
 
     return ret
   end

@@ -206,6 +206,16 @@ global define boolean Read () ``{
 
     y2internal ("read: %1", read);
 
+    if (read == nil)
+    {
+	string message	= (string) KerberosClient::last_error ();
+	if (message != nil && message != "")
+	{
+	    Report::Error (message);
+	}
+	return false;
+    }
+
     Import (read);
 
     // Expert settings are directly in 'read' map

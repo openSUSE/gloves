@@ -2,7 +2,11 @@
 require "kerberos_client"
 if ARGV.empty?
   krb = KerberosClient::read({})
-  puts krb.inspect
+  puts krb.inspect unless krb.nil?
+  if krb.nil?
+    error	= KerberosClient::last_error
+    puts "returned error: #{error}" if error
+  end
 else
   puts KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0]}})
 end
