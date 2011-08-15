@@ -60,7 +60,7 @@ module SystemAgents
     end
 
     def write(params)
-      aug		= Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+      aug		= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Krb5.lns", :incl => "/etc/krb5.conf")
       aug.load
 
@@ -73,9 +73,9 @@ module SystemAgents
       # update existing realm section
       realm_save_path		= ""
 
-      realms		= aug.match("/files/etc/krb5.conf/realms/realm[*]")
-      realms_save_path = realms.detect { |realm_path| aug.get(realm_path) == default_realm }
-      realms_save_path ||= ""
+      realms		= aug.match("/files/etc/krb5.conf/realms/*")
+      realm_save_path = realms.detect { |realm_path| aug.get(realm_path) == default_realm }
+      realm_save_path ||= ""
 
       # ... or create new realm section
       if realm_save_path.empty? && default_realm
