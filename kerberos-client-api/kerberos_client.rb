@@ -6,18 +6,6 @@ require 'system_agent/pam_config'
 # module for kerberos-client configuration
 module KerberosClient
 
-  def self.pam_query(mod)
-    return SystemAgent::PamConfig.execute({ "exec_params" => "-q --" + mod })["stdout"] || ""
-  end
-
-  def self.pam_add(mod)
-    return SystemAgent::PamConfig.execute({ "exec_params" => "-a --" + mod })
-  end
-
-  def self.pam_delete(mod)
-    return SystemAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
-  end
-
   def self.read(params)
     krb5_conf	= SystemAgent::Krb5Conf.read({})
     # FIXME read /etc/ssh/ssh_config
@@ -90,4 +78,18 @@ module KerberosClient
     ret = {}
     return ret
   end
+
+private
+  def self.pam_query(mod)
+    return SystemAgent::PamConfig.execute({ "exec_params" => "-q --" + mod })["stdout"] || ""
+  end
+
+  def self.pam_add(mod)
+    return SystemAgent::PamConfig.execute({ "exec_params" => "-a --" + mod })
+  end
+
+  def self.pam_delete(mod)
+    return SystemAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
+  end
+
 end
