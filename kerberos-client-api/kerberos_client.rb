@@ -47,12 +47,7 @@ module KerberosClient
     # save config file settings
     krb5_conf	= params["kerberos_client"]
     unless krb5_conf.nil? && krb5_conf.empty?
-      begin
-	ret	= SystemAgent::Krb5Conf.write(krb5_conf)
-      rescue DbusClients::InsufficientPermission => e
-	@error	= "User has no permission for action '#{e.permission}'."
-	return nil
-      end
+	    ret	= SystemAgent::Krb5Conf.write(krb5_conf)
       return ret unless ret["success"] 
     end
 
@@ -90,6 +85,9 @@ module KerberosClient
     # FIXME write /etc/ssh/ssh_config
 
     return ret
+  rescue DbusClients::InsufficientPermission => e
+	  @error	= "User has no permission for action '#{e.permission}'."
+  	return nil
   end
 
   def self.propose(params)
