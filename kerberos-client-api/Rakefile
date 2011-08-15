@@ -1,7 +1,13 @@
 require "rake"
+require "rake/testtask"
 
 desc "install all things on system"
 task :install do
   sh "cp kerberos_client.rb /usr/share/YaST2/modules"
   sh "ln -sf /usr/share/YaST2/modules/kerberos_client.rb /usr/share/YaST2/modules/KerberosClient.rb"
+end
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/*.rb']
+  t.verbose = true
 end
