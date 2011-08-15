@@ -99,8 +99,6 @@ module SystemAgents
 # FIXME remove domain_realm  default_realm sections in case DNS is used
 # (should this be on agent level?)
             
-# FIXME when yast2-kerberos-client wrote ExpertSettings, there was a chance to remove the key
-
       write_pam aug, params
       write_trusted_servers aug, params
 
@@ -141,13 +139,17 @@ private
        "keytab", "ccache_dir", "ccname_template", "mappings", "existing_ticket", "external",
        "validate", "use_shmem", "addressless", "debug", "debug_sensitive", "initial_prompt",
        "subsequent_prompt", "banner"].each do |pam_key|
-	if params[pam_key]
+	if params.has_key? pam_key
 	  unless pam_exists
 	    pam_path	= "/files/etc/krb5.conf/appdefaults/application[#{appdefaults.size + 1}]"
 	    aug.set(pam_path, "pam")
 	    pam_exists	= true
 	  end
-	  aug.set(pam_path + "/" + pam_key, params[pam_key])
+	  if params[pam_key].nil? || params[pam_key].empty?
+	    aug.rm(pam_path + "/" + pam_key)
+	  else
+	    aug.set(pam_path + "/" + pam_key, params[pam_key])
+	  end
 	end
       end
     end
