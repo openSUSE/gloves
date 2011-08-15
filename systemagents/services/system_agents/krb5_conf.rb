@@ -16,13 +16,14 @@ module SystemAgents
       aug.load
 
       # possible error: parse_failed
+      # FIXME use exception!
       unless aug.get("/augeas/files/etc/krb5.conf/error").nil?
 	aug.close
 	return {}
       end
 
       default_realm	= aug.get("/files/etc/krb5.conf/libdefaults/default_realm")
-      default_realm	= "" if default_realm.nil?
+      default_realm	||= ""
 
       krb5_conf	= {
 	"default_realm"	=> default_realm,
@@ -36,22 +37,21 @@ module SystemAgents
       # read data from relevant realm section
       realms.each do |realm_path|
 	realm	= aug.get(realm_path)
-	if (!realm.nil? && realm == default_realm)
-	    # put current realm data into return map
-	    aug.match(realm_path + "/*").each do |realm_key_path|
-		key	= realm_key_path.split("/").last
-		next if key.index("#comment") == 0
-		krb5_conf[key]	= aug.get(realm_key_path)
-	    end
-	    break
-	end
+        next if realm != default_realm
+        # put current realm data into return map
+        aug.match(realm_path + "/*").each do |realm_key_path|
+            key	= realm_key_path.split("/").last
+            next if key.start_with? "#comment"
+            krb5_conf[key]	= aug.get(realm_key_path)
+        end
+        break
       end
 
       # read data from appdefaults sections (called 'application' by augeas)
       # there could be 'pam' and 'pkinit' subsections
       aug.match("/files/etc/krb5.conf/appdefaults/application/*").each do |sub_path|
 	key	= sub_path.split("/").last
-	next if key.index("#comment") == 0
+	next if key.start_with? "#comment"
 	krb5_conf[key]	= aug.get(sub_path)
       end
 
