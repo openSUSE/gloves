@@ -403,6 +403,8 @@ global define boolean Write () ``{
 	write["kerberos_client",key]	= value;
     });
     write["kerberos_client"]	= remove (write["kerberos_client"]:$[], "ExpertSettings");
+    write["kerberos_client","forwardable"]	= forwardable;
+    write["kerberos_client","proxiable"]	= proxiable;
 
     if (!(pam_modified || write_only))
     {
