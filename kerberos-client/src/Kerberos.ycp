@@ -100,9 +100,6 @@ global boolean sssd		= false;
  */
 global map<string,any> ExpertSettings	= $[];
 
-// backup of original ExpertSettings
-map<string,any> OrigExpertSettings	= $[];
-
 /**
  * Data was modified?
  * @return true if modified
@@ -234,10 +231,6 @@ global define boolean Read () ``{
 
     if (!haskey (ExpertSettings, "external"))
 	ExpertSettings["external"]	= "sshd";
-
-
-    // FIXME trusted_servers not read
-    // trusted_servers	= ReadKrb5ConfValue (.etc.krb5_conf.v.pkinit.trusted_servers, "");
 
     // propose some good values, if there are install defaults
     if (default_domain == "")
@@ -406,7 +399,10 @@ global define boolean Write () ``{
 
     map write	= Export ();
 
-    y2internal ("export map: %1", write);
+    foreach (string key, string value, write["kerberos_client","ExpertSettings"]:$[], {
+	write["kerberos_client",key]	= value;
+    });
+    write["kerberos_client"]	= remove (write["kerberos_client"]:$[], "ExpertSettings");
 
     if (!(pam_modified || write_only))
     {
@@ -421,10 +417,21 @@ global define boolean Write () ``{
     // -- write to /etc/krb5.conf
     Progress::NextStage ();
 
-    KerberosClient::write (write);
+    map write_ret	= (map) KerberosClient::write (write);
+
+    if (write_ret == nil)
+    {
+	string message	= (string) KerberosClient::last_error ();
+	if (message != nil && message != "")
+	{
+	    Report::Error (message);
+	}
+	return false;
+    }
 
 
-	/* FIXME trusted_servers not done yet
+
+	/* FIXME pam_pkcs11.conf not done yet
 	if (trusted_servers != "" &&
 	    Package::Installed ("krb5-plugin-preauth-pkinit-nss"))
 	{
