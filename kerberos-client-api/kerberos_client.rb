@@ -46,6 +46,9 @@ module KerberosClient
     }
     # save config file settings
     krb5_conf	= params["kerberos_client"]
+    ssh_support	= krb5_conf.delete "ssh_support"
+    ignore_unknown	= krb5_conf.delete "ignore_unknown"
+
     unless krb5_conf.nil? && krb5_conf.empty?
       ret	= SystemAgent::Krb5Conf.write(krb5_conf)
       return ret unless ret["success"] 
@@ -74,7 +77,7 @@ module KerberosClient
       else
 	pam_add("ldap-account_only")
       end
-      pam_add("krb5-ignore_unknown_principals") if params["kerberos_client"]["ignore_unknown"]
+      pam_add("krb5-ignore_unknown_principals") if ignore_unknown
     # standard authentication (krb5) is off
     else
       pam_delete("krb5")
