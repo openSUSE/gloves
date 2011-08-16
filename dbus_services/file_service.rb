@@ -16,7 +16,7 @@ module DbusServices
           [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
         end
       end
-      dbus_method :write, "out result:a{sv}, in params:a{sv}" do |params,user|
+      dbus_method :write, "out result:a{sv}, in params:a{sv}" do |params,sender|
         begin
           permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.write"
           check_permissions sender, permission_name, params
