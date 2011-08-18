@@ -1,5 +1,6 @@
 require "rake"
 require "rake/testtask"
+require "packaging"
 
 desc "install all things on system"
 task :install do
