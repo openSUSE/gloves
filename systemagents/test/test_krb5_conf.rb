@@ -45,6 +45,7 @@ class TestKrb5Conf < Test::Unit::TestCase
     params["_aug_internal"]	= Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     params["kdc"]		= "kdc.example.de"
     params["ticket_lifetime"]	= ""
+    params["proxiable"]		= nil
 
     ret = file2.write params
     assert_equal nil, ret["message"]
