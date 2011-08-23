@@ -14,33 +14,29 @@ module SystemAgents
       aug.transform(:lens => "Ssh.lns", :incl => "/etc/ssh/ssh_config")
       aug.load
     
-      ret = {}
+      ret = {
+	"ssh_config"	=> []
+      } 
 
-      aug.match("/files/etc/ssh/ssh_config/*").each do |key_path|
-        key	= key_path.split("/").last
-        next if key.start_with? "#comment"
-	if key.start_with? "Host"
-	    # read Host submap
-	    ret["Host"]	= [] unless ret.has_key? "Host"
-	    host	= {
-		"Host"	=> aug.get(key_path)
-	    }
-	    aug.match(key_path + "/*").each do |host_path|
-		host_key = host_path.split("/").last
-		next if host_key.start_with? "#comment"
-		if host_key == "SendEnv"
-		    host[host_key] = read_send_env(aug, host_path)
-		else
-		    host[host_key] = aug.get(host_path)
-		end
+      aug.match("/files/etc/ssh/ssh_config/Host").each do |host_path|
+
+	host	= {
+	    "Host"	=> aug.get(host_path)
+	}
+	# read Host submap
+	aug.match(host_path + "/*").each do |key_path|
+
+	    key = key_path.split("/").last
+	    next if key.start_with? "#comment"
+	    if key == "SendEnv"
+		host[key] = read_send_env(aug, key_path)
+	    else
+		host[key] = aug.get(key_path)
 	    end
-	    ret["Host"].push host
-	elsif key == "SendEnv"
-	    ret[key]	= read_send_env(aug, key_path)
-	else
-	    ret[key]	= aug.get(key_path)
 	end
+	ret["ssh_config"].push host
       end
+
       aug.close
       return ret
     end

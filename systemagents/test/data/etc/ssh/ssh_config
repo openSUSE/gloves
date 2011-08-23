@@ -17,7 +17,7 @@
 # list of available options, their meanings and defaults, please see the
 # ssh_config(5) man page.
 
-# Host *
+Host suse.cz
 #   ForwardAgent no
 #   ForwardX11 no
 
@@ -56,8 +56,6 @@ VisualHostKey no
 # This will hash new host keys and make them so unusable for malicious
 # people or software trying to use known_hosts to find further hops.
 HashKnownHosts yes
-
-Host suse.cz
 
 GSSAPIAuthentication no
 GSSAPIDelegateCredentials no
