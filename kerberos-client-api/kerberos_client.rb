@@ -4,6 +4,8 @@ require 'system_agent/krb5_conf'
 require 'system_agent/ssh_config'
 require 'system_agent/pam_config'
 
+require 'socket'
+
 # module for kerberos-client configuration
 module KerberosClient
 
@@ -15,7 +17,6 @@ module KerberosClient
     # read config files    
     begin
       krb5_conf	= SystemAgent::Krb5Conf.read({})
-      ssh_config= SystemAgent::SshConfig.read({})
       pam_krb5	= pam_query("krb5")
       sssd	= pam_query("sss")
 
@@ -28,6 +29,8 @@ module KerberosClient
         line.start_with?("account") and line.include? "ignore_unknown_principals"
       end
     end
+
+    krb5_conf["ssh_support"]	= read_ssh_support
 
     # returning same structure as Kerberos::Export
     return {
@@ -109,6 +112,22 @@ private
 
   def self.pam_delete(mod)
     return SystemAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
+  end
+
+  def self.read_ssh_support
+    hostname	= Socket.gethostname
+    ssh_config	= SystemAgent::SshConfig.read({})["ssh_config"]
+    
+    ssh_support	= false
+    ssh_config.each do |host|
+	puts "host map: #{host.inspect}"
+	if (host["Host"] == "*" || host["Host"] == hostname) &&
+	    (host["GSSAPIAuthentication"] && host["GSSAPIDelegateCredentials"])
+	    ssh_support	= host["GSSAPIAuthentication"] == "yes" && host["GSSAPIDelegateCredentials"] == "yes"
+	    break
+	end
+    end
+    return ssh_support
   end
 
 end
