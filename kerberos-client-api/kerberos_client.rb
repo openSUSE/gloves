@@ -1,6 +1,7 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'system_agent/krb5_conf'
+require 'system_agent/ssh_config'
 require 'system_agent/pam_config'
 
 # module for kerberos-client configuration
@@ -14,8 +15,7 @@ module KerberosClient
     # read config files    
     begin
       krb5_conf	= SystemAgent::Krb5Conf.read({})
-    # FIXME read /etc/ssh/ssh_config
-
+      ssh_config= SystemAgent::SshConfig.read({})
       pam_krb5	= pam_query("krb5")
       sssd	= pam_query("sss")
 
