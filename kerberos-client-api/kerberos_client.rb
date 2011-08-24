@@ -13,6 +13,7 @@ module KerberosClient
     return @error
   end
 
+  # Read all settings relevant for Kerberos client configuration
   def self.read(params)
     # read config files    
     begin
@@ -42,6 +43,7 @@ module KerberosClient
     }
   end
 
+  # Write Kerberos client configuration
   def self.write(params)
 
     ret		= {
@@ -56,6 +58,8 @@ module KerberosClient
       ret	= SystemAgent::Krb5Conf.write(krb5_conf)
       return ret unless ret["success"] 
     end
+
+    ret = write_ssh_support(ssh_support) unless ssh_support.nil?
 
     # no changes in PAM config
     return ret if params["pam_login"].nil? || params["pam_login"].empty?
@@ -88,7 +92,6 @@ module KerberosClient
       pam_add("ldap") if pam_query("ldap-account_only")
     end
     # FIXME write pam_pkcs11.conf
-    # FIXME write /etc/ssh/ssh_config
 
     return ret
   rescue DbusClients::InsufficientPermission => e
@@ -114,20 +117,40 @@ private
     return SystemAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
   end
 
+  # Read state of ssh support from /etc/ssh/ssh_config
   def self.read_ssh_support
     hostname	= Socket.gethostname
     ssh_config	= SystemAgent::SshConfig.read({})["ssh_config"]
     
     ssh_support	= false
     ssh_config.each do |host|
-	puts "host map: #{host.inspect}"
 	if (host["Host"] == "*" || host["Host"] == hostname) &&
 	    (host["GSSAPIAuthentication"] && host["GSSAPIDelegateCredentials"])
 	    ssh_support	= host["GSSAPIAuthentication"] == "yes" && host["GSSAPIDelegateCredentials"] == "yes"
+	    @ssh_section = host["Host"]
 	    break
 	end
     end
     return ssh_support
+  end
+
+  def self.write_ssh_support ssh_support
+
+    # read ssh config to find out if there's matching Host section
+    read_ssh_support if @ssh_section.nil?
+    @ssh_section = "*" if @ssh_section.nil?
+    ssh_value	= ssh_support ? "yes": "no"
+    # only update existing section
+    ssh_config	= {
+	"update"	=> {
+	    @ssh_section	=> {
+		"GSSAPIAuthentication"	=> ssh_value,
+		"GSSAPIDelegateCredentials" => ssh_value
+	    }
+	}
+    }
+    ret	= SystemAgent::SshConfig.write(ssh_config)
+    return ret
   end
 
 end

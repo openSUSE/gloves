@@ -9,4 +9,8 @@ if ARGV.empty?
   end
 else
   puts KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0]}})
+#  puts KerberosClient::write({"kerberos_client"=>{
+#    "default_realm"=>ARGV[0],
+#    "ssh_support" => true
+#  }})
 end
