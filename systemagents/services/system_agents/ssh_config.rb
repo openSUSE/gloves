@@ -100,11 +100,9 @@ private
     # read list of values for SendEnv
     # arguments are augeas object and path to SendEnv key
     def read_send_env aug, path
-      send_env	= []
-      aug.match(path + "/*").each do |send_env_path|
-	send_env.push aug.get(send_env_path)
+      aug.match(path + "/*").reduce([]) do |acc,send_env_path|
+        acc << aug.get(send_env_path)
       end
-      return send_env
     end
 
     # write values into given Host section
