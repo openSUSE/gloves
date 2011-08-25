@@ -10,7 +10,7 @@ class TestSshConfig < Test::Unit::TestCase
 
   def test_reading
     file = SystemAgents::SshConfig.new nil
-    ret = file.read "_aug_internal" => Augeas::open(@data_dir,"/tmp/lens", Augeas::NO_MODL_AUTOLOAD)
+    ret = file.read "_aug_internal" => Augeas::open(@data_dir,File.join(File.dirname(__FILE__),'..','..',"lens"), Augeas::NO_MODL_AUTOLOAD)
     ssh_config	= ret["ssh_config"]
     assert_equal ["LC_IDENTIFICATION", "LC_ALL"], ssh_config[0]["SendEnv"]
     assert_equal "suse.cz", ssh_config[0]["Host"]
