@@ -1,0 +1,9 @@
+require 'dbus_clients/<%= type.to_s.downcase %>_client'
+
+module ConfigAgent
+  class <%= agent_class %> < DbusClients::<%= type.to_s.capitalize %>Client
+
+    # identification of relevant DBUS service
+    agent_id "<%= identifier %>"
+  end
+end

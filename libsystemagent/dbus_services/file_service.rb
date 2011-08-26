@@ -37,7 +37,7 @@ module DbusServices
       "/org/opensuse/systemagents/file/#{filename}" #TODO check filename characters
     end
 
-    def self.filename(value=nil)
+    def self.agent_id(value=nil)
       instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
       raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
       filename_for_service

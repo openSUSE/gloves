@@ -12,7 +12,7 @@ Rights for setting/getting user permissions
 -->
 
   <% if type == :file %>
-  <action id="org.opensuse.systemagents.file.<%= identifier %>.read">
+  <action id="org.opensuse.config_agent.file.<%= identifier %>.read">
     <description>Reading file <%= file_name %></description>
     <message>Authentication is required to read file <%= file_name %></message>
     <defaults>
@@ -20,7 +20,7 @@ Rights for setting/getting user permissions
       <allow_active>no</allow_active>
     </defaults>
   </action>
-  <action id="org.opensuse.systemagents.file.<%= identifier %>.write">
+  <action id="org.opensuse.config_agent.file.<%= identifier %>.write">
     <description>Writing to file <%= file_name %></description>
     <message>Authentication is required to write to <%= file_name %></message>
     <defaults>
@@ -29,7 +29,7 @@ Rights for setting/getting user permissions
     </defaults>
   </action>
   <% elsif type == :script %>
-  <action id="org.opensuse.systemagents.script.<%= identifier %>.execute">
+  <action id="org.opensuse.config_agent.script.<%= identifier %>.execute">
     <description>Execute script <%= file_name %></description>
     <message>Authentication is required to execute script <%= file_name %></message>
     <defaults>

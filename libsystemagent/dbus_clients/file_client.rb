@@ -5,7 +5,7 @@ require "dbus_clients/backend_exception"
 module DbusClients
   class FileClient
     FILE_INTERFACE = "org.opensuse.systemagents.file"
-    def self.filename(value=nil)
+    def self.agent_id(value=nil)
       instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
       raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
       filename_for_service

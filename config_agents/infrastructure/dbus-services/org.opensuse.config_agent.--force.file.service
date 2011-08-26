@@ -1,0 +1,5 @@
+# DBus service activation config
+[D-BUS Service]
+Name=org.opensuse.config_agent.--force.file
+Exec=/usr/share/config_agent/bin/--force_services/file_service.rb
+User=root
