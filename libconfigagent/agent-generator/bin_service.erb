@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+=begin
+This file is part of LibConfigAgent.
+
+LibConfigAgent is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+version 2.1 of the License.
+
+LibConfigAgent is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LibConfigAgent.  If not, see <http://www.gnu.org/licenses/>.
+=end
+
+$stdout.reopen("/var/log/systemagent.stdout")
+$stderr.reopen("/var/log/systemagent.stderr")
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
+require "rubygems"
+require "system_agent/<%= agent_class_file %>"
+require "dbus_services/service_runner"
+DbusServices::ServiceRunner::run(SystemAgents::<%= agent_class %>)
