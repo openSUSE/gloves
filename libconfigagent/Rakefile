@@ -9,3 +9,15 @@ task :install, :prefix do |t,args|
   sh "cp -r agent-generator/* #{args[:prefix]}usr/lib/config-agent-generator/"
   sh "ln -s #{args[:prefix]}usr/lib/config-agent-generator/agent-generator #{args[:prefix]}usr/bin/config-agent-generator"
 end
+
+Packaging::Configuration.run do |conf|
+  conf.obs_project = "YaST:Head:yastpp"
+  conf.obs_target = "devel_languages_ruby_extensions_devel_languages_ruby_openSUSE_Factory"
+end
+
+task :generate_spec do
+  sh `sed 's/VERSION_TEMPLATE/#{Packaging.Configuration.instance.version}/g' libconfigagent.spec.template > package/libconfigagent.spec`
+end
+
+#add generation of spec file as dependency for package task
+Rake.application.lookup(:package).prerequisites << "generate_spec"
