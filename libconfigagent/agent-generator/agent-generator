@@ -1,25 +1,26 @@
 #!/usr/bin/env ruby
-=begin
-This file is part of LibConfigAgent.
-
-LibConfigAgent is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-version 2.1 of the License.
-
-LibConfigAgent is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with LibConfigAgent.  If not, see <http://www.gnu.org/licenses/>.
-=end
-TEMPLATES_DIR = File.dirname(__FILE__)
+#--
+# Config Agents Framework
+#
+# Copyright (C) 2011 Novell, Inc. 
+#   This library is free software; you can redistribute it and/or modify
+# it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
+# License as published by the Free Software Foundation. 
+#
+#   This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
+# details. 
+#
+#   You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software 
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+#++
 
 if ARGV.size < 2 || (!["file","script"].include?(ARGV[0]) && !["file","script"].include?(ARGV[1]))
-  puts "Usage agent-generator [-f] <type> <file_path>
+  puts "Usage agent-generator [-fi] <type> <file_path>
   * -f overwrite existing files
+  * -i overwrittes only files in infrastructure directory
   * type could be file or script
   * file_path is path to config file or script"
   exit 1
@@ -29,8 +30,14 @@ require "erb"
 
 index = 0
 force = false
-if ARGV[index] == "-f"
+infra_only = false
+case ARGV[index]
+when "-f"
   force = true
+  index += 1
+when "-i"
+  force = true
+  infra_only = true
   index += 1
 end
 type = ARGV[index].to_sym
@@ -59,7 +66,12 @@ generated_files.each do |template,result_path|
     puts "File #{result_path} exists. Skipping..."
     next
   end
+  if File.exists?(result_path) && infra_only && !result_path.include?("infrastructure/")
+    puts "File #{result_path} exists and not infrastructure. Skipping..."
+    next
+  end
   template = File.read File.join(TEMPLATES_DIR,template)
   result = ERB.new(template,0,"").result(binding)
   File.open(result_path,"w") {|f| f.write result }
+  puts "File #{result_path} succesfully generated"
 end
