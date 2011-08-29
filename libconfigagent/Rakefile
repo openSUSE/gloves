@@ -34,7 +34,7 @@ Packaging::Configuration.run do |conf|
 end
 
 task :generate_spec do
-  sh `sed 's/VERSION_TEMPLATE/#{Packaging.Configuration.instance.version}/g' libconfigagent.spec.template > package/libconfigagent.spec`
+  sh `sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' libconfigagent.spec.template > package/libconfigagent.spec`
 end
 
 #add generation of spec file as dependency for package task
