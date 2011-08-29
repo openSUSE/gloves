@@ -20,11 +20,11 @@ require "dbus_services/backend_exception"
 
 module DbusServices
   class FileService < DbusService
-    FILE_INTERFACE = "org.opensuse.systemagents.file"
+    FILE_INTERFACE = "org.opensuse.config_agent.file"
     dbus_interface(FILE_INTERFACE) do
       dbus_method :read, "out result:a{sv}, in params:a{sv}" do |params,sender|
         begin
-          permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.read"
+          permission_name = "org.opensuse.config_agent.file.#{self.class.agent_id}.read"
           check_permissions sender, permission_name, params
           [read(params)]
         rescue BackendException => e
@@ -35,7 +35,7 @@ module DbusServices
       end
       dbus_method :write, "out result:a{sv}, in params:a{sv}" do |params,sender|
         begin
-          permission_name = "org.opensuse.systemagents.file.#{self.class.filename}.write"
+          permission_name = "org.opensuse.config_agent.file.#{self.class.agent_id}.write"
           check_permissions sender, permission_name, params
           [write(params)]
         rescue BackendException => e
@@ -47,11 +47,11 @@ module DbusServices
     end
 
     def self.service_name
-      "org.opensuse.systemagents.file.#{filename}" #TODO check filename characters
+      "org.opensuse.config_agent.file.#{agent_id}" #TODO check filename characters
     end
 
     def self.object_path
-      "/org/opensuse/systemagents/file/#{filename}" #TODO check filename characters
+      "/org/opensuse/config_agent/file/#{agent_id}" #TODO check filename characters
     end
 
     def self.agent_id(value=nil)

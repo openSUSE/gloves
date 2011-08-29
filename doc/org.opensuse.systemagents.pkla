@@ -1,6 +1,6 @@
 [systemagent]
 Identity=unix-user:<yourcooluser>
-Action=org.opensuse.systemagents.*
+Action=org.opensuse.config_agent.*
 ResultAny=yes
 ResultActive=yes
 ResultInactive=yes

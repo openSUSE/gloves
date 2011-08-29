@@ -20,11 +20,11 @@ require "open4"
 
 module DbusServices
   class ScriptService < DbusService
-    FILE_INTERFACE = "org.opensuse.systemagents.script"
+    FILE_INTERFACE = "org.opensuse.config_agent.script"
     dbus_interface(FILE_INTERFACE) do
       dbus_method :execute, "out result:a{sv}, in params:a{sv}" do |params,sender|
         begin
-          permission_name = "org.opensuse.systemagents.script.#{self.class.filename}.execute"
+          permission_name = "org.opensuse.config_agent.script.#{self.class.agent_id}.execute"
           check_permissions sender, permission_name, params
           [execute(params)]
         rescue BackendException => e
@@ -36,11 +36,11 @@ module DbusServices
     end
 
     def self.service_name
-      "org.opensuse.systemagents.script.#{filename}" #TODO check filename characters
+      "org.opensuse.config_agent.script.#{agent_id}" #TODO check filename characters
     end
 
     def self.object_path
-      "org/opensuse/systemagents/script/#{filename}" #TODO check filename characters
+      "org/opensuse/config_agent/script/#{agent_id}" #TODO check filename characters
     end
 
     def self.agent_id(value=nil)

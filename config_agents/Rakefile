@@ -10,7 +10,7 @@ task :install do
   sh "cp -r infrastructure/dbus-services/* /usr/share/dbus-1/system-services/"
   sh "mkdir -p /usr/share/config_agents/"
   sh "cp -r infrastructure/bin services /usr/share/config_agents/"
-  sh "cp -r infrastructure/polkit-definitions /usr/share/polkit-1/actions/"
+  sh "cp infrastructure/polkit-definitions/* /usr/share/polkit-1/actions/"
   sh "cd /usr/lib*/ruby/vendor_ruby/1.*/; mkdir -p config_agent; cd -"
   sh "cp -r infrastructure/clients/config_agent /usr/lib*/ruby/vendor_ruby/1.*/"
   sh "chmod +x /usr/share/config_agents/bin/*/*.rb"

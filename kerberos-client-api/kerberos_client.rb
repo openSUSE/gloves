@@ -1,8 +1,8 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
-require 'system_agent/krb5_conf'
-require 'system_agent/ssh_config'
-require 'system_agent/pam_config'
+require 'config_agent/krb5_conf'
+require 'config_agent/ssh_config'
+require 'config_agent/pam_config'
 
 require 'socket'
 
@@ -17,7 +17,7 @@ module KerberosClient
   def self.read(params)
     # read config files    
     begin
-      krb5_conf	= SystemAgent::Krb5Conf.read({})
+      krb5_conf	= ConfigAgent::Krb5Conf.read({})
       pam_krb5	= pam_query("krb5")
       sssd	= pam_query("sss")
 
@@ -55,7 +55,7 @@ module KerberosClient
     ignore_unknown	= krb5_conf.delete "ignore_unknown"
 
     unless krb5_conf.nil? && krb5_conf.empty?
-      ret	= SystemAgent::Krb5Conf.write(krb5_conf)
+      ret	= ConfigAgent::Krb5Conf.write(krb5_conf)
       return ret unless ret["success"] 
     end
 
@@ -106,21 +106,21 @@ module KerberosClient
 
 private
   def self.pam_query(mod)
-    return SystemAgent::PamConfig.execute({ "exec_params" => "-q --" + mod })["stdout"] || ""
+    return ConfigAgent::PamConfig.execute({ "exec_params" => "-q --" + mod })["stdout"] || ""
   end
 
   def self.pam_add(mod)
-    return SystemAgent::PamConfig.execute({ "exec_params" => "-a --" + mod })
+    return ConfigAgent::PamConfig.execute({ "exec_params" => "-a --" + mod })
   end
 
   def self.pam_delete(mod)
-    return SystemAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
+    return ConfigAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
   end
 
   # Read state of ssh support from /etc/ssh/ssh_config
   def self.read_ssh_support
     hostname	= Socket.gethostname
-    ssh_config	= SystemAgent::SshConfig.read({})["ssh_config"]
+    ssh_config	= ConfigAgent::SshConfig.read({})["ssh_config"]
     
     ssh_support	= false
     ssh_config.each do |host|
@@ -149,7 +149,7 @@ private
 	    }
 	}
     }
-    ret	= SystemAgent::SshConfig.write(ssh_config)
+    ret	= ConfigAgent::SshConfig.write(ssh_config)
     return ret
   end
 
