@@ -21,6 +21,7 @@ Summary:        libconfigagent - framework for config agents
 Source:         libconfigagent-%{version}.tar.bz2
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  ruby
 BuildRequires:  rubygem-packaging-rake-tasks
 
 # This is for Hudson (build service) to setup the build env correctly
@@ -55,7 +56,7 @@ code which call proper parts of code and stubs for methods.
 
 #---------------------------------------------------------------
 %install
-rake install
+rake install[%{buildroot}/,%{rb_vendorlib}]
 
 #---------------------------------------------------------------
 %clean
@@ -65,11 +66,11 @@ rm -rf $RPM_BUILD_ROOT
 %files 
 %defattr(-,root,root)
 %doc COPYING COPYING.LESSER
-%{ruby_sitelib}/dbus_clients
-%{ruby_sitelib}/dbus_services
+%{rb_vendorlib}/dbus_clients
+%{rb_vendorlib}/dbus_services
 
 
-%files testsuite
+%files devel
 %defattr(-,root,root)
 /usr/lib/config-agent-generator
 /usr/bin/config-agent-generator
