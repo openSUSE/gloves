@@ -2,6 +2,10 @@ require "rake"
 require "packaging"
 
 desc "install all things on system"
-task :install do
-  sh "cp -r dbus_clients dbus_services /usr/lib*/ruby/vendor_ruby/1.*/"
+task :install, :prefix do |t,args|
+  args.with_defaults :prefix => '/'
+  sh "cp -r dbus_clients dbus_services #{args[:prefix]}usr/lib*/ruby/vendor_ruby/1.*/"
+  sh "mkdir -p #{args[:prefix]}usr/lib/config-agent-generator"
+  sh "cp -r agent-generator/* #{args[:prefix]}usr/lib/config-agent-generator/"
+  sh "ln -s #{args[:prefix]}usr/lib/config-agent-generator/agent-generator #{args[:prefix]}usr/bin/config-agent-generator"
 end

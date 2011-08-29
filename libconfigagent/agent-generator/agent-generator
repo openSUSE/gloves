@@ -18,10 +18,10 @@
 #++
 
 if ARGV.size < 2 || (!["file","script"].include?(ARGV[0]) && !["file","script"].include?(ARGV[1]))
-  puts "Usage agent-generator [-fi] <type> <file_path>
+  puts "Usage config-agent-generator [-fi] <type> <file_path>
   * -f overwrite existing files
   * -i overwrittes only files in infrastructure directory
-  * type could be file or script
+  * type could be 'file' or 'script'
   * file_path is path to config file or script"
   exit 1
 end
