@@ -1,5 +1,0 @@
-# DBus service activation config
-[D-BUS Service]
-Name=org.opensuse.config_agent.file.etc_ssh_config
-Exec=/usr/share/config_agents/bin/file_services/ssh_config_service.rb
-User=root

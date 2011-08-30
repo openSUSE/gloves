@@ -22,7 +22,7 @@ module ConfigAgent
   class PamConfig < DbusServices::ScriptService
 
     # identification of relevant DBUS service
-    agent_id "sbin_pam_config"
+    agent_id "usr_sbin_pam_config"
 
     def execute(params)
       exec_params	= params["exec_params"] || ""

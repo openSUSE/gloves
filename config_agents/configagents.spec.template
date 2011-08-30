@@ -1,0 +1,71 @@
+#
+# spec file for package configagents (Version VERSION_TEMPLATE)
+#
+# Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# This file and all modifications and additions to the pristine
+# package are under the same license as the package itself.
+#
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+
+Name:           configagents
+Requires:       libconfigagent
+License:	      LGPLv2.1 or LGPLv3
+Group:          Libraries/System
+URL:            https://github.com/yast/yast--
+Autoreqprov:    on
+Version:        VERSION_TEMPLATE
+Release:        0
+Summary:        configagents - set of dbus services for basic access to system config
+Source:         configagents-%{version}.tar.bz2
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  ruby
+BuildRequires:  rubygem-packaging-rake-tasks
+BuildRequires:  libconfigagent
+
+# This is for Hudson (build service) to setup the build env correctly
+%if 0
+BuildRequires:  rubygem-test-unit
+BuildRequires:  rubygem-rcov >= 0.9.3.2
+%endif
+
+%description
+configagents - Set of config agents for for easier access to configuration files and services
+via dbus.
+Authors:
+--------
+    Jiri Suchomel <jsuchome@suse.cz>
+    Josef Reidinger <jreidinger@suse.cz>
+
+
+%prep
+%setup
+
+%build
+
+%check
+
+#---------------------------------------------------------------
+%install
+rake install[%{buildroot}/,%{rb_vendorlib}]
+
+#---------------------------------------------------------------
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+#---------------------------------------------------------------
+%files 
+%defattr(-,root,root)
+%doc COPYING COPYING.LESSER
+/etc/dbus-1/system.d/org.opensuse.config_agent*
+/usr/lib64/ruby/vendor_ruby/1.8/config_agent/
+/usr/share/augeas/lenses/*
+/usr/share/config_agents
+/usr/share/dbus-1/system-services/org.opensuse.config_agent*
+/usr/share/polkit-1/actions/org.opensuse.config_agent*
+
+
+#---------------------------------------------------------------
+%changelog
