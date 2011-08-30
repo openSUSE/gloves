@@ -10,15 +10,21 @@
 
 
 Name:           configagents
-Requires:       libconfigagent
 License:	      LGPLv2.1 or LGPLv3
-Group:          Libraries/System
+Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
 Version:        VERSION_TEMPLATE
 Release:        0
-Summary:        configagents - set of dbus services for basic access to system config
+Summary:        Set of dbus services for basic access to system config
 Source:         configagents-%{version}.tar.bz2
+Source1:        configagents-rpmlintrc
+Requires:       libconfigagent
+Requires:       rubygem-ruby-augeas
+Requires:       augeas
+Requires:       rubygem-ruby-dbus
+Requires:       dbus
+Requires:       polkit
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
@@ -58,8 +64,16 @@ rm -rf $RPM_BUILD_ROOT
 #---------------------------------------------------------------
 %files 
 %defattr(-,root,root)
+%dir /etc/dbus-1
+%dir /etc/dbus-1/system.d
+%dir /usr/share/augeas
+%dir /usr/share/augeas/lenses
+%dir /usr/share/dbus-1
+%dir /usr/share/dbus-1/system-services
+%dir /usr/share/polkit-1
+%dir /usr/share/polkit-1/actions
 %doc COPYING COPYING.LESSER
-/etc/dbus-1/system.d/org.opensuse.config_agent*
+%config /etc/dbus-1/system.d/org.opensuse.config_agent*
 /usr/lib64/ruby/vendor_ruby/1.8/config_agent/
 /usr/share/augeas/lenses/*
 /usr/share/config_agents
