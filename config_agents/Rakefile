@@ -41,7 +41,7 @@ task :install, :prefix, :ruby_path do |t,args|
 end
 
 Packaging::Configuration.run do |conf|
-  conf.obs_project = "YaST:Head:yastpp"
+  conf.obs_project = "YaST:Head:yast++"
   conf.obs_target = "devel_languages_ruby_extensions_devel_languages_ruby_openSUSE_Factory"
   conf.package_name = "configagents"
 end
