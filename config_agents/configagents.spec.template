@@ -74,7 +74,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/polkit-1/actions
 %doc COPYING COPYING.LESSER
 %config /etc/dbus-1/system.d/org.opensuse.config_agent*
-/usr/lib64/ruby/vendor_ruby/1.8/config_agent/
+%{rb_vendorlib}/config_agent
 /usr/share/augeas/lenses/*
 /usr/share/config_agents
 /usr/share/dbus-1/system-services/org.opensuse.config_agent*
