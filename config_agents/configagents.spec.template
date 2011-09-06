@@ -23,7 +23,7 @@ Requires:       libconfigagent
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
 Requires:       rubygem-ruby-dbus
-Requires:       dbus
+Requires:       dbus-1
 Requires:       polkit
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
