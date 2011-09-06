@@ -21,7 +21,7 @@ require "rubygems"
 require "mocha"
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "kerberos_client"
+require "y_lib/kerberos_client"
 
 class TestKerberosClient < Test::Unit::TestCase
   def setup
@@ -40,13 +40,14 @@ class TestKerberosClient < Test::Unit::TestCase
       "admin_server"=>"kdc.example.cz",
       "ticket_lifetime"=>"1d"
     }
-    SystemAgent::Krb5Conf.stubs(:read).returns krb5_conf_data
+    ConfigAgent::Krb5Conf.stubs(:read).returns krb5_conf_data
     sss_pam_module_out = {
       "stderr" => "",
       "stdout" => "",
       "exitstatus" => 0
     }
-    SystemAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --sss" ).returns(sss_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --sss" ).returns(sss_pam_module_out)
+    ConfigAgent::SshConfig.stubs(:read).returns({"ssh_config" => []})
   end
 
   def test_read_common
@@ -55,9 +56,9 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "auth:\naccount: ignore_unknown_principals\npassword:\nsession:\n",
       "exitstatus" => 0
     }
-    SystemAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
 
-    ret = KerberosClient.read({})
+    ret = YLib::KerberosClient.read({})
     assert_equal "300",ret["kerberos_client"]["clockskew"]
     assert_equal true,ret["kerberos_client"]["ignore_unknown"]
     assert_equal true,ret["pam_login"]["use_kerberos"]
@@ -72,9 +73,9 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "",
       "exitstatus" => 0
     }
-    SystemAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
 
-    ret = KerberosClient.read({})
+    ret = YLib::KerberosClient.read({})
     assert_equal false,ret["pam_login"]["use_kerberos"]
     assert_equal nil,ret["kerberos_client"]["ignore_unknown"]
   end
@@ -87,9 +88,9 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "auth:\naccount:\npassword:\nsession:\n",
       "exitstatus" => 0
     }
-    SystemAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
 
-    ret = KerberosClient.read({})
+    ret = YLib::KerberosClient.read({})
     assert_equal true,ret["pam_login"]["use_kerberos"]
     assert_equal false,ret["kerberos_client"]["ignore_unknown"]
   end
