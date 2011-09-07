@@ -46,7 +46,7 @@ type = ARGV[index].to_sym
 file_name = ARGV[index+1]
 identifier = file_name.gsub(/[-\.\/]/,"_").gsub(/^_/,"").downcase
 
-`mkdir -p infrastructure/bin/script_services infrastructure/bin/file_services infrastructure/dbus-policies infrastructure/dbus-services infrastructure/polkit-definitions services/config_agent infrastructure/clients/config_agent test` #create dir structure
+`mkdir -p infrastructure/bin/script_services infrastructure/bin/file_services infrastructure/dbus-policies infrastructure/dbus-services infrastructure/polkit-definitions services/config_agent_service infrastructure/clients/config_agent test` #create dir structure
 
 agent_class_file = file_name.gsub(/^.*\//,"").gsub(/[-\.]/,"_").downcase
 agent_class = agent_class_file.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase } #rails code of camelize
@@ -57,7 +57,7 @@ generated_files = {
   "dbus_policy.erb" => File.join("infrastructure","dbus-policies","org.opensuse.config_agent.#{type}.#{identifier}.conf"),
   "dbus_service.erb" => File.join("infrastructure","dbus-services","org.opensuse.config_agent.#{type}.#{identifier}.service"),
   "polkit_policy.erb" => File.join("infrastructure","polkit-definitions","org.opensuse.config_agent.#{type}.#{identifier}.policy"),
-  "config_agent_service.erb" => File.join("services","config_agent",agent_class_file+".rb"),
+  "config_agent_service.erb" => File.join("services","config_agent_service",agent_class_file+".rb"),
   "config_agent_client.erb" => File.join("infrastructure","clients","config_agent",agent_class_file+".rb"),
   "agent_test.erb" => File.join("test","test_#{agent_class_file}.rb"),
   "Rakefile.erb" => "Rakefile"

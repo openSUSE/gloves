@@ -18,7 +18,7 @@
 
 require 'dbus_services/<%= type.to_s.downcase %>_service'
 
-module ConfigAgent
+module ConfigAgentService
   class <%= agent_class %> < DbusServices::<%= type.to_s.capitalize %>Service
 
     # identification of relevant DBUS service

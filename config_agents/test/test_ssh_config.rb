@@ -20,7 +20,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "config_agent/ssh_config"
+require "config_agent_service/ssh_config"
 
 class TestSshConfig < Test::Unit::TestCase
   def setup
@@ -28,7 +28,7 @@ class TestSshConfig < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::SshConfig.new nil
+    file = ConfigAgentService::SshConfig.new nil
     ret = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
     ssh_config	= ret["ssh_config"]
     assert_equal ["LC_IDENTIFICATION", "LC_ALL"], ssh_config[0]["SendEnv"]

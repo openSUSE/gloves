@@ -18,7 +18,7 @@
 
 require 'dbus_services/script_service'
 
-module ConfigAgent
+module ConfigAgentService
   class PamConfig < DbusServices::ScriptService
 
     # identification of relevant DBUS service

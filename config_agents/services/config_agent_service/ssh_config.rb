@@ -19,7 +19,7 @@
 require 'dbus_services/file_service'
 require "augeas"
 
-module ConfigAgent
+module ConfigAgentService
   class SshConfig < DbusServices::FileService
 
     # identification of relevant DBUS service
