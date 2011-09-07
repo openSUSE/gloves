@@ -22,8 +22,9 @@ require "packaging"
 
 desc "install all things on system"
 task :install, :prefix, :ruby_path do |t,args|
-  args.with_defaults :prefix => '/',:ruby_path => "usr/lib*/ruby/vendor_ruby/1.*/"
-  sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/y_lib" if Dir["#{args[:prefix]}#{args[:ruby_path]}/y_lib"].empty?
+  args.with_defaults :prefix => '/',:ruby_path => "usr/lib*/ruby/vendor_ruby/1.*"
+  sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/" if Dir["#{args[:prefix]}#{args[:ruby_path]}/"].empty?
+  sh "cd #{args[:prefix]}#{args[:ruby_path]}/; mkdir -p y_lib; cd -"
   sh "cp lib/y_lib/* #{args[:prefix]}#{args[:ruby_path]}/y_lib"
 #  sh "ln -sf /usr/share/YaST2/modules/kerberos_client.rb /usr/share/YaST2/modules/KerberosClient.rb"
 end
