@@ -1,7 +1,12 @@
 {
-    // run the example with '/sbin/yast2 ./kerberos-example.ycp'
+    // FIXME installation:
+    // mkdir -p /usr/share/YaST2/modules/YLib
+    // ln -sf /usr/lib64/ruby/vendor_ruby/1.8/y_lib/kerberos_client.rb /usr/share/YaST2/modules/YLib/KerberosClient.rb
 
-    import "KerberosClient";
 
-    y2internal ("read: %1", KerberosClient::read ($[]));
+    // run this example with '/sbin/yast2 ./kerberos-example.ycp'
+
+    import "YLib::KerberosClient";
+
+    y2internal ("read: %1", YLib::KerberosClient::read ($[]));
 }
