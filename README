@@ -6,8 +6,8 @@ install rubygem-ruby-augeas from OBS
     sudo zypper in rubygem-ruby-augeas
 install rubygem-open4
     sudo zypper in rubygem-open4
-install rubygem-packaging_rake_tasks
-    sudo zypper in rubygem-packaging_rake_tasks
+install rubygem-packaging-rake-tasks
+    sudo zypper in rubygem-packaging-rake-tasks
 sudo rake install
 cd kerberos-client-api
 ruby kerberos_conf
