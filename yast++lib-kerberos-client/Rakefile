@@ -26,13 +26,12 @@ task :install, :prefix, :ruby_path do |t,args|
   sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/" if Dir["#{args[:prefix]}#{args[:ruby_path]}/"].empty?
   sh "cd #{args[:prefix]}#{args[:ruby_path]}/; mkdir -p y_lib; cd -"
   sh "cp lib/y_lib/* #{args[:prefix]}#{args[:ruby_path]}/y_lib"
-#  sh "ln -sf /usr/share/YaST2/modules/kerberos_client.rb /usr/share/YaST2/modules/KerberosClient.rb"
 end
 
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:yast++"
   conf.obs_target = "devel_languages_ruby_extensions_devel_languages_ruby_openSUSE_Factory"
-  conf.package_name = "yast++lib-kerberos_client"
+  conf.package_name = "yast++lib-kerberos-client"
 end
 
 Rake::TestTask.new do |t|
@@ -41,7 +40,7 @@ Rake::TestTask.new do |t|
 end
 
 task :generate_spec do
-  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' yast++lib-kerberos_client.spec.template > package/yast++lib-kerberos_client.spec"
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' yast++lib-kerberos-client.spec.template > package/yast++lib-kerberos-client.spec"
 end
 
 #add generation of spec file as dependency for package task

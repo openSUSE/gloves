@@ -9,8 +9,8 @@
 #
 
 
-Name:           yast++lib-kerberos_client
-License:	      LGPLv2.1 or LGPLv3
+Name:           yast++lib-kerberos-client
+License:	LGPLv2.1 or LGPLv3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
