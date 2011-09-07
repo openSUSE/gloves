@@ -30,7 +30,7 @@ end
 
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:yast++"
-  conf.obs_target = "devel_languages_ruby_extensions_devel_languages_ruby_openSUSE_Factory"
+  conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
   conf.package_name = "yast++lib-kerberos-client"
 end
 
