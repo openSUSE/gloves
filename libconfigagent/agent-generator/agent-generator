@@ -28,6 +28,9 @@ end
 
 require "erb"
 
+file = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
+TEMPLATES_DIR = File.dirname(file)
+
 index = 0
 force = false
 infra_only = false
