@@ -28,7 +28,7 @@ import "Stage";
 import "Summary";
 
 // ruby API
-import "KerberosClient";
+import "YLib::KerberosClient";
 
 /**
  * Required packages for this module to operate
@@ -79,9 +79,6 @@ global string mappings	= "";
 
 // --krb5-ignore_unknown_principals for pam-config
 global boolean ignore_unknown	= true;
-
-// section in /etc/ssh/ssh_config file for storing krb support
-string ssh_section = "*";
 
 // packages to install (openssh etc.)
 global list<string> packages = [];
@@ -199,13 +196,13 @@ global define map Export () ``{
 global define boolean Read () ``{
 
 
-    map read	= (map) KerberosClient::read ($[]);
+    map read	= (map) YLib::KerberosClient::read ($[]);
 
     y2internal ("read: %1", read);
 
     if (read == nil)
     {
-	string message	= (string) KerberosClient::last_error ();
+	string message	= (string) YLib::KerberosClient::last_error ();
 	if (message != nil && message != "")
 	{
 	    Report::Error (message);
@@ -300,34 +297,6 @@ global define boolean Read () ``{
 	y2milestone ("no kdc defined, proposing: %1", kdc);
     }
 
-    // read ssh support
-    y2debug ("ssh_config sections: %1", SCR::Dir (.etc.ssh.ssh_config.s));
-    string hostname = Hostname::CurrentHostname ();
-
-    ssh_support = nil;
-    foreach (string sec, SCR::Dir (.etc.ssh.ssh_config.s), ``{
-	// according to ssh man page, first value is taken:
-	if (ssh_support != nil)
-	    return;
-
-	list cont = SCR::Dir (add(.etc.ssh.ssh_config.v, sec));
-	y2debug ("section %1 contains: %2", sec, cont);
-
-	if ((sec == "*" || sec == hostname) &&
-	   (contains (cont, "GSSAPIAuthentication") &&
-	    contains (cont, "GSSAPIDelegateCredentials")))
-	{
-	    ssh_support =
-		(SCR::Read (add (add (.etc.ssh.ssh_config.v, sec),
-		    "GSSAPIAuthentication")) == "yes") &&
-		(SCR::Read (add (add (.etc.ssh.ssh_config.v, sec),
-		    "GSSAPIDelegateCredentials")) == "yes");
-	    ssh_section = sec;
-	}
-    });
-    if (ssh_support == nil)
-	ssh_support = false;
-
     // nothing modified after pure read (negate Import's setting)
     pam_modified	= false;
     modified		= false;
@@ -356,16 +325,12 @@ global define boolean Write () ``{
 	    _("Write PAM settings"),
 	    // progress stage label
 	    _("Write Kerberos client settings"),
-	    // progress stage label
-	    _("Write OpenSSH settings"),
     ];
     list steps = [
 	    // progress step label
 	    _("Writing PAM settings..."),
 	    // progress step label
 	    _("Writing Kerberos client settings..."),
-	    // progress step label
-	    _("Writing OpenSSH settings..."),
 	    // final progress step label
 	    _("Finished")
     ];
@@ -406,6 +371,11 @@ global define boolean Write () ``{
     write["kerberos_client","forwardable"]	= forwardable;
     write["kerberos_client","proxiable"]	= proxiable;
 
+    if (!ssh_modified)
+    {
+	write["kerberos_client"]    = remove (write["kerberos_client"]:$[], "ssh_support");
+    }
+
     if (!(pam_modified || write_only))
     {
 	write	= remove (write, "pam_login");
@@ -419,11 +389,11 @@ global define boolean Write () ``{
     // -- write to /etc/krb5.conf
     Progress::NextStage ();
 
-    map write_ret	= (map) KerberosClient::write (write);
+    map write_ret	= (map) YLib::KerberosClient::write (write);
 
     if (write_ret == nil)
     {
-	string message	= (string) KerberosClient::last_error ();
+	string message	= (string) YLib::KerberosClient::last_error ();
 	if (message != nil && message != "")
 	{
 	    Report::Error (message);
@@ -453,20 +423,6 @@ global define boolean Write () ``{
 	    }
 	}
     */
-
-    // -- write openssh settings
-    Progress::NextStage ();
-
-    if (ssh_modified)
-    {
-	string write = ssh_support ? "yes": "no";
-	SCR::Write (add (add (.etc.ssh.ssh_config.v, ssh_section),
-	    "GSSAPIAuthentication"), write);
-	SCR::Write (add (add (.etc.ssh.ssh_config.v, ssh_section),
-	    "GSSAPIDelegateCredentials"), write);
-	SCR::Write (.etc.ssh.ssh_config, nil);
-	y2milestone ("/etc/ssh/ssh_config modified");
-    }
 
     // final stage
     Progress::NextStage ();
