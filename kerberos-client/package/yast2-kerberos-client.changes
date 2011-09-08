@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Sep  7 16:23:40 CEST 2011 - jsuchome@suse.cz
+
+- using ruby-based yast++ library to access the system
+- 2.22.0 
+
+-------------------------------------------------------------------
 Fri Jul 15 12:05:53 CEST 2011 - jsuchome@suse.cz
 
 - fixed typos in help texts (bnc#703166)

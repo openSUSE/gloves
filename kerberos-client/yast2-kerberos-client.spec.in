@@ -3,10 +3,10 @@
 @HEADER@
 Group:	System/YaST
 License: GPL v2 or later
-BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-pam yast2-testsuite
+BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite yast++lib-kerberos-client
 
-# etc_krb5_conf.scr 
-Requires:	yast2-pam >= 2.20.0
+# API for system access
+Requires:	yast++lib-kerberos-client
 
 # Hostname::CurrentDomain, CurrentHostname
 Requires:	yast2 >= 2.16.48
