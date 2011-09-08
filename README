@@ -9,8 +9,8 @@ install rubygem-open4
 install rubygem-packaging-rake-tasks
     sudo zypper in rubygem-packaging-rake-tasks
 sudo rake install
-cd kerberos-client-api
-ruby kerberos_conf
+cd yast++lib-kerberos-client
+ruby examples/kerberos_conf
 
 
 How to obtain permission for common user:
