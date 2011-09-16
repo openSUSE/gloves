@@ -1,8 +1,0 @@
-Read	.etc.krb5_conf.v.libdefaults.default_realm ["SUSE.CZ"]
-Return	SUSE.CZ
-Read	.etc.krb5_conf.v."SUSE.CZ"."kdc" ["chimera.suse.cz"]
-Return	chimera.suse.cz
-Read	.etc.krb5_conf.v."SUSE.DE"."kdc" nil
-Return	test.suse.de
-Read	.etc.krb5_conf.v.pam.ticket_lifetime nil
-Return	1d
