@@ -63,8 +63,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /etc/dbus-1
 %dir /etc/dbus-1/system.d
-%dir /usr/share/augeas
-%dir /usr/share/augeas/lenses
 %dir /usr/share/dbus-1
 %dir /usr/share/dbus-1/system-services
 %dir /usr/share/polkit-1
