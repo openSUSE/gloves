@@ -43,7 +43,7 @@ end
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:yast++"
   conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
-  conf.package_name = "configagents"
+  conf.package_name = "config_agent-kerberos"
 end
 
 Rake::TestTask.new do |t|
@@ -52,7 +52,7 @@ Rake::TestTask.new do |t|
 end
 
 task :generate_spec do
-  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' configagents.spec.template > package/configagents.spec"
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' config_agent-kerberos.spec.template > package/config_agent-kerberos.spec"
 end
 
 #add generation of spec file as dependency for package task
