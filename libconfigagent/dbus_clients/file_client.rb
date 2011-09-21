@@ -19,6 +19,7 @@
 require "rubygems" #FIXME not nice to require rubygems, user of library should require it itself
 require "dbus"
 require "dbus_clients/backend_exception"
+require "dbus_clients/utils"
 
 module DbusClients
   class FileClient
@@ -30,7 +31,11 @@ module DbusClients
     end
 
     def self.read (options)
-      ret = dbus_object.read(options).first #ruby dbus return array of return values
+      ret = if Process.euid == 0 #root user
+          Utils.direct_call self.name, :read, options
+        else
+          dbus_object.read(options).first #ruby dbus return array of return values
+        end
       if ret["error"]
         if ret["error_type"]
           BackendException.raise_from_hash ret
@@ -42,7 +47,11 @@ module DbusClients
     end
 
     def self.write (options)
-      ret = dbus_object.write(options).first #ruby dbus return array of return values
+      ret = if Process.euid == 0 #root user
+          Utils.direct_call self.name, :write, options
+        else
+          dbus_object.write(options).first #ruby dbus return array of return values
+        end
       if ret["error"]
         if ret["error_type"]
           BackendException.raise_from_hash ret

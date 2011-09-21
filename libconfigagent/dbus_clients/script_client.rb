@@ -30,7 +30,11 @@ module DbusClients
     end
 
     def self.execute (options)
-      ret = dbus_object.execute(options).first #ruby dbus return array of return values
+      ret = if Process.euid == 0 #root user
+          Utils.direct_call self.name, :execute, options
+        else
+          dbus_object.execute(options).first #ruby dbus return array of return values
+        end
       if ret["error"]
         if ret["error_type"]
           BackendException.raise_from_hash ret
