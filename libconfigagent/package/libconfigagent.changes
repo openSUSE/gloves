@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Sep 27 12:29:48 CEST 2011 - jsuchome@suse.cz
+
+- various fixes for agent generator 
+
+-------------------------------------------------------------------
 Mon Aug 29 14:34:16 UTC 2011 - jreidinger@suse.com
 
 - initial package 
