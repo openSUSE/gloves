@@ -1,4 +1,4 @@
-[systemagent]
+[configagent]
 Identity=unix-user:<yourcooluser>
 Action=org.opensuse.config_agent.*
 ResultAny=yes
