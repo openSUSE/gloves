@@ -22,6 +22,6 @@ $stdout.reopen("/var/log/systemagent.stdout")
 $stderr.reopen("/var/log/systemagent.stderr")
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
 require "rubygems"
-require "config_agent/pam_config"
+require "config_agent_service/pam_config"
 require "dbus_services/service_runner"
-DbusServices::ServiceRunner::run(ConfigAgent::PamConfig)
+DbusServices::ServiceRunner::run(ConfigAgentService::PamConfig)
