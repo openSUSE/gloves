@@ -30,6 +30,14 @@ module YLib
 
     # Read all settings relevant for language configuration
     def self.read(params)
+
+      # get the list of available languages (not only YaST supported)
+      if (params.has_key? "languages")
+	# this is read only call, no need for an agent here
+	locales = `locale -a | grep -i utf`.split("\n")
+      	return locales
+      end
+
       # read config files    
       begin
         sysconfig_language	= ConfigAgent::Language.read({})
@@ -38,12 +46,12 @@ module YLib
         return nil
       end
 
-      # TODO languages and use_utf8
       ret	= {
         "language"	=> sysconfig_language["RC_LANG"] || ""
       }
       rootlang		= sysconfig_language["ROOT_USES_LANG"]
       ret["rootlang"]	= rootlang unless rootlang == "ctype"
+      ret["languages"]	= sysconfig_language["INSTALLED_LANGUAGES"] || ""
 
       return ret
     end

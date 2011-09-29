@@ -21,8 +21,11 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
 require "y_lib/language"
 require "dbus_clients/backend_exception"
 begin
-  if ARGV.empty?
-    language = YLib::Language::read({})
+  args = {}
+  args = { "languages" => 1 } if ARGV[0] == "languages"
+
+  if ARGV.empty? || ARGV[0] == "languages"
+    language = YLib::Language::read(args)
     puts language.inspect unless language.nil?
     if language.nil?
       error	= YLib::Language::last_error
