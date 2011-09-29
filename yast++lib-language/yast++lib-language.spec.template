@@ -18,12 +18,12 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Library for high level access to language configuration
 Source:         %{name}-%{version}.tar.bz2
-Requires:	config_agent-language
+Requires:	config_agent-country
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging-rake-tasks
-BuildRequires:  config_agent-language
+BuildRequires:  config_agent-country
 
 # This is for Hudson (build service) to setup the build env correctly
 %if 0
