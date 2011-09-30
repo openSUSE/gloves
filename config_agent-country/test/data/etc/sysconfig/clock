@@ -1,0 +1,36 @@
+## Path:		System/Environment/Clock
+## Description:		Information about your timezone and time
+## Type:		string(-u,--utc,--localtime)
+## ServiceRestart:	boot.clock
+## Command:		/sbin/refresh_initrd
+#
+# Set to "-u" if your system clock is set to UTC, and to "--localtime"
+# if your clock runs that way.
+#
+HWCLOCK="--localtime"
+## Description: Write back system time to the hardware clock
+## Type:		yesno
+## Default:		yes
+#
+# Is set to "yes" write back the system time to the hardware
+# clock at reboot or shutdown. Usefull if hardware clock is
+# much more inaccurate than system clock.  Set to "no" if
+# system time does it wrong due e.g. missed timer interrupts.
+# If set to "no" the hardware clock adjust feature is also
+# skipped because it is rather useless without writing back
+# the system time to the hardware clock.
+#
+SYSTOHC="yes"
+
+## Type:		string(Europe/Berlin,Europe/London,Europe/Paris)
+## ServiceRestart:	boot.clock
+## Command:		/sbin/refresh_initrd
+#
+# Timezone (e.g. CET or Asia/Tokyo). The value should correspond
+# to the contents of the /etc/localtime file and is for internal
+# YaST use; changing this setting will not make SuSEconfig update
+# the /etc/localtime file, YaST does that or you will need to do
+# this manually by calling zic -l.
+#
+TIMEZONE="Europe/Prague"
+DEFAULT_TIMEZONE="US/Eastern"
