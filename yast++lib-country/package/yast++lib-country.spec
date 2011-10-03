@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-language (Version 0.1.0)
+# spec file for package yast++lib-country (Version 0.1.0)
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -9,14 +9,14 @@
 #
 
 
-Name:           yast++lib-language
+Name:           yast++lib-country
 License:	LGPLv2.1 or LGPLv3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
 Version:        0.1.0
 Release:        0
-Summary:        Library for high level access to language configuration
+Summary:        Library for high level access to country configuration
 Source:         %{name}-%{version}.tar.bz2
 Requires:	config_agent-country
 
@@ -32,7 +32,7 @@ BuildRequires:  rubygem-rcov >= 0.9.3.2
 %endif
 
 %description
-Library for high level access to language configuration. Part of yast++ project.
+Library for high level access to country configuration. Part of yast++ project.
 Authors:
 --------
     Jiri Suchomel <jsuchome@suse.cz>
