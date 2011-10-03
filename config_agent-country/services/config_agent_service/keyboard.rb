@@ -48,8 +48,28 @@ module ConfigAgentService
     end
 
     def write(params)
-      #TODO add your code here
-      return {}
+      aug		= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+      # different lens for writing, because of double quote handling...
+      aug.transform(:lens => "Shellvars.lns", :incl => "/etc/sysconfig/keyboard")
+      aug.load
+      ret	= {
+	"success"	=> true
+      }
+
+      path	= "/files/etc/sysconfig/keyboard/"
+      params.each do |key, value|
+	next if key.start_with? "_" # skip internal keys
+	value = "\"" + value + "\""
+	aug.set(path + key, value)
+      end
+
+      unless aug.save
+	ret["success"]	= false
+	ret["message"]	= aug.get("/augeas/files/etc/sysconfig/keyboard/error/message")
+      end
+
+      aug.close
+      return ret
     end
 
   end
