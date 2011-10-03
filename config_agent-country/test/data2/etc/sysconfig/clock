@@ -1,0 +1,4 @@
+DEFAULT_TIMEZONE="US/Eastern"
+TIMEZONE="US/Eastern"
+HWCLOCK="--localtime"
+SYSTOHC="yes"
