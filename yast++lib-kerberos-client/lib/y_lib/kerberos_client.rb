@@ -65,9 +65,6 @@ module YLib
     # Write Kerberos client configuration
     def self.write(params)
 
-      ret		= {
-    "success"	=> true
-      }
       # save config file settings
       krb5_conf	= params["kerberos_client"]
       ssh_support	= krb5_conf.delete "ssh_support"
@@ -82,6 +79,10 @@ module YLib
 
       # no changes in PAM config
       return ret if params["pam_login"].nil? || params["pam_login"].empty?
+
+      ret		= {
+    	"success"	=> true
+      }
 
       # update PAM configuration
       sssd	= params["pam_login"]["sssd"]
@@ -99,9 +100,9 @@ module YLib
       elsif params["pam_login"]["use_kerberos"]
         # combined LDAP+Kerberos setup
         if pam_query("ldap").empty?
-    pam_add("krb5")
+	  pam_add("krb5")
         else
-    pam_add("ldap-account_only")
+	  pam_add("ldap-account_only")
         end
         pam_add("krb5-ignore_unknown_principals") if ignore_unknown
       # standard authentication (krb5) is off
