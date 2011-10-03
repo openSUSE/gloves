@@ -28,14 +28,24 @@ module YLib
       return @error
     end
 
-    # Read all settings relevant for language configuration
+    @sysconfig2yast	= {
+      "RC_LANG"		=> "language",
+      "ROOT_USES_LANG"	=> "rootlang",
+      "INSTALLED_LANGUAGES"	=> "languages"
+    }
+
+    # Read all settings relevant for language configuration (key:value map).
+    # If "languages" key is passed in input parameters, return list
+    # of available languages instead (under "languages" key of return map)
     def self.read(params)
 
       # get the list of available languages (not only YaST supported)
       if (params.has_key? "languages")
-	# this is read only call, no need for an agent here
+	# this is read only system call, no need for an agent here
 	locales = `locale -a | grep -i utf`.split("\n")
-      	return locales
+      	return {
+	    "languages"	=> locales
+	}
       end
 
       # read config files    
@@ -46,14 +56,36 @@ module YLib
         return nil
       end
 
-      ret	= {
-        "language"	=> sysconfig_language["RC_LANG"] || ""
-      }
-      rootlang		= sysconfig_language["ROOT_USES_LANG"]
-      ret["rootlang"]	= rootlang unless rootlang == "ctype"
-      ret["languages"]	= sysconfig_language["INSTALLED_LANGUAGES"] || ""
+      ret	= {}
+      sysconfig_language.each do |key, val|
+      	ret[@sysconfig2yast[key]]	= val if @sysconfig2yast.has_key? key
+      end
 
       return ret
     end
+
+    # Write Language configuration
+    def self.write(params)
+
+      ret		= {
+	"success"	=> true
+      }
+
+      unless params.nil? && params.empty?
+	sysconfig_params = {}
+	params.each do |key, value|
+      	  new_key = @sysconfig2yast.invert[key]
+      	  sysconfig_params[new_key] = value unless new_key.nil?
+	end
+        ret	= ConfigAgent::Language.write(sysconfig_params)
+      end
+
+      return ret
+    rescue DbusClients::InsufficientPermission => e
+      @error	= "User has no permission for action '#{e.permission}'."
+      return nil
+    end
+
+
   end
 end
