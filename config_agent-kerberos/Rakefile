@@ -22,7 +22,7 @@ require "packaging"
 
 desc "install all things on system"
 task :install, :prefix, :ruby_path do |t,args|
-  args.with_defaults :prefix => '/',:ruby_path => "usr/lib*/ruby/vendor_ruby/1.*/"
+  args.with_defaults :prefix => '/',:ruby_path => Dir["usr/lib*/ruby/vendor_ruby/1.*/"][0]
   sh "mkdir -p #{args[:prefix]}etc/dbus-1/system.d/"
   sh "cp -r infrastructure/dbus-policies/* #{args[:prefix]}etc/dbus-1/system.d/"
   sh "mkdir -p #{args[:prefix]}usr/share/dbus-1/system-services/"
