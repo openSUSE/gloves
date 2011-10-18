@@ -11,8 +11,8 @@
 
 Name:           libconfigagent
 Requires:       rubygem-ruby-dbus
-License:	      LGPLv2.1 or LGPLv3
-Group:          Libraries/System
+License:        LGPLv2.1 or LGPLv3
+Group:          System/Libraries
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
 Version:        VERSION_TEMPLATE
@@ -21,6 +21,7 @@ Summary:        libconfigagent - framework for config agents
 Source:         libconfigagent-%{version}.tar.bz2
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildArch:      noarch
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging-rake-tasks
 
@@ -37,15 +38,17 @@ Summary:  Generator of new config agents
 
 
 %description
-libconfigagent - Framework needed by each config agent. Provide way to easy
-way to call agent attached to dbus in transparent way.
+Framework needed by each config agent. Provide way to easy way to call
+agent attached to dbus in transparent way.
+
 Authors:
 --------
     Josef Reidinger <jreidinger@suse.cz>
 
 %description devel
-Contain generator for new config agents. It generates neccessary dbus and polkit configartion,
-code which call proper parts of code and stubs for methods.
+Contain generator for new config agents. It generates neccessary dbus
+and polkit configuration, code which call proper parts of code and stubs
+for methods.
 
 %prep
 %setup
