@@ -389,7 +389,7 @@ global define boolean Write () ``{
     // -- write to /etc/krb5.conf
     Progress::NextStage ();
 
-    map write_ret	= (map) YLib::KerberosClient::write (write);
+    map write_ret	= (map) YLib::KerberosClient::modify ($[], write);
 
     if (write_ret == nil)
     {
