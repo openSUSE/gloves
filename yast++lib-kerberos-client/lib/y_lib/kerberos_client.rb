@@ -63,7 +63,7 @@ module YLib
     end
 
     # Write Kerberos client configuration
-    def self.write(params)
+    def self.modify(config,params)
 
       # save config file settings
       krb5_conf	= params["kerberos_client"]

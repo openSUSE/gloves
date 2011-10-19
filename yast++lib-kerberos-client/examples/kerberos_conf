@@ -29,8 +29,8 @@ begin
       puts "returned error: #{error}" if error
     end
   else
-    puts YLib::KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0]}})
-#    puts YLib::KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0], "ssh_support" => true}})
+    puts YLib::KerberosClient::modify({}, {"kerberos_client"=>{"default_realm"=>ARGV[0]}})
+#    puts YLib::KerberosClient::modify({}, {"kerberos_client"=>{"default_realm"=>ARGV[0], "ssh_support" => true}})
   end
 rescue DbusClients::BackendException => e
   puts e.backend_backtrace
