@@ -1,0 +1,71 @@
+#	$OpenBSD: ssh_config,v 1.26 2010/01/11 01:39:46 dtucker Exp $
+# Source: example config
+
+# This is the ssh client system-wide configuration file.  See
+# ssh_config(5) for more information.  This file provides defaults for
+# users, and the values can be changed in per-user configuration files
+# or on the command line.
+
+# Configuration data is parsed as follows:
+#  1. command line options
+#  2. user-specific file
+#  3. system-wide file
+# Any configuration value is only changed the first time it is set.
+# Thus, host-specific definitions should be at the beginning of the
+# configuration file, and defaults at the end.
+
+# Site-wide defaults for some commonly used options.  For a comprehensive
+# list of available options, their meanings and defaults, please see the
+# ssh_config(5) man page.
+
+Host suse.cz
+#   ForwardAgent no
+#   ForwardX11 no
+
+# If you do not trust your remote host (or its administrator), you
+# should not forward X11 connections to your local X11-display for
+# security reasons: Someone stealing the authentification data on the
+# remote side (the "spoofed" X-server by the remote sshd) can read your
+# keystrokes as you type, just like any other X11 client could do.
+# Set this to "no" here for global effect or in your own ~/.ssh/config
+# file if you want to have the remote X11 authentification data to
+# expire after two minutes after remote login.
+ForwardX11Trusted yes
+
+#   RhostsRSAAuthentication no
+#   RSAAuthentication yes
+#   PasswordAuthentication yes
+#   HostbasedAuthentication no
+#   GSSAPIAuthentication no
+#   GSSAPIDelegateCredentials no
+#   BatchMode no
+#   CheckHostIP yes
+#   AddressFamily any
+#   ConnectTimeout 0
+#   StrictHostKeyChecking ask
+#   IdentityFile ~/.ssh/identity
+#   IdentityFile ~/.ssh/id_rsa
+#   IdentityFile ~/.ssh/id_dsa
+#   Port 22
+Protocol 2
+SendEnv LC_IDENTIFICATION LC_ALL
+
+# This will print the fingerprint of the host key in "visual" form
+# this should make it easier to also recognize bad things
+VisualHostKey no
+
+# This will hash new host keys and make them so unusable for malicious
+# people or software trying to use known_hosts to find further hops.
+HashKnownHosts yes
+
+GSSAPIAuthentication yes
+GSSAPIDelegateCredentials yes
+
+Host *
+
+GSSAPIAuthentication yes
+GSSAPIDelegateCredentials yes
+
+SendEnv LC_LANG
+
+#   ProxyCommand ssh -q -W %h:%p gateway.example.com
