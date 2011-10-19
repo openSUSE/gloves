@@ -65,7 +65,7 @@ module YLib
     end
 
     # Write Language configuration
-    def self.write(params)
+    def self.modify(config,params)
 
       ret		= {
 	"success"	=> true

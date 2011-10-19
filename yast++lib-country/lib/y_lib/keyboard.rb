@@ -66,7 +66,7 @@ module YLib
     end
 
     # Write Keyboard configuration
-    def self.write(params)
+    def self.modify(config,params)
 
       ret		= {
 	"success"	=> true

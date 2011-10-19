@@ -32,7 +32,7 @@ begin
       puts "returned error: #{error}" if error
     end
   else
-    puts YLib::Language::write({"language"=>ARGV[0]})
+    puts YLib::Language::modify({}, {"language"=>ARGV[0]})
   end
 rescue DbusClients::BackendException => e
   puts e.backend_backtrace
