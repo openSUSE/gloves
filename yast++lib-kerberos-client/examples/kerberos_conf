@@ -30,10 +30,7 @@ begin
     end
   else
     puts YLib::KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0]}})
-#  puts KerberosClient::write({"kerberos_client"=>{
-#    "default_realm"=>ARGV[0],
-#    "ssh_support" => true
-#  }})
+#    puts YLib::KerberosClient::write({"kerberos_client"=>{"default_realm"=>ARGV[0], "ssh_support" => true}})
   end
 rescue DbusClients::BackendException => e
   puts e.backend_backtrace

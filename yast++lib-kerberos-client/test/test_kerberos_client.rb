@@ -47,7 +47,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "exitstatus" => 0
     }
     ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --sss" ).returns(sss_pam_module_out)
-    ConfigAgent::SshConfig.stubs(:read).returns({"ssh_config" => []})
+    ConfigAgent::SshConfig.stubs(:read).returns({"Host" => []})
   end
 
   def test_read_common

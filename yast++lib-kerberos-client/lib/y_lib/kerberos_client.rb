@@ -140,16 +140,16 @@ module YLib
     # Read state of ssh support from /etc/ssh/ssh_config
     def self.read_ssh_support
       hostname	= Socket.gethostname
-      ssh_config	= ConfigAgent::SshConfig.read({})["ssh_config"]
+      ssh_config	= ConfigAgent::SshConfig.read({})
       
       ssh_support	= false
-      ssh_config.each do |host|
-    if (host["Host"] == "*" || host["Host"] == hostname) &&
-        (host["GSSAPIAuthentication"] && host["GSSAPIDelegateCredentials"])
-        ssh_support	= host["GSSAPIAuthentication"] == "yes" && host["GSSAPIDelegateCredentials"] == "yes"
-        @ssh_section = host["Host"]
-        break
-    end
+      ssh_config["Host"].each do |host|
+	if (host["Host"] == "*" || host["Host"] == hostname) &&
+	   (host["GSSAPIAuthentication"] && host["GSSAPIDelegateCredentials"])
+        	ssh_support	= host["GSSAPIAuthentication"] == "yes" && host["GSSAPIDelegateCredentials"] == "yes"
+        	@ssh_section = host["Host"]
+        	break
+	end
       end
       return ssh_support
     end
@@ -160,14 +160,15 @@ module YLib
       read_ssh_support if @ssh_section.nil?
       @ssh_section = "*" if @ssh_section.nil?
       ssh_value	= ssh_support ? "yes": "no"
-      # only update existing section
+      # only update one host in existing section
       ssh_config	= {
-    "update"	=> {
-        @ssh_section	=> {
-      "GSSAPIAuthentication"	=> ssh_value,
-      "GSSAPIDelegateCredentials" => ssh_value
-        }
-    }
+	"Host"	=> [
+	    {
+		"Host"	=> @ssh_section,
+		"GSSAPIAuthentication"	=> ssh_value,
+		"GSSAPIDelegateCredentials" => ssh_value
+	    }
+        ]
       }
       ret	= ConfigAgent::SshConfig.write(ssh_config)
       return ret
