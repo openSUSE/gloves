@@ -25,16 +25,35 @@ require "config_agent_service/ssh_config"
 class TestSshConfig < Test::Unit::TestCase
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
+    @data2_dir = File.join(File.dirname(__FILE__),"data2")
   end
 
   def test_reading
     file = ConfigAgentService::SshConfig.new nil
     ret = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
-    ssh_config	= ret["ssh_config"]
-    assert_equal ["LC_IDENTIFICATION", "LC_ALL"], ssh_config[0]["SendEnv"]
-    assert_equal "suse.cz", ssh_config[0]["Host"]
-    assert_equal "*", ssh_config[1]["Host"]
-    assert_equal ["LC_LANG"], ssh_config[1]["SendEnv"]
+    hosts	= ret["Host"]
+    assert_equal ["LC_IDENTIFICATION", "LC_ALL"], hosts[0]["SendEnv"]
+    assert_equal "suse.cz", hosts[0]["Host"]
+    assert_equal "*", hosts[1]["Host"]
+    assert_equal ["LC_LANG"], hosts[1]["SendEnv"]
+  end
+
+  # change the values of GSSAPI keys of suse.cz section
+  def test_overwrite
+
+    file2 = ConfigAgentService::SshConfig.new nil
+    params	= {
+	"_aug_internal"	=> Augeas::open(@data2_dir,File.join(File.dirname(__FILE__),'..',"lens"), Augeas::NO_MODL_AUTOLOAD),
+	"Host"	=> [
+		{
+		    "GSSAPIAuthentication"=>"yes",
+		    "GSSAPIDelegateCredentials"=>"yes",
+		    "Host"=>"suse.cz"
+		}
+	]
+    }
+    ret = file2.write params
+    assert_equal nil, ret["message"]
   end
 
 end

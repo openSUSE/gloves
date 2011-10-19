@@ -31,7 +31,8 @@ module ConfigAgentService
       aug.load
     
       ret = {
-	"ssh_config"	=> []
+	# we have to create list (not hash), because order matters
+	"Host"	=> []
       } 
 
       aug.match("/files/etc/ssh/ssh_config/Host").each do |host_path|
@@ -50,7 +51,7 @@ module ConfigAgentService
 		host[key] = aug.get(key_path)
 	    end
 	end
-	ret["ssh_config"].push host
+	ret["Host"].push host
       end
 
       aug.close
@@ -66,41 +67,37 @@ module ConfigAgentService
 	"success"	=> true
       }
 
-      # only modified parts provided
-      if params.has_key? "update"
-	update	= params["update"]
+      # currently we support updating the Host section
+      if params.has_key? "Host"
+	hosts	= params["Host"]
 	first_host = nil
+	# convert hosts list to a hash for better searching
+	hosts_hash	= {}
+	hosts.each do |host|
+	    h		= host.dup
+	    name	= h.delete "Host"
+	    hosts_hash[name]	= h
+	end
 	# iterate over existing hosts
 	aug.match("/files/etc/ssh/ssh_config/Host").each do |host_path|
 	    host = aug.get(host_path)
 	    first_host	= host_path unless first_host
-	    if update.has_key? host
-		args	= update.delete host
+	    if hosts_hash.has_key? host
+		args	= hosts_hash.delete host
 		write_host_args(aug, host_path, args)
 	    end
 	end
-	# host section was not found: should be added
-	unless update.empty?
-	    update.each do |new_host, args|
+	# given host section was not found in current file: should be added
+	unless hosts_hash.empty?
+	    hosts.each do |args|
 		# add new host to the top of the file
 		aug.insert(first_host,"Host",true)
 		path = "/files/etc/ssh/ssh_config/Host[1]"
+		new_host	= args.delete "Host"
 		aug.set(path, new_host)
 		write_host_args(aug, path, args)
 	    end
 	end
-      elsif params.has_key? "ssh_config"
-	# Here, it should be possible to pass whole new list covering the config file, 
-	# same format as the output of read.
-	# Everything should be written
-	ret["message"]	= "Not implemented"
-	aug.close
-	return ret
-      else
-	ret["message"]	= "Wrong format of input parameters"
-	ret["success"]	= false
-	aug.close
-	return ret
       end
 
       unless aug.save
