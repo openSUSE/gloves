@@ -1,0 +1,13 @@
+- define YLib API (https://github.com/yast/yast--/wiki/YLib-Use-Cases)
+
+- fix AugeasSerializer (options for comments, check if it handles current files0
+
+- find a way to store some system wide settings (like chroot)
+
+- wrinte complete yast2/yast2++/config_agent modules for:
+	- country (locale)
+	- runlevel/services
+	- autologin
+	- network
+	- firewall
+	- users
