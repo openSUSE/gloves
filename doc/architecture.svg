@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg2"
+   inkscape:label="Pozadí"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="architecture.svg">
+  <defs
+     id="defs3">
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lend"
+       style="overflow:visible;">
+      <path
+         id="path3929"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none;"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.18"
+     inkscape:cx="520.35161"
+     inkscape:cy="395.39942"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:snap-grids="true"
+     inkscape:snap-page="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="980"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3797"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata6">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.26766)">
+    <g
+       id="g3062"
+       transform="translate(-40,299.99997)">
+      <rect
+         y="42.362183"
+         x="60"
+         height="70"
+         width="210"
+         id="rect3027"
+         style="fill:none;stroke:#000000;stroke-width:0.85027939px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text2984"
+         y="92.362183"
+         x="90"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="92.362183"
+           x="90"
+           id="tspan2986"
+           sodipodi:role="line">YaST UI</tspan></text>
+    </g>
+    <g
+       id="g3088"
+       transform="translate(150,339.99996)">
+      <rect
+         y="182.36218"
+         x="250"
+         height="70"
+         width="220"
+         id="rect3027-9"
+         style="fill:none;stroke:#000000;stroke-width:0.87028867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3006"
+         y="232.36218"
+         x="320"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="232.36218"
+           x="320"
+           id="tspan3008"
+           sodipodi:role="line">YLib</tspan></text>
+    </g>
+    <g
+       id="g3093"
+       transform="translate(150,409.99996)">
+      <g
+         transform="matrix(1.04,0,0,1,11.6,0)"
+         id="g3075">
+        <rect
+           style="fill:none;stroke:#000000;stroke-width:0.9277308px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="rect3027-9-2"
+           width="250"
+           height="70"
+           x="210"
+           y="322.36218" />
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3006-2"
+         y="372.36218"
+         x="240"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="372.36218"
+           x="240"
+           id="tspan3008-8"
+           sodipodi:role="line">Config Agent</tspan></text>
+    </g>
+    <g
+       id="g3030"
+       transform="translate(-10,299.99996)">
+      <rect
+         y="42.362183"
+         x="300"
+         height="70"
+         width="220"
+         id="rect3027-2"
+         style="fill:none;stroke:#000000;stroke-width:0.87028867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text2984-2"
+         y="92.362183"
+         x="320"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="92.362183"
+           x="320"
+           id="tspan2986-8"
+           sodipodi:role="line">WebYaST</tspan></text>
+    </g>
+    <g
+       id="g3070"
+       transform="translate(40,299.99996)">
+      <rect
+         y="42.362183"
+         x="500"
+         height="70"
+         width="220"
+         id="rect3027-2-7"
+         style="fill:none;stroke:#000000;stroke-width:0.87028867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text2984-2-3"
+         y="92.362183"
+         x="550"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="92.362183"
+           x="550"
+           id="tspan2986-8-6"
+           sodipodi:role="line">Studio</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="50"
+       y="542.36212"
+       id="text3099"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3101"
+         x="50"
+         y="542.36212"
+         style="font-size:20px">Stateless, high-level library</tspan></text>
+    <g
+       id="g3070-4"
+       transform="translate(300,299.99996)">
+      <rect
+         y="42.362183"
+         x="500"
+         height="70"
+         width="220"
+         id="rect3027-2-7-7"
+         style="fill:none;stroke:#000000;stroke-width:0.87028867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text2984-2-3-9"
+         y="92.362183"
+         x="550"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="92.362183"
+           x="550"
+           id="tspan2986-8-6-4"
+           sodipodi:role="line">CLI app</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 140,104.09448 260,110"
+       id="path4367"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 400,104.09448 60,110"
+       id="path4369"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 650,104.09448 -110,110"
+       id="path4555"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 920,104.09448 -300,110"
+       id="path4739"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+    <path
+       style="fill:none;stroke:#c20000;stroke-width:3.31294583999999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:13.25178312999999974, 3.31294578000000017;stroke-dashoffset:0"
+       d="m 20,622.36214 700.33898,0 299.66102,0"
+       id="path5107"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
+    <g
+       id="g5206"
+       transform="translate(-100,20.000021)">
+      <rect
+         y="822.36212"
+         x="240"
+         height="70"
+         width="210"
+         id="rect3027-8"
+         style="fill:none;stroke:#000000;stroke-width:0.85027939px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <g
+         id="g5202">
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="300"
+           y="872.36212"
+           id="text2984-7"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan2986-0"
+             x="300"
+             y="872.36212">File</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g5212"
+       transform="translate(30,20.000021)">
+      <rect
+         y="822.36212"
+         x="570"
+         height="70"
+         width="210"
+         id="rect3027-25"
+         style="fill:none;stroke:#000000;stroke-width:0.85027939px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text2984-6"
+         y="872.36212"
+         x="630"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="872.36212"
+           x="630"
+           id="tspan2986-6"
+           sodipodi:role="line">Script</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="50"
+       y="652.36212"
+       id="text3099-7"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3101-6"
+         x="50"
+         y="652.36212"
+         style="font-size:20px">Polkit checks if user has the access right</tspan><tspan
+         sodipodi:role="line"
+         x="50"
+         y="677.36212"
+         style="font-size:20px"
+         id="tspan5178" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="50"
+       y="702.36212"
+       id="text5180"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5182"
+         x="50"
+         y="702.36212"
+         style="font-size:20px">D-Bus starts a service running as root</tspan></text>
+    <path
+       style="fill:none;stroke:#007800;stroke-width:3.31294584;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:13.25178313, 3.31294578;stroke-dashoffset:0"
+       d="m 20,672.36214 1000,0"
+       id="path5107-8"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="30"
+       y="332.36215"
+       id="text5217"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5219"
+         x="30"
+         y="332.36215"
+         style="fill:#0000ff;fill-opacity:1">yast2 kerberos-client</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="660"
+       y="552.36212"
+       id="text5221"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5223"
+         x="660"
+         y="552.36212"
+         style="fill:#0000ff">Adapt Kerberos configuration:</tspan><tspan
+         sodipodi:role="line"
+         x="660"
+         y="577.36212"
+         id="tspan5227"
+         style="fill:#0000ff">YLib::modify ({ &quot;realm&quot; =&gt; &quot;SUSE.CZ&quot; })</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="360"
+       y="872.36212"
+       id="text5221-6"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5223-9"
+         x="360"
+         y="872.36212"
+         style="fill:#0000ff">Write the config file:</tspan><tspan
+         sodipodi:role="line"
+         x="360"
+         y="897.36212"
+         style="fill:#0000ff"
+         id="tspan5258">/etc/krb5.conf</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="830"
+       y="872.36212"
+       id="text5221-6-6"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5223-9-4"
+         x="830"
+         y="872.36212"
+         style="fill:#0000ff">Update PAM settings:</tspan><tspan
+         sodipodi:role="line"
+         x="830"
+         y="897.36212"
+         style="fill:#0000ff"
+         id="tspan5258-5">/sbin/pam-config</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 510,284.09448 0,140"
+       id="path5288"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 640,494.09448 70,40"
+       id="path5472"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 380,494.09448 -140,40"
+       id="path5656"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.26766)" />
+  </g>
+</svg>
