@@ -19,3 +19,11 @@ How to obtain permission for common user:
 
 OpenSUSE Build Service project with packages:
   https://build.opensuse.org/project/show?project=YaST:Head:YaST%2B%2B
+
+
+Directory structure:
+* config_agent-* - contains packages with config agents
+* doc - overall yast++ documentation
+* libconfigagent - infrastructure and generators for config agents
+* yast - contains modified yast modules to use yast++
+* yast++lib* - contains high level configuration library
