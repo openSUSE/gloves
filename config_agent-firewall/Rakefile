@@ -1,0 +1,44 @@
+#--
+# Config Agents Framework
+#
+# Copyright (C) 2011 Novell, Inc. 
+#   This library is free software; you can redistribute it and/or modify
+# it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
+# License as published by the Free Software Foundation. 
+#
+#   This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
+# details. 
+#
+#   You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software 
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+#++
+
+require "rake"
+require "rake/testtask"
+require "packaging"
+
+desc "install all things on system"
+task :install, :prefix, :ruby_path do |t,args|
+  args.with_defaults :prefix => '/',:ruby_path => Dir["/usr/lib*/ruby/vendor_ruby/1.*/"][0]
+  sh "mkdir -p #{args[:prefix]}etc/dbus-1/system.d/"
+  sh "cp -r infrastructure/dbus-policies/* #{args[:prefix]}etc/dbus-1/system.d/"
+  sh "mkdir -p #{args[:prefix]}usr/share/dbus-1/system-services/"
+  sh "cp -r infrastructure/dbus-services/* #{args[:prefix]}usr/share/dbus-1/system-services/"
+  sh "mkdir -p #{args[:prefix]}usr/share/config_agents/"
+  sh "cp -r infrastructure/bin services #{args[:prefix]}usr/share/config_agents/"
+  sh "mkdir -p #{args[:prefix]}usr/share/polkit-1/actions/"
+  sh "cp infrastructure/polkit-definitions/* #{args[:prefix]}usr/share/polkit-1/actions/"
+  sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/"
+  sh "cd #{args[:prefix]}#{args[:ruby_path]}/; mkdir -p config_agent; cd -"
+  sh "cp -r infrastructure/clients/config_agent #{args[:prefix]}usr/lib*/ruby/vendor_ruby/1.*/"
+  sh "chmod +x #{args[:prefix]}usr/share/config_agents/bin/*/*.rb"
+  `pkill -f '#{args[:prefix]}usr/share/config_agents/bin/.*/.*\.rb' || true`
+end
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/*.rb']
+  t.verbose = true
+end
