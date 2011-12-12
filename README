@@ -14,7 +14,7 @@ ruby examples/kerberos_conf
 How to obtain permission for common user:
   su
   mkdir -p /etc/polkit-1/localauthority/50.local.d
-  mv doc/org.opensuse.config_agent.pkla /etc/polkit-1/localauthority/50.local.d
+  cp doc/org.opensuse.config_agent.pkla /etc/polkit-1/localauthority/50.local.d
 #replace <yourcooluser> with real user in /etc/polkit-1/localauthority/50.local.d/org.opensuse.config_agent.pkla
 
 OpenSUSE Build Service project with packages:
