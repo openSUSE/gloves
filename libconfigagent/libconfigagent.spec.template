@@ -23,7 +23,7 @@ Source:         libconfigagent-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
 BuildRequires:  ruby
-BuildRequires:  rubygem-packaging-rake-tasks
+BuildRequires:  rubygem-packaging_rake_tasks
 
 # This is for Hudson (build service) to setup the build env correctly
 %if 0

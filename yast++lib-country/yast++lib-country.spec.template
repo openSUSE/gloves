@@ -22,7 +22,7 @@ Requires:	config_agent-country
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
-BuildRequires:  rubygem-packaging-rake-tasks
+BuildRequires:  rubygem-packaging_rake_tasks
 BuildRequires:  config_agent-country
 
 # This is for Hudson (build service) to setup the build env correctly

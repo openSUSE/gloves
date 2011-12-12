@@ -26,7 +26,7 @@ Requires:       rubygem-ruby-dbus
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
-BuildRequires:  rubygem-packaging-rake-tasks
+BuildRequires:  rubygem-packaging_rake_tasks
 BuildRequires:  libconfigagent
 
 # This is for Hudson (build service) to setup the build env correctly
