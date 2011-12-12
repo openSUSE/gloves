@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Dec 12 10:38:38 UTC 2011 - jreidinger@suse.com
+
+- add initial augeas  serializer
+
+-------------------------------------------------------------------
 Tue Sep 27 12:29:48 CEST 2011 - jsuchome@suse.cz
 
 - various fixes for agent generator 
