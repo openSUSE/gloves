@@ -1,0 +1,5 @@
+# DBus service activation config
+[D-BUS Service]
+Name=org.opensuse.config_agent.file.etc_sysconfig_susefirewall2
+Exec=/usr/share/config_agents/bin/file_services/susefirewall2_service.rb
+User=root
