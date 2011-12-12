@@ -118,7 +118,7 @@ global define boolean Import (map settings) ``{
 
     default_domain	= client["default_domain"]:"";
     default_realm	= client["default_realm"]:"";
-    kdc			= client["kdc_server"]:"";
+    kdc			= client["kdc_server"]:client["kdc"]:"";
     clockskew		= client["clockskew"]:clockskew;
     ssh_support		= client["ssh_support"]:false;
     ignore_unknown	= client["ignore_unknown"]:ignore_unknown;
@@ -170,7 +170,8 @@ global define map Export () ``{
 	"kerberos_client": $[
 		"default_domain"	: default_domain,
 		"default_realm"		: default_realm,
-		"kdc_server"		: kdc,
+		"kdc_server"		: kdc, // for autoYaST backward compatibility
+		"kdc"			: kdc,
 		"clockskew"		: clockskew,
 		"ssh_support"		: ssh_support,
 		"ignore_unknown"	: ignore_unknown,
@@ -194,7 +195,6 @@ global define map Export () ``{
  * @return success
  */
 global define boolean Read () ``{
-
 
     map read	= (map) YLib::KerberosClient::read ($[]);
 
