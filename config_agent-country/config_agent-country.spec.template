@@ -18,7 +18,6 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Set of dbus services for basic access to country config
 Source:         %{name}-%{version}.tar.bz2
-Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent
 Requires:       rubygem-ruby-augeas
 Requires:       augeas

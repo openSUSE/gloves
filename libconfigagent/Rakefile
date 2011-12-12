@@ -29,7 +29,7 @@ task :install, :prefix, :ruby_path do |t,args|
   sh "mkdir -p #{args[:prefix]}usr/lib/config-agent-generator"
   sh "cp agent-generator/* #{args[:prefix]}usr/lib/config-agent-generator/"
   sh "mkdir -p #{args[:prefix]}usr/bin/"
-  sh "ln -s #{args[:prefix]}usr/lib/config-agent-generator/agent-generator #{args[:prefix]}usr/bin/config-agent-generator" unless File.exists?("#{args[:prefix]}usr/bin/config-agent-generator")
+  sh "ln -s /usr/lib/config-agent-generator/agent-generator #{args[:prefix]}usr/bin/config-agent-generator" unless File.exists?("#{args[:prefix]}usr/bin/config-agent-generator")
 end
 
 Packaging::Configuration.run do |conf|
