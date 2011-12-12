@@ -23,7 +23,7 @@ Requires:  config_agent-pam
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
-BuildRequires:  rubygem-packaging-rake-tasks
+BuildRequires:  rubygem-packaging_rake_tasks
 BuildRequires:  config_agent-kerberos
 BuildRequires:  config_agent-pam
 
