@@ -16,21 +16,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-module DbusServices
-  class BackendException < StandardError
-    attr_reader :type
+require "open4"
+require "dbus_service/logger"
 
-    def initialize(msg,type)
-      super(msg)
-      @type = type
-    end
+module ConfigAgentService
+  class ScriptService
+    include ConfigAgentService::Logger
 
-    def to_hash
-      return { 
-        "error" => message,
-        "backtrace" => backtrace,
-        "error_type" => type
-      }
+    def run command
+      ret = {}
+      status = Open4::popen4(command) do |pid,stdin,stdout,stderr|
+        stdin.close
+        ret["stdout"] = stdout.read.strip
+        ret["stderr"] = stderr.read.strip
+      end
+      ret["exitstatus"] = status.exitstatus
+      ret
     end
   end
 end

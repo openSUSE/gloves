@@ -18,7 +18,7 @@
 
 require "augeas"
 
-module DbusServices
+module ConfigAgentService
   module AugeasSerializer
 
     def augeas_load (path,lense,options={})

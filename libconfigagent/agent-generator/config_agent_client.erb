@@ -22,6 +22,6 @@ module ConfigAgent
   class <%= agent_class %> < DbusClients::<%= type.to_s.capitalize %>Client
 
     # identification of relevant DBUS service
-    agent_id "<%= identifier %>"
+    agent_id "<%= type.to_s.downcase %>.<%= identifier %>"
   end
 end

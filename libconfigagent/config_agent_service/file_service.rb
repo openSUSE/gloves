@@ -1,4 +1,4 @@
-<%#--
+#--
 # Config Agents Framework
 #
 # Copyright (C) 2011 Novell, Inc. 
@@ -15,15 +15,12 @@
 # License along with this library; if not, write to the Free Software 
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
-%><!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
-  "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
-<busconfig>
-  <policy user="root">
-    <allow own="org.opensuse.config_agent.<%= type.to_s %>.<%= identifier %>" />
-    <allow send_destination="org.opensuse.config_agent.<%= type.to_s %>.<%= identifier %>" />
-  </policy>
-<!-- anyone can call service as it is protected by policyKit -->
-  <policy context="default">
-    <allow send_destination="org.opensuse.config_agent.<%= type.to_s %>.<%= identifier %>" />
-  </policy>
-</busconfig>
+
+require "config_agent_service/backend_exception"
+require "config_agent_service/logger"
+
+module ConfigAgentService
+  class FileService
+    include ConfigAgentService::Logger
+  end
+end

@@ -16,25 +16,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'rubygems'
-require 'dbus'
+require "logger"
 
-module DbusServices
-  module ServiceRunner
-    def self.run(service_class)
-      # Choose the bus (could also be DBus::session_bus, which is not suitable for a system service)
-      bus = DBus::system_bus
-      # Define the service name
-      service = bus.request_service(service_class.service_name)
-      # Set the object path
-      obj = service_class.new(service_class.object_path)
-      # Export it!
-      service.export(obj)
+module ConfigAgentService
+  module Logger
+    def log
+      @log_instance ||= ::Logger.new("/var/log/configagent-services.log") # no log rotation yet
+    end
 
-      # Now listen to incoming requests
-      main = DBus::Main.new
-      main << bus
-      main.run
+    # automatically include these methods also to class methods
+    # when included in a class (auto extend the class)
+    def self.included(base)
+      base.extend(self)
     end
   end
 end

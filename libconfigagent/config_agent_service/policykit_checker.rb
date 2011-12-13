@@ -16,14 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "dbus_services/insufficient_permission"
+require "config_agent_service/insufficient_permission"
 
-module DbusServices
+module ConfigAgentService
   module PolicykitChecker
     def check_permissions sender,permission, options={}
       bus = DBus::SystemBus.instance
-      uid = bus.proxy.GetConnectionUnixUser(sender)[0]
-      return if uid == 0 #skip check of permission for root
       pid = bus.proxy.GetConnectionUnixProcessID(sender)[0]
       rb_service = bus.service "org.freedesktop.PolicyKit1"
       instance = rb_service.object "/org/freedesktop/PolicyKit1/Authority"

@@ -28,15 +28,15 @@ module DbusClients
     end
 
     BACKEND_LOCATION = "/usr/share/config_agents/services"
-    def self.direct_call class_name, method, params
-      $LOAD_PATH << BACKEND_LOCATION
+    def self.direct_call class_name, type, method, params
+      $LOAD_PATH << File.join BACKEND_LOCATION
       base_name = class_name.split('::').last
       module_path = underscore base_name
       begin
-        require "config_agent_service/#{module_path}"
-        require "dbus_services/backend_exception"
+        require "#{type}/#{module_path}"
+        require "config_agent_service/backend_exception"
         begin
-          ret = ConfigAgentService.const_get(base_name).send(:new,nil).send(method,params) #name is same
+          ret = Kernel.const_get(base_name).send(:new,nil).send(method,params) #name is same
         rescue DbusServices::BackendException => e
           ret = e.to_hash
         end

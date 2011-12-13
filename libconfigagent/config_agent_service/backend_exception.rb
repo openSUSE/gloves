@@ -16,20 +16,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "dbus_services/backend_exception"
+module ConfigAgentService
+  class BackendException < StandardError
+    attr_reader :type
 
-module DbusServices
-  class InsufficientPermission < BackendException
-    attr_reader :permission
-    def initialize(permission)
-      super("Permission(#{permission} not granted.","ERR_PERMISSION")
-      @permission = permission
+    def initialize(msg,type)
+      super(msg)
+      @type = type
     end
 
     def to_hash
-      ret = super
-      ret["permission"] = permission
-      return ret
+      return { 
+        "error" => message,
+        "backtrace" => backtrace,
+        "error_type" => type
+      }
     end
   end
 end

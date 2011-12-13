@@ -16,18 +16,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "rubygems"
-require "dbus"
-require "dbus_services/policykit_checker"
-require "dbus_services/logger"
+require "config_agent_service/backend_exception"
 
-module DbusServices
-  class DbusService < DBus::Object
-    include PolicykitChecker
-    include DbusServices::Logger
-    def dispatch(msg)
-      msg.params << msg.sender
-      super(msg)
+module ConfigAgentService
+  class InsufficientPermission < BackendException
+    attr_reader :permission
+    def initialize(permission)
+      super("Permission(#{permission} not granted.","ERR_PERMISSION")
+      @permission = permission
+    end
+
+    def to_hash
+      ret = super
+      ret["permission"] = permission
+      return ret
     end
   end
 end
