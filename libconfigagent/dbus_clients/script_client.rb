@@ -33,7 +33,9 @@ module DbusClients
       ret = if Process.euid == 0 #root user
           Utils.direct_call self.name, :execute, options
         else
-          dbus_object.execute(options).first #ruby dbus return array of return values
+          db_object = dbus_object
+          db_object.define_method("execute","out result:a{sv}, in params:a{sv}")
+          db_object.execute(options).first #ruby dbus return array of return values
         end
       if ret["error"]
         if ret["error_type"]
@@ -57,8 +59,7 @@ module DbusClients
       bus = DBus::SystemBus.instance
       rb_service = bus.service service_name
       instance = rb_service.object object_path
-      instance.introspect #to get interfaces
-      iface = instance[SCRIPT_INTERFACE]
+      iface = DBus::ProxyObjectInterface.new(instance,SCRIPT_INTERFACE)
     end
   end
 end

@@ -34,7 +34,9 @@ module DbusClients
       ret = if Process.euid == 0 #root user
           Utils.direct_call self.name, :read, options
         else
-          dbus_object.read(options).first #ruby dbus return array of return values
+          db_object = dbus_object
+          db_object.define_method("read","out result:a{sv}, in params:a{sv}")
+          db_object.read(options).first #ruby dbus return array of return values
         end
       if ret["error"]
         if ret["error_type"]
@@ -50,7 +52,9 @@ module DbusClients
       ret = if Process.euid == 0 #root user
           Utils.direct_call self.name, :write, options
         else
-          dbus_object.write(options).first #ruby dbus return array of return values
+          db_object = dbus_object
+          db_object.define_method("write","out result:a{sv}, in params:a{sv}")
+          db_object.write(options).first #ruby dbus return array of return values
         end
       if ret["error"]
         if ret["error_type"]
@@ -74,8 +78,7 @@ module DbusClients
       bus = DBus::SystemBus.instance
       rb_service = bus.service service_name
       instance = rb_service.object object_path
-      instance.introspect
-      iface = instance[FILE_INTERFACE]
+      iface = DBus::ProxyObjectInterface.new(instance,FILE_INTERFACE)
     end
   end
 end

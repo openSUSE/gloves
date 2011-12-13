@@ -198,8 +198,6 @@ global define boolean Read () ``{
 
     map read	= (map) YLib::KerberosClient::read ($[]);
 
-    y2internal ("read: %1", read);
-
     if (read == nil)
     {
 	string message	= (string) YLib::KerberosClient::last_error ();

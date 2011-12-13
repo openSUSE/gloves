@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Dec 13 11:36:48 CET 2011 - jsuchome@suse.cz
+
+- YLib::KerberosClient::write is now ::modify 
+- 2.22.1
+
+-------------------------------------------------------------------
 Wed Sep  7 16:23:40 CEST 2011 - jsuchome@suse.cz
 
 - using ruby-based yast++ library to access the system
