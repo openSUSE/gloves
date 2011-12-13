@@ -18,6 +18,7 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Set of dbus services for basic access to country config
 Source:         %{name}-%{version}.tar.bz2
+Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
@@ -72,6 +73,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/config_agents
 /usr/share/dbus-1/system-services/org.opensuse.config_agent*
 /usr/share/polkit-1/actions/org.opensuse.config_agent*
+%dir /usr/share/augeas
+%dir /usr/share/augeas/lenses
 /usr/share/augeas/lenses/sysconfig.aug
 
 
