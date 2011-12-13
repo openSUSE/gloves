@@ -22,6 +22,6 @@ module ConfigAgent
   class Krb5Conf < DbusClients::FileClient
 
     # identification of relevant DBUS service
-    agent_id "etc_krb5_conf"
+    agent_id "file.etc_krb5_conf"
   end
 end
