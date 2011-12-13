@@ -32,7 +32,7 @@ BuildRequires:  rubygem-rcov >= 0.9.3.2
 
 %package devel
 Group:    Development/Tools/Other
-Requires: webyast-base-ws = %{version}
+Requires: %{name} = %{version}
 Summary:  Generator of new config agents
 BuildArch:      noarch
 
