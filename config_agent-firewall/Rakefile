@@ -42,3 +42,11 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['test/*.rb']
   t.verbose = true
 end
+
+
+task :generate_spec do
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' config_agent-firewall.spec.template > package/config_agent-firewall.spec"
+end
+
+#add generation of spec file as dependency for package task
+Rake.application.lookup(:package).prerequisites << "generate_spec"
