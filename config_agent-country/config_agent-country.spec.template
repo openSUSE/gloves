@@ -72,6 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/config_agents
 /usr/share/dbus-1/system-services/org.opensuse.config_agent*
 /usr/share/polkit-1/actions/org.opensuse.config_agent*
+/usr/share/augeas/lenses/sysconfig.aug
 
 
 #---------------------------------------------------------------
