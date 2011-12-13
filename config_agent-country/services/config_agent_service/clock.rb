@@ -17,6 +17,7 @@
 #++
 
 require 'dbus_services/file_service'
+require 'augeas'
 
 module ConfigAgentService
   class Clock < DbusServices::FileService
