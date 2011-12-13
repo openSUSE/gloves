@@ -29,7 +29,7 @@ module DbusServices
       instance = rb_service.object "/org/freedesktop/PolicyKit1/Authority"
       instance.introspect #to get interfaces
       iface = DBus::ProxyObjectInterface.new(instance,"org.freedesktop.PolicyKit1.Authority")
-      iface.define_method("CheckAuthorization","out:(bba{ss}) , in params:((sa{sv})sa{ss}us)"
+      iface.define_method("CheckAuthorization","out:(bba{ss}) , in params:((sa{sv})sa{ss}us)")
       interactive = !(options.delete "only_noninteractive_permission_check")
       flags = 0
       flags &= 1 if interactive
