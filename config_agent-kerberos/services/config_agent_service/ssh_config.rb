@@ -45,7 +45,7 @@ module ConfigAgentService
 
 	    key = key_path.split("/").last
 	    next if key.start_with? "#comment"
-	    if key == "SendEnv"
+	    if key.start_with? "SendEnv"
 		host[key] = read_send_env(aug, key_path)
 	    else
 		host[key] = aug.get(key_path)
