@@ -25,7 +25,8 @@ begin
 
   if ARGV.empty? 
     susefirewall2 = YLib::Susefirewall2::read(args)
-    puts susefirewall2.inspect unless susefirewall2.nil?
+    puts susefirewall2.inspect
+
     if susefirewall2.nil?
       error = YLib::Susefireewall2::last_error
       puts "returned error: #{error}" if error
