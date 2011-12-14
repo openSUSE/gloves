@@ -62,20 +62,14 @@ rm -rf $RPM_BUILD_ROOT
 #---------------------------------------------------------------
 %files 
 %defattr(-,root,root)
-%dir /etc/dbus-1
-%dir /etc/dbus-1/system.d
 %dir /usr/share/augeas
 %dir /usr/share/augeas/lenses
-%dir /usr/share/dbus-1
-%dir /usr/share/dbus-1/system-services
 %dir /usr/share/polkit-1
 %dir /usr/share/polkit-1/actions
 %doc COPYING COPYING.LESSER
-%config /etc/dbus-1/system.d/org.opensuse.config_agent*
 %{rb_vendorlib}/config_agent
 /usr/share/augeas/lenses/*
 /usr/share/config_agents
-/usr/share/dbus-1/system-services/org.opensuse.config_agent*
 /usr/share/polkit-1/actions/org.opensuse.config_agent*
 
 
