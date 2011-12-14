@@ -82,7 +82,7 @@ module YLib
     #
     def self.add(config, params)
       return ret if params.nil? || params.empty?
-      raise SyntaxError, "Non-empty parameter 'kind' is required" if params["kind"].nil? || params["kind"].empty?
+      check_parameters(params, ["kind"])
 
       susefirewall2 = self.read(params)
       return nil if susefirewall2.nil?
@@ -91,7 +91,32 @@ module YLib
 
       case params["kind"]
         when "open_port"
-          add_open_port(susefirewall2, params)
+          handle_open_port(susefirewall2, params, true)
+        else
+          raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
+      end
+
+      ret = DEFAULT_RET.dup
+      ret = ConfigAgent::Susefirewall2.write(susefirewall2) if susefirewall2 != susefirewall2_previous
+      return ret
+
+    rescue DbusClients::InsufficientPermission => e
+      @error = "User has no permission for action '#{e.permission}'."
+      return nil
+    end
+
+    def self.remove(config, params)
+      return ret if params.nil? || params.empty?
+      check_parameters(params, ["kind"])
+
+      susefirewall2 = self.read(params)
+      return nil if susefirewall2.nil?
+
+      susefirewall2_previous = susefirewall2.dup
+
+      case params["kind"]
+        when "open_port"
+          handle_open_port(susefirewall2, params, false)
         else
           raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
@@ -109,10 +134,13 @@ module YLib
 
     #
     # Opens a new port
-    #   add({...current configuration...}, {"port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #   handle_open_port({...current configuration...}, {(boolean) "add" => true, "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
     #
-    def self.add_open_port(config, params)
-      raise SyntaxError, "Non-empty parameter 'port' is required" if params["port"].nil? || params["port"].empty?
+    # Removes a port
+    #   handle_open_port({...current configuration...}, {(boolean) "add" => false, "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
+    def self.handle_open_port(config, params, add_port)
+      check_parameters(params, ["port"])
       port     = params["port"]
 
       # These are optional
@@ -122,9 +150,18 @@ module YLib
       key = "FW_SERVICES_#{zone}_#{protocol}".upcase
       val = config[key].split
 
-      unless val.include? port
+      if add_port && !val.include?(port)
         val << port
         config[key] = val.join CONFIG_DELIMITER
+      elsif !add_port && val.include?(port)
+        val.delete port
+        config[key] = val.join CONFIG_DELIMITER
+      end
+    end
+
+    def self.check_parameters(params, required_params)
+      required_params.each do |key|
+        raise SyntaxError, "Non-empty parameter '#{key}' is required" if params[key].nil? || params[key].empty?
       end
     end
 
