@@ -53,8 +53,7 @@ class Susefirewall2 < ConfigAgentService::FileService
 
     params.each do |key, value|
       next if key.start_with? "_" # skip internal keys
-      value = "\"" + value + "\""
-      aug.set(FIREWALL_PATH + key, value)
+      aug.set("#{FIREWALL_PATH}/#{key}", value)
     end
 
     unless aug.save
