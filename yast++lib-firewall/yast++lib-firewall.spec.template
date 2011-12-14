@@ -1,0 +1,62 @@
+#
+# spec file for package yast++lib-firewall (Version VERSION_TEMPLATE)
+#
+# Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# This file and all modifications and additions to the pristine
+# package are under the same license as the package itself.
+#
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+
+Name:           yast++lib-firewall
+License:        LGPLv2.1 or LGPLv3
+Group:          System/Management
+URL:            https://github.com/yast/yast--
+Autoreqprov:    on
+Version:        VERSION_TEMPLATE
+Release:        0
+Summary:        Library for high level access to SuSEfirewall2 configuration
+Source:         %{name}-%{version}.tar.bz2
+Requires:       config_agent-firewall
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  ruby
+BuildRequires:  rubygem-packaging_rake_tasks
+BuildRequires:  config_agent-firewall
+
+# This is for Hudson (build service) to setup the build env correctly
+%if 0
+BuildRequires:  rubygem-test-unit
+BuildRequires:  rubygem-rcov >= 0.9.3.2
+%endif
+
+%description
+Library for high level access to SuSEfirewall2 configuration. Part of yast++ project.
+Authors:
+--------
+    Lukas Ocilka <locilka@suse.com>
+
+
+%prep
+%setup
+
+%build
+
+%check
+
+#---------------------------------------------------------------
+%install
+rake install[%{buildroot}/,%{rb_vendorlib}]
+
+#---------------------------------------------------------------
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+#---------------------------------------------------------------
+%files 
+%defattr(-,root,root)
+%{rb_vendorlib}/y_lib
+
+#---------------------------------------------------------------
+%changelog
