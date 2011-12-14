@@ -30,6 +30,8 @@ begin
       error	= YLib::Timezone::last_error
       puts "returned error: #{error}" if error
     end
+  else
+    puts YLib::Timezone::modify({}, {"timezone"=>ARGV[0]})
   end
 
 rescue DbusClients::BackendException => e

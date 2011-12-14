@@ -57,6 +57,14 @@ module YLib
       ret		= {
 	"success"	=> true
       }
+      unless params.nil? && params.empty?
+	sysconfig_params = {}
+	params.each do |key, value|
+      	  new_key = @sysconfig2yast.invert[key]
+      	  sysconfig_params[new_key] = value unless new_key.nil?
+	end
+        ret	= ConfigAgent::Clock.write(sysconfig_params)
+      end
       return ret
     rescue DbusClients::InsufficientPermission => e
       @error	= "User has no permission for action '#{e.permission}'."
