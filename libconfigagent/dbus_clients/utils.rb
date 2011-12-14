@@ -29,7 +29,7 @@ module DbusClients
 
     BACKEND_LOCATION = "/usr/share/config_agents/services"
     def self.direct_call class_name, type, method, params
-      $LOAD_PATH << File.join BACKEND_LOCATION
+      $LOAD_PATH << BACKEND_LOCATION
       base_name = class_name.split('::').last
       module_path = underscore base_name
       begin

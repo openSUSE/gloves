@@ -38,7 +38,7 @@ module DbusClients
           instance = rb_service.object OBJECT_PATH
           iface = DBus::ProxyObjectInterface.new(instance,INTERFACE)
           iface.define_method("call","out result:a{sv}, in id:s, in method:s, in data:a{sv}")
-          iface.call("#{INTERFACE}.#{type}.#{id}",method.to_s,options)
+          iface.call("#{INTERFACE}.#{id}",method.to_s,options).first
       end
       if ret["error"]
         if ret["error_type"]

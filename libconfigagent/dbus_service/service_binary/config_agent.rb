@@ -28,19 +28,19 @@ require "config_agent_service/logger"
 require "config_agent_service/backend_exception"
 
 SERVICE_NAME="org.opensuse.config_agent"
-SERVICE_NAME="org.opensuse.config_agent"
 OBJECT_PATH="/org/opensuse/config_agent"
 INTERFACE_NAME="org.opensuse.config_agent"
 SERVICE_PATH="/usr/share/config_agents/services"
 KNOWN_TYPES = ["file","script"]
 PERMISSION_PREFIX="org.opensuse.config_agent"
 
-class ConfigAgentService < DBus::Object
-  include DbusServices::Logger
-  include DbusServices::PolicykitChecker
+class ConfigAgentDbusService < DBus::Object
+  include ConfigAgentService::Logger
+  include ConfigAgentService::PolicykitChecker
 
   def dispatch(msg)
     msg.params << msg.sender
+    log.info msg.params.inspect
     super(msg)
   end
 
@@ -48,9 +48,9 @@ class ConfigAgentService < DBus::Object
     dbus_method :call, "out result:a{sv}, in id:s, in method:s, in data:a{sv}" do |id,method,data,sender|
       #at first ensure permission is given
       begin
-        check_permissions sender, PERMISSION_PREFIX+"."+id+"."+method, params 
-        ConfigAgentService.call_method id,method,data
-      rescue DbusServices::BackendException => e
+        check_permissions sender, id+"."+method, data 
+        [ConfigAgentDbusService.call_method(id,method,data)]
+      rescue ConfigAgentService::BackendException => e
           [ e.to_hash ]
       rescue Exception => e
           [{ "error" => e.message, "backtrace" => e.backtrace.join("\n") }]
@@ -62,17 +62,17 @@ class ConfigAgentService < DBus::Object
     method = method.to_sym
     #TODO check agains whitelist if id conform expectation
     parts = id.split(".")
-    type = parts[-2].to_sym
-    return { :error => "not allowed type" } unless KNOWN_TYPES.include? type
+    type = parts[-2]
+    return { "error" => "not allowed type '#{type}'" } unless KNOWN_TYPES.include?(type)
     service = parts[-1]
-    file_path = File.join(SERVICE_PATH,type.to_s,service+".rb")
+    file_path = File.join(SERVICE_PATH,type,service+".rb")
     if !File.exist? file_path
-      return { :error => "missing service for id" } unless KNOWN_TYPES.include? type
+      return { "error" => "missing service for id #{id}" } 
     end
     require file_path
     class_name = service.gsub(/(^|_)(.)/) { $2.upcase }
-    obj = class_name.new
-    return { :error => "unknown method for class" } unless obj.respond_to? method
+    obj = Kernel.const_get(class_name.to_sym).new
+    return { "error" => "unknown method for class" } unless obj.respond_to? method
     return obj.send(method,data)
   end
 end
@@ -85,7 +85,7 @@ bus = DBus::system_bus
 # Define the service name
 service = bus.request_service(SERVICE_NAME)
 # Set the object path
-obj = ConfigAgentService.new(OBJECT_PATH)
+obj = ConfigAgentDbusService.new(OBJECT_PATH)
 # Export it!
 service.export(obj)
 
