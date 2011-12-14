@@ -141,10 +141,15 @@ module YLib
 
     #
     # Opens a new port
-    #   handle_open_port({...current configuration...}, {(boolean) "add" => true, "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #   handle_open_port({...current configuration...}, {"action" => "add", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
     #
     # Removes a port
-    #   handle_open_port({...current configuration...}, {(boolean) "add" => false, "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #   handle_open_port({...current configuration...}, {"action" => "remove", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
+    # Checks whether a port is open
+    #   handle_open_port({...current configuration...}, {"action" => "read", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
+    # Handles the FW_SERVICES_$ZONE_$PROTOCOL entry
     #
     def self.handle_open_port(config, params, action)
       check_parameters(params, ["port"])
