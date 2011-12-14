@@ -32,7 +32,7 @@ class TestSshConfig < Test::Unit::TestCase
     file = SshConfig.new
     ret = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
     hosts	= ret["Host"]
-    assert_equal ["LC_IDENTIFICATION", "LC_ALL"], hosts[0]["SendEnv"]
+    assert_equal ["LC_IDENTIFICATION", "LC_ALL"], hosts[0]["SendEnv[1]"]
     assert_equal "suse.cz", hosts[0]["Host"]
     assert_equal "*", hosts[1]["Host"]
     assert_equal ["LC_LANG"], hosts[1]["SendEnv"]
@@ -48,12 +48,14 @@ class TestSshConfig < Test::Unit::TestCase
 		{
 		    "GSSAPIAuthentication"=>"yes",
 		    "GSSAPIDelegateCredentials"=>"yes",
-		    "Host"=>"suse.cz"
+		    "Host"=>"suse.cz",
+		    "SendEnv"	=> ["LC_ALL", "LC_LANG"],
 		}
 	]
     }
     ret = file2.write params
     assert_equal nil, ret["message"]
+    assert_equal true, ret["success"]
   end
 
 end

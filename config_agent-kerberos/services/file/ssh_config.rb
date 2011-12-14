@@ -98,7 +98,7 @@ class SshConfig < ConfigAgentService::FileService
 
     unless aug.save
       ret["success"]	= false
-      ret["message"]	= aug.get("/augeas/files/etc/krb5.conf/error/message")
+      ret["message"]	= aug.get("/augeas/files/etc/ssh/ssh_config/error/message")
     end
 
     aug.close
@@ -121,6 +121,12 @@ private
     args.each do |key, value|
       if value.nil? || value.empty?
         aug.delete(host_path + "/" + key)
+      elsif value.is_a? Array
+        i = 1
+      	value.each do |v|
+      	  aug.set(host_path + "/" + key + "/" + i.to_s , v)
+	  i = i + 1
+	end
       else
         aug.set(host_path + "/" + key, value)
       end

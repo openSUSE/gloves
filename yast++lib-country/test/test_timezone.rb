@@ -1,5 +1,5 @@
 #--
-# Config Agents Framework
+# YaST++ Timezone Library
 #
 # Copyright (C) 2011 Novell, Inc. 
 #   This library is free software; you can redistribute it and/or modify
@@ -16,18 +16,29 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "logger"
+$LOAD_PATH << File.join(File.dirname(__FILE__),'..')
+require "rubygems"
+require "mocha"
+require "test/unit/testcase"
+require 'test/unit/ui/console/testrunner'
+require "y_lib/timezone"
 
-module ConfigAgentService
-  module Logger
-    def log
-      @log_instance ||= ::Logger.new("/var/log/config_agents/services.log") # no log rotation yet
-    end
-
-    # automatically include these methods also to class methods
-    # when included in a class (auto extend the class)
-    def self.included(base)
-      base.extend(self)
-    end
+class TestTimezone < Test::Unit::TestCase
+  def setup
+    sysconfig_data = {
+      "TIMEZONE" => "Europe/Prague",
+      "HWCLOCK" => "--localtime"
+    }
+    ConfigAgent::Clock.stubs(:read).returns sysconfig_data
   end
+
+  def test_read_sysconfig
+    ret = YLib::Timezone.read({})
+    assert_equal "Europe/Prague",ret["timezone"]
+    assert_equal "--localtime", ret["hwclock"]
+  end
+
+
 end
+
+Test::Unit::UI::Console::TestRunner.run(TestTimezone)
