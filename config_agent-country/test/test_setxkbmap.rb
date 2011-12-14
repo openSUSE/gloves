@@ -20,7 +20,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "config_agent_service/setxkbmap"
+require "script/setxkbmap"
 
 class TestSetxkbmap < Test::Unit::TestCase
   def setup

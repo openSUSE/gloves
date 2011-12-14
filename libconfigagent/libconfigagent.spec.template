@@ -70,7 +70,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc COPYING COPYING.LESSER
 %{rb_vendorlib}/dbus_clients
-%{rb_vendorlib}/dbus_services
+%{rb_vendorlib}/config_agent_service
 
 
 %files devel

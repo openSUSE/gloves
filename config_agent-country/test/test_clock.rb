@@ -20,7 +20,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "config_agent_service/clock"
+require "file/clock"
 
 class TestClock < Test::Unit::TestCase
   def setup
@@ -30,7 +30,7 @@ class TestClock < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgentService::Clock.new nil
+    file = Clock.new
     sysconfig_clock = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
     assert_equal "Europe/Prague", sysconfig_clock["TIMEZONE"]
     assert_equal "--localtime", sysconfig_clock["HWCLOCK"]
@@ -39,7 +39,7 @@ class TestClock < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgentService::Clock.new nil
+    file = Clock.new
     params	= {
 	"_aug_internal"		=> Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
 	"TIMEZONE"		=> "US/Eastern",
@@ -52,11 +52,11 @@ class TestClock < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/clock data2/etc/sysconfig/clock -> change value of TIMEZONE
   def test_overwrite
-    file = ConfigAgentService::Clock.new nil
+    file = Clock.new
     params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     assert_equal "Europe/Prague", params["TIMEZONE"]
 
-    file2 = ConfigAgentService::Clock.new nil
+    file2 = Clock.new
     params["_aug_internal"]	= Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     params["TIMEZONE"]		= "US/Eastern"
 

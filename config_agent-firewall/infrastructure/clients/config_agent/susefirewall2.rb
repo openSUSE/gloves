@@ -22,6 +22,6 @@ module ConfigAgent
   class Susefirewall2 < DbusClients::FileClient
 
     # identification of relevant DBUS service
-    agent_id "etc_sysconfig_susefirewall2"
+    agent_id "file.susefirewall2"
   end
 end

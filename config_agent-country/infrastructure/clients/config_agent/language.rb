@@ -22,6 +22,6 @@ module ConfigAgent
   class Language < DbusClients::FileClient
 
     # identification of relevant DBUS service
-    agent_id "etc_sysconfig_language"
+    agent_id "file.language"
   end
 end
