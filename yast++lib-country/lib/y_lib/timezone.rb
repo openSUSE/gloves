@@ -37,6 +37,15 @@ module YLib
     # Read all settings relevant for timezone configuration (key:value map).
     def self.read(params)
 
+      # get the list of available time zones
+      if (params.has_key? "timezones")
+	# this is read only system call, no need for an agent here
+	timezones = `grep -v "#" /usr/share/zoneinfo/zone.tab | cut -f 3 | sort`.split("\n")
+      	return {
+	    "timezones"	=> timezones
+	}
+      end
+
       # read config files    
       begin
         sysconfig_timezone	= ConfigAgent::Clock.read({})

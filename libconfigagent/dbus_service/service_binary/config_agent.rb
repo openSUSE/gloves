@@ -33,11 +33,30 @@ INTERFACE_NAME="org.opensuse.config_agent"
 SERVICE_PATH="/usr/share/config_agents/services"
 KNOWN_TYPES = ["file","script"]
 PERMISSION_PREFIX="org.opensuse.config_agent"
+TIMEOUT = 60 #in seconds
+
+module Sync
+  def self.last_call
+    @time ||= Time.now
+  end
+  def self.last_call=(val)
+    mutex.synchronize do
+      @time = val
+    end
+  end
+
+  def self.mutex
+    @mymutex ||= Mutex.new
+  end
+end
 
 class ConfigAgentDbusService < DBus::Object
   include ConfigAgentService::Logger
   include ConfigAgentService::PolicykitChecker
 
+  def mutex=(m)
+    @my_mutex = m
+  end
   def dispatch(msg)
     msg.params << msg.sender
     log.info msg.params.inspect
@@ -48,6 +67,7 @@ class ConfigAgentDbusService < DBus::Object
     dbus_method :call, "out result:a{sv}, in id:s, in method:s, in data:a{sv}" do |id,method,data,sender|
       #at first ensure permission is given
       begin
+        Sync.last_call = Time.now
         check_permissions sender, id+"."+method, data 
         [ConfigAgentDbusService.call_method(id,method,data)]
       rescue ConfigAgentService::BackendException => e
@@ -89,8 +109,20 @@ obj = ConfigAgentDbusService.new(OBJECT_PATH)
 # Export it!
 service.export(obj)
 
-#TODO timeout
 # Now listen to incoming requests
 main = DBus::Main.new
 main << bus
+
+Thread.new(main) do |dbus_loop|
+  cont = true
+  while cont do
+    sleep(TIMEOUT/2)
+    Sync.mutex.synchronize do
+      if Time.now - Sync.last_call > TIMEOUT
+        exit 0
+      end
+    end
+  end
+end
+
 main.run
