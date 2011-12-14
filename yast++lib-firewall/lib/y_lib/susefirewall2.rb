@@ -159,6 +159,12 @@ module YLib
       end
     end
 
+    #
+    # Checks existence of mandatory parameters
+    # Throws a SyntaxError if some parameter is missing
+    #
+    #   check_parameters({"params" => "1", "got" => "2"}, ["required", "params"])
+    #
     def self.check_parameters(params, required_params)
       required_params.each do |key|
         raise SyntaxError, "Non-empty parameter '#{key}' is required" if params[key].nil? || params[key].empty?
