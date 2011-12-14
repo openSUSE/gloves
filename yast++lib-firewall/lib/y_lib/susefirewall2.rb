@@ -39,7 +39,7 @@ module YLib
     #
     def self.read(params)
       begin
-        sysconfig_susefirewall2 = ConfigAgent::Susefirewall2.read({})
+        susefirewall2 = ConfigAgent::Susefirewall2.read({})
       rescue DbusClients::InsufficientPermission => e
         @error = "User has no permission for action '#{e.permission}'."
         return nil
@@ -47,8 +47,15 @@ module YLib
 
       ret = {}
 
-      sysconfig_susefirewall2.each do |key, val|
-        ret[key] = val
+      case params["kind"]
+        when "open_port"
+          ret = handle_open_port(susefirewall2, params, "read")
+        when "interface"
+          ret = handle_interface_in_zone(susefirewall2, params, "read")
+        else
+          susefirewall2.each do |key, val|
+            ret[key] = val
+          end
       end
 
       return ret
@@ -81,17 +88,16 @@ module YLib
     #   add({}, {"kind" => "open_port", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
     #
     def self.add(config, params)
-      return ret if params.nil? || params.empty?
       check_parameters(params, ["kind"])
 
-      susefirewall2 = self.read(params)
+      susefirewall2 = self.read({})
       return nil if susefirewall2.nil?
 
       susefirewall2_previous = susefirewall2.dup
 
       case params["kind"]
         when "open_port"
-          handle_open_port(susefirewall2, params, true)
+          handle_open_port(susefirewall2, params, "add")
         else
           raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
@@ -105,18 +111,21 @@ module YLib
       return nil
     end
 
+    #
+    # To close port in firewall
+    #   remove({}, {"kind" => "open_port", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
     def self.remove(config, params)
-      return ret if params.nil? || params.empty?
       check_parameters(params, ["kind"])
 
-      susefirewall2 = self.read(params)
+      susefirewall2 = self.read({})
       return nil if susefirewall2.nil?
 
       susefirewall2_previous = susefirewall2.dup
 
       case params["kind"]
         when "open_port"
-          handle_open_port(susefirewall2, params, false)
+          handle_open_port(susefirewall2, params, "remove")
         else
           raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
@@ -134,12 +143,17 @@ module YLib
 
     #
     # Opens a new port
-    #   handle_open_port({...current configuration...}, {(boolean) "add" => true, "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #   handle_open_port({...current configuration...}, {"action" => "add", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
     #
     # Removes a port
-    #   handle_open_port({...current configuration...}, {(boolean) "add" => false, "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #   handle_open_port({...current configuration...}, {"action" => "remove", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
     #
-    def self.handle_open_port(config, params, add_port)
+    # Checks whether a port is open
+    #   handle_open_port({...current configuration...}, {"action" => "read", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
+    # Handles the FW_SERVICES_$ZONE_$PROTOCOL entry
+    #
+    def self.handle_open_port(config, params, action)
       check_parameters(params, ["port"])
       port     = params["port"]
 
@@ -150,16 +164,53 @@ module YLib
       key = "FW_SERVICES_#{zone}_#{protocol}".upcase
       val = config[key].split
 
-      if add_port && !val.include?(port)
+      if action == "add" && !val.include?(port)
         val << port
         config[key] = val.join CONFIG_DELIMITER
-      elsif !add_port && val.include?(port)
+        return true
+      elsif action == "remove" && val.include?(port)
         val.delete port
         config[key] = val.join CONFIG_DELIMITER
+        return true
+      elsif action == "read"
+        if val.include?(port)
+          return params
+        else
+          return nil
+        end
       end
     end
 
+    #
+    # Handles FW_DEV_$ZONE
+    #
+    def self.handle_interface_in_zone(config, params, action)
+      check_parameters(params, ["interface"])
+
+      interface = params["interface"]
+      zone      = params["zone"] || DEFAULT_ZONE
+
+      key = "FW_DEV_#{zone}".upcase
+      val = config[key].split
+
+      if action == "read"
+        if val.include?(interface)
+          return params
+        else
+          return nil
+        end
+      end
+    end
+
+    #
+    # Checks existence of mandatory parameters
+    # Throws a SyntaxError if some parameter is missing
+    #
+    #   check_parameters({"params" => "1", "got" => "2"}, ["required", "params"])
+    #
     def self.check_parameters(params, required_params)
+      raise SyntaxError, "Non-empty parameters are required" if params.nil? || params.empty?
+
       required_params.each do |key|
         raise SyntaxError, "Non-empty parameter '#{key}' is required" if params[key].nil? || params[key].empty?
       end
