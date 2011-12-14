@@ -30,7 +30,8 @@ module YLib
 
     @sysconfig2yast	= {
       "TIMEZONE"	=> "timezone",
-      "HWCLOCK"		=> "hwclock"
+      "HWCLOCK"		=> "hwclock",
+      "DEFAULT_TIMEZONE"=> "default_timezone"
     }
 
     # Read all settings relevant for timezone configuration (key:value map).
@@ -65,6 +66,18 @@ module YLib
 	end
         ret	= ConfigAgent::Clock.write(sysconfig_params)
       end
+
+      if config.has_key? "apply_timezone" && config["apply_timezone"]
+      	timezone	= params["timezone"] # FIXME read it if it wasn't provided?
+	ConfigAgent::Zic.execute({ "exec_params" => "-l #{timezone}" }) unless timezone.nil?
+	hwclock		= params["hwclock"]
+	ConfigAgent::Hwclock.execute({ "exec_params" => " --hctosys #{hwclock}"}) unless hwclock.nil?
+      end
+
+      # TODO set time
+      # TODO sync sys to hwclock
+      # TODO mkinitrd call
+
       return ret
     rescue DbusClients::InsufficientPermission => e
       @error	= "User has no permission for action '#{e.permission}'."
