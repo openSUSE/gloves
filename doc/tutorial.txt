@@ -33,6 +33,9 @@ Add some lines of code to the skelleton:
 # vi services/config_agent_service/windowmanager.rb
 (TODO read function)
 
-for debugging see: /var/log/configagent-service*
+for debugging see: /var/log/config_agents/
+- service.stderr when dbus service crash
+- service.stdout for stdout of service ( use log method instead of writing to stdout )
+- services.log for log messages
 
 
