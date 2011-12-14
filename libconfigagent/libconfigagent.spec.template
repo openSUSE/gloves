@@ -24,6 +24,7 @@ Source1:        libconfigagent-rpmlintrc
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging_rake_tasks
+Recommends:     rubygem-ruby-dbus
 
 # This is for Hudson (build service) to setup the build env correctly
 %if 0
@@ -79,6 +80,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/config_agents/bin
 %dir %{_datadir}/dbus-1
 %dir %{_datadir}/dbus-1/system-services
+%dir /var/log/config_agents
 %{_datadir}/config_agents/bin/config_agent.rb
 %{_datadir}/dbus-1/system-services/org.opensuse.config_agent.service
 

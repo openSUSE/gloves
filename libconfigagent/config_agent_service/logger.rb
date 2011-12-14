@@ -21,7 +21,7 @@ require "logger"
 module ConfigAgentService
   module Logger
     def log
-      @log_instance ||= ::Logger.new("/var/log/configagent-services.log") # no log rotation yet
+      @log_instance ||= ::Logger.new("/var/log/config_agents/services.log") # no log rotation yet
     end
 
     # automatically include these methods also to class methods

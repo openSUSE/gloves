@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$stdout.reopen("/var/log/configagent-service.stdout")
-$stderr.reopen("/var/log/configagent-service.stderr")
+$stdout.reopen("/var/log/config_agents/service.stdout")
+$stderr.reopen("/var/log/config_agents/service.stderr")
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
 require "rubygems"
 require "dbus"
