@@ -45,7 +45,7 @@ when "-i"
 end
 type = ARGV[index].to_sym
 file_name = ARGV[index+1]
-identifier = file_name.split("/")[-1]gsub(/[-\.\/]/,"_").gsub(/^_/,"").downcase
+identifier = file_name.split("/")[-1].gsub(/[-\.\/]/,"_").gsub(/^_/,"").downcase
 
 `mkdir -p infrastructure/polkit-definitions services/config_agent_service infrastructure/clients/config_agent test` #create dir structure
 

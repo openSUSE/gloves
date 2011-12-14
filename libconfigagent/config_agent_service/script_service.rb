@@ -17,7 +17,7 @@
 #++
 
 require "open4"
-require "dbus_service/logger"
+require "config_agent_service/logger"
 
 module ConfigAgentService
   class ScriptService
