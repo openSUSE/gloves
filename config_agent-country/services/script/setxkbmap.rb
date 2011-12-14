@@ -16,18 +16,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'dbus_services/script_service'
+require 'config_agent_service/script_service'
 
-module ConfigAgentService
-  class Setxkbmap < DbusServices::ScriptService
+class Setxkbmap < ConfigAgentService::ScriptService
 
-    # identification of relevant DBUS service
-    agent_id "usr_bin_setxkbmap"
-
-    def execute(params)
-      exec_params	= params["exec_params"] || ""
-      run "/usr/bin/setxkbmap #{exec_params}"
-    end
-
+  def execute(params)
+    exec_params	= params["exec_params"] || ""
+    run "/usr/bin/setxkbmap #{exec_params}"
   end
+
 end

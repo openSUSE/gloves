@@ -12,7 +12,7 @@ Rights for setting/getting user permissions
 -->
 
   
-  <action id="org.opensuse.config_agent.script.usr_bin_setxkbmap.execute">
+  <action id="org.opensuse.config_agent.script.setxkbmap.execute">
     <description>Execute script /usr/bin/setxkbmap</description>
     <message>Authentication is required to execute script /usr/bin/setxkbmap</message>
     <defaults>

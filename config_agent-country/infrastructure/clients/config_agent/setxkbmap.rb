@@ -22,6 +22,6 @@ module ConfigAgent
   class Setxkbmap < DbusClients::ScriptClient
 
     # identification of relevant DBUS service
-    agent_id "usr_bin_setxkbmap"
+    agent_id "script.setxkbmap"
   end
 end
