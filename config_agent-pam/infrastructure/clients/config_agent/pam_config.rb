@@ -22,6 +22,6 @@ module ConfigAgent
   class PamConfig < DbusClients::ScriptClient
 
     # identification of relevant DBUS service
-    agent_id "usr_sbin_pam_config"
+    agent_id "script.pam_config"
   end
 end

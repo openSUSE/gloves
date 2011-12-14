@@ -12,7 +12,7 @@ Rights for setting/getting user permissions
 -->
 
   
-  <action id="org.opensuse.config_agent.script.usr_sbin_pam_config.execute">
+  <action id="org.opensuse.config_agent.script.pam_config.execute">
     <description>Execute script /usr/sbin/pam-config</description>
     <message>Authentication is required to execute script /usr/sbin/pam-config</message>
     <defaults>

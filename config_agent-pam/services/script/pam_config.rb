@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 #--
 # Config Agents Framework
 #
@@ -18,10 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$stdout.reopen("/var/log/systemagent.stdout")
-$stderr.reopen("/var/log/systemagent.stderr")
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
-require "rubygems"
-require "config_agent_service/pam_config"
-require "dbus_services/service_runner"
-DbusServices::ServiceRunner::run(ConfigAgentService::PamConfig)
+require 'config_agent_service/script_service'
+
+class PamConfig < ConfigAgentService::ScriptService
+  def execute(params)
+    exec_params	= params["exec_params"] || ""
+    run "/usr/sbin/pam-config #{exec_params}" #FIXME escape parameters
+  end
+end
