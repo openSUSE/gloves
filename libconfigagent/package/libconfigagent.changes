@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Dec 14 09:55:04 UTC 2011 - jreidinger@suse.com
+
+- change architecture to use only one dbus service for all agents 
+- 0.2.0
+
+-------------------------------------------------------------------
 Mon Dec 12 10:38:38 UTC 2011 - jreidinger@suse.com
 
 - add initial augeas  serializer
