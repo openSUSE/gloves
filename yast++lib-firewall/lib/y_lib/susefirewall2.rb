@@ -105,6 +105,10 @@ module YLib
       return nil
     end
 
+    #
+    # To close port in firewall
+    #   remove({}, {"kind" => "open_port", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
     def self.remove(config, params)
       return ret if params.nil? || params.empty?
       check_parameters(params, ["kind"])
