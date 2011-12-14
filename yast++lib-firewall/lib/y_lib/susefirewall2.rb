@@ -50,6 +50,8 @@ module YLib
       case params["kind"]
         when "open_port"
           ret = handle_open_port(susefirewall2, params, "read")
+        when "interface"
+          ret = handle_interface_in_zone(susefirewall2, params, "read")
         else
           susefirewall2.each do |key, val|
             ret[key] = val
@@ -172,6 +174,27 @@ module YLib
         return true
       elsif action == "read"
         if val.include?(port)
+          return params
+        else
+          return nil
+        end
+      end
+    end
+
+    #
+    # Handles FW_DEV_$ZONE
+    #
+    def self.handle_interface_in_zone(config, params, action)
+      check_parameters(params, ["interface"])
+
+      interface = params["interface"]
+      zone      = params["zone"] || DEFAULT_ZONE
+
+      key = "FW_DEV_#{zone}".upcase
+      val = config[key].split
+
+      if action == "read"
+        if val.include?(interface)
           return params
         else
           return nil
