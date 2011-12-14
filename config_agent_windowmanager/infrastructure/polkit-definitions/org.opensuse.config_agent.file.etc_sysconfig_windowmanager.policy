@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+<policyconfig>
+
+  <vendor>YaST Project</vendor>
+  <vendor_url>http://en.opensuse.org/YAST</vendor_url>
+
+<!--
+Rights for setting/getting user permissions
+-->
+
+  
+  <action id="org.opensuse.config_agent.file.etc_sysconfig_windowmanager.read">
+    <description>Reading file /etc/sysconfig/windowmanager</description>
+    <message>Authentication is required to read file /etc/sysconfig/windowmanager</message>
+    <defaults>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>no</allow_active>
+    </defaults>
+  </action>
+  <action id="org.opensuse.config_agent.file.etc_sysconfig_windowmanager.write">
+    <description>Writing to file /etc/sysconfig/windowmanager</description>
+    <message>Authentication is required to write to /etc/sysconfig/windowmanager</message>
+    <defaults>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>no</allow_active>
+    </defaults>
+  </action>
+  
+
+</policyconfig>
