@@ -20,7 +20,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "config_agent_service/windowmanager"
+require "file/windowmanager"
 
 class TestWindowmanager < Test::Unit::TestCase
   def setup

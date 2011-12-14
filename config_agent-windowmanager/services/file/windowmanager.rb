@@ -21,8 +21,19 @@ require 'config_agent_service/file_service'
 class Windowmanager < ConfigAgentService::FileService
 
   def read(params)
-    #TODO add your code here
-    return {}
+
+    aug               = params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+    aug.transform(:lens => "windowsmanager.lns", :incl => "/etc/sysconfig/windowmanager")
+    aug.load
+
+    default_wm = aug.get("/files/etc/sysconfig/windowmanager/DEFAULT_WM")
+
+    windowmanager_conf = {
+      "default_wm" => default_wm
+    }
+    aug.close
+
+    return windowmanager_conf
   end
 
   def write(params)
