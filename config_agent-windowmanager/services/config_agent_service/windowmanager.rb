@@ -25,7 +25,7 @@ module ConfigAgentService
     agent_id "etc_sysconfig_windowmanager"
 
 
-    def readiii(params)
+    def read(params)
 
 	my_file = File.new("/tmp/yastdebug", APPEND)
 	my_file.puts "newline"
