@@ -21,8 +21,8 @@ Run an example:
 
 It's time to write your own yast++ module now. We'll start with the config_agent, the low level part:
 
-# mkdir config_agent_windowmanager
-# cd config_agent_windowmanager
+# mkdir config_agent-windowmanager
+# cd config_agent-windowmanager
 
 Use config agent generator to generate the skeleton for your code:
 
