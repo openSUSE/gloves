@@ -15,6 +15,7 @@
 # License along with this library; if not, write to the Free Software 
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
+require 'config_agent_service/backend_exception'
 
 module DbusClients
   module Utils
@@ -36,8 +37,8 @@ module DbusClients
         require "#{type}/#{module_path}"
         require "config_agent_service/backend_exception"
         begin
-          ret = Kernel.const_get(base_name).send(:new,nil).send(method,params) #name is same
-        rescue DbusServices::BackendException => e
+          ret = Kernel.const_get(base_name).send(:new).send(method,params) #name is same
+        rescue ConfigAgentService::BackendException => e
           ret = e.to_hash
         end
       ensure
