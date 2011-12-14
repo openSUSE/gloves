@@ -28,11 +28,15 @@ module YLib
     DEFAULT_ZONE = "EXT"
     DEFAULT_PROTOCOL = "TCP"
 
+    CONFIG_DELIMITER = " "
+
     def self.last_error
       return @error
     end
 
+    #
     # Read all settings relevant for SuSEfirewall2 configuration (key:value map)
+    #
     def self.read(params)
       begin
         sysconfig_susefirewall2 = ConfigAgent::Susefirewall2.read({})
@@ -44,13 +48,15 @@ module YLib
       ret = {}
 
       sysconfig_susefirewall2.each do |key, val|
-        ret[key.downcase] = val
+        ret[key] = val
       end
 
       return ret
     end
 
+    #
     # Write SuSEfirewall2 configuration
+    #
     def self.modify(config, params)
       ret = DEFAULT_RET.dup
 
@@ -71,21 +77,28 @@ module YLib
     end
 
     #
-    # add({}, {"kind" => "service", "service" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    # To open port in firewall
+    #   add({}, {"kind" => "open_port", "port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
     #
     def self.add(config, params)
       return ret if params.nil? || params.empty?
-      raise SyntaxError, "Non-empty parameter 'kind' is required" if not params.has_key? "kind"
+      raise SyntaxError, "Non-empty parameter 'kind' is required" if params["kind"].nil? || params["kind"].empty?
 
       susefirewall2 = self.read(params)
       return nil if susefirewall2.nil?
 
+      susefirewall2_previous = susefirewall2.dup
+
       case params["kind"]
-        when "service"
-          return add_service(susefirewall2, params)
+        when "open_port"
+          add_open_port(susefirewall2, params)
         else
           raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
+
+      ret = DEFAULT_RET.dup
+      ret = ConfigAgent::Susefirewall2.write(susefirewall2) if susefirewall2 != susefirewall2_previous
+      return ret
 
     rescue DbusClients::InsufficientPermission => e
       @error = "User has no permission for action '#{e.permission}'."
@@ -94,18 +107,25 @@ module YLib
 
     private
 
-    # add({"service" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
-    def self.add_service(config, params)
-      ret = DEFAULT_RET.dup
+    #
+    # Opens a new port
+    #   add({...current configuration...}, {"port" => "ssh", "protocol" => "TCP", "zone" => "EXT"})
+    #
+    def self.add_open_port(config, params)
+      raise SyntaxError, "Non-empty parameter 'port' is required" if params["port"].nil? || params["port"].empty?
+      port     = params["port"]
 
+      # These are optional
       zone     = params["zone"]     || DEFAULT_ZONE
       protocol = params["protocol"] || DEFAULT_PROTOCOL
 
-      key = "FW_SERVICES_#{zone}_#{protocol}".downcase
-      # FIXME: ...
-      puts config[key]
+      key = "FW_SERVICES_#{zone}_#{protocol}".upcase
+      val = config[key].split
 
-      return ret
+      unless val.include? port
+        val << port
+        config[key] = val.join CONFIG_DELIMITER
+      end
     end
 
   end

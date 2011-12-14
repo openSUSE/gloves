@@ -21,7 +21,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
 require "y_lib/susefirewall2"
 require "dbus_clients/backend_exception"
 begin
-    susefirewall2 = YLib::Susefirewall2::add({}, {"kind" => "service", "service" => "xyz"})
+    susefirewall2 = YLib::Susefirewall2::add({}, {"kind" => "open_port", "port" => "xyz"})
     puts susefirewall2.inspect unless susefirewall2.nil?
 
     if susefirewall2.nil?
