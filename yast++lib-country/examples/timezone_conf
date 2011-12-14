@@ -22,8 +22,9 @@ require "y_lib/timezone"
 require "dbus_clients/backend_exception"
 begin
   args = {}
+  args = { "timezones" => 1 } if ARGV[0] == "timezones"
 
-  if ARGV.empty?
+  if ARGV.empty? || ARGV[0] == "timezones"
     timezone = YLib::Timezone::read(args)
     puts timezone.inspect unless timezone.nil?
     if timezone.nil?
