@@ -28,6 +28,11 @@ module YLib
       return @error
     end
 
+    @sysconfig2yast	= {
+      "TIMEZONE"	=> "timezone",
+      "HWCLOCK"		=> "hwclock"
+    }
+
     # Read all settings relevant for timezone configuration (key:value map).
     def self.read(params)
 
@@ -39,7 +44,11 @@ module YLib
         return nil
       end
 
-      return sysconfig_timezone
+      ret	= {}
+      sysconfig_timezone.each do |key, val|
+      	ret[@sysconfig2yast[key]]	= val if @sysconfig2yast.has_key? key
+      end
+      return ret
     end
 
     # Write Timezone configuration
