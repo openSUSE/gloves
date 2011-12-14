@@ -48,7 +48,7 @@ ForwardX11Trusted yes
 #   IdentityFile ~/.ssh/id_dsa
 #   Port 22
 Protocol 2
-SendEnv LC_IDENTIFICATION LC_ALL
+SendEnv LC_ALL LC_LANG
 
 # This will print the fingerprint of the host key in "visual" form
 # this should make it easier to also recognize bad things

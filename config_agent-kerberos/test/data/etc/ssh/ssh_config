@@ -49,6 +49,7 @@ ForwardX11Trusted yes
 #   Port 22
 Protocol 2
 SendEnv LC_IDENTIFICATION LC_ALL
+SendEnv LC_LANGUAGE
 
 # This will print the fingerprint of the host key in "visual" form
 # this should make it easier to also recognize bad things
