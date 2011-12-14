@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Dec 14 13:36:42 CET 2011 - jsuchome@suse.cz
+
+- added script agents
+- ported to new layout (jreidinger)
+- 0.1.1
+
+-------------------------------------------------------------------
 Fri Sep 30 15:58:11 CEST 2011 - jsuchome@suse.cz
 
 - added keyboard support 

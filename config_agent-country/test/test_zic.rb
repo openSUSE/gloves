@@ -1,6 +1,5 @@
-#!/usr/bin/env ruby
 #--
-# YaST++ Timezone Library
+# Config Agents Framework
 #
 # Copyright (C) 2011 Novell, Inc. 
 #   This library is free software; you can redistribute it and/or modify
@@ -17,24 +16,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "y_lib/timezone"
-require "dbus_clients/backend_exception"
-begin
-  args = {}
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+require "test/unit/testcase"
+require 'test/unit/ui/console/testrunner'
+require "rubygems"
+require "script/zic"
 
-  if ARGV.empty?
-    timezone = YLib::Timezone::read(args)
-    puts timezone.inspect unless timezone.nil?
-    if timezone.nil?
-      error	= YLib::Timezone::last_error
-      puts "returned error: #{error}" if error
-    end
-  else
-    puts YLib::Timezone::modify({}, {"timezone"=>ARGV[0]})
+class TestZic < Test::Unit::TestCase
+  def setup
+    @data_dir = File.join(File.dirname(__FILE__),"data")
   end
-
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
-  raise
 end
+
+Test::Unit::UI::Console::TestRunner.run(TestZic)
