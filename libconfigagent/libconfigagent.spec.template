@@ -19,6 +19,7 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Framework for config agents
 Source:         libconfigagent-%{version}.tar.bz2
+Source1:        libconfigagent-rpmlintrc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
@@ -71,6 +72,16 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING COPYING.LESSER
 %{rb_vendorlib}/dbus_clients
 %{rb_vendorlib}/config_agent_service
+/etc/dbus-1/system.d/org.opensuse.config_agent.conf
+%dir /etc/dbus-1
+%dir /etc/dbus-1/system.d
+%dir %{_datadir}/config_agents
+%dir %{_datadir}/config_agents/bin
+%dir %{_datadir}/dbus-1
+%dir %{_datadir}/dbus-1/system-services
+%{_datadir}/config_agents/bin/config_agent.rb
+%{_datadir}/dbus-1/system-services/org.opensuse.config_agent.service
+
 
 
 %files devel
