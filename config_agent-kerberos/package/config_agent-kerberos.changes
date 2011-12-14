@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Dec 14 13:41:01 CET 2011 - jsuchome@suse.cz
+
+- return correct error message
+- fixed SendEnv detection
+- ported to new layout (jreidinger)
+- 0.2.1 
+
+-------------------------------------------------------------------
 Tue Aug 30 10:35:03 UTC 2011 - jreidinger@suse.com
 
 - initial version 
