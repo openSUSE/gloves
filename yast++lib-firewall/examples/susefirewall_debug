@@ -25,15 +25,37 @@ begin
     puts susefirewall2.inspect unless susefirewall2.nil?
 
     if susefirewall2.nil?
-      error = YLib::Susefireewall2::last_error
+      error = YLib::Susefirewall2::last_error
       puts "returned error: #{error}" if error
     end
+
+    ###
+
+    susefirewall2 = YLib::Susefirewall2::read({"kind" => "open_port", "port" => "xyz"})
+    puts susefirewall2.inspect unless susefirewall2.nil?
+
+    if susefirewall2.nil?
+      error = YLib::Susefirewall2::last_error
+      puts "returned error: #{error}" if error
+    end
+
+    ###
 
     susefirewall2 = YLib::Susefirewall2::remove({}, {"kind" => "open_port", "port" => "xyz"})
     puts susefirewall2.inspect unless susefirewall2.nil?
 
     if susefirewall2.nil?
-      error = YLib::Susefireewall2::last_error
+      error = YLib::Susefirewall2::last_error
+      puts "returned error: #{error}" if error
+    end
+
+    ###
+
+    susefirewall2 = YLib::Susefirewall2::read({"kind" => "open_port", "port" => "xyz"})
+    puts susefirewall2.inspect
+
+    if susefirewall2.nil?
+      error = YLib::Susefirewall2::last_error
       puts "returned error: #{error}" if error
     end
 rescue DbusClients::BackendException => e
