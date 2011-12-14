@@ -1,0 +1,33 @@
+
+## This document isn't finished. 
+## Stay tuned
+
+
+First of all you need checkout the sources and install needed ruby gems:
+
+# git clone https://github.com/yast/yast--.git
+
+Follow the README file and install needed dependencies:
+
+# sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_11.4/devel:languages:ruby:extensions.repo
+# sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
+
+Run rake install from the yast-- directory:
+# sudo rake install
+
+Run an example:
+# ./yast++lib-country/examples/keyboard_conf
+
+
+It's time to write your own yast++ module now:
+
+# mkdir config_agent_windowmanager
+# cd config_agent_windowmanager
+
+Add some lines of code to the skelleton:
+# vi services/config_agent_service/windowmanager.rb
+(TODO read function)
+
+for debugging see: /var/log/configagent-service*
+
+
