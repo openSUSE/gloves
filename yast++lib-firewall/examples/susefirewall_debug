@@ -28,6 +28,14 @@ begin
       error = YLib::Susefireewall2::last_error
       puts "returned error: #{error}" if error
     end
+
+    susefirewall2 = YLib::Susefirewall2::remove({}, {"kind" => "open_port", "port" => "xyz"})
+    puts susefirewall2.inspect unless susefirewall2.nil?
+
+    if susefirewall2.nil?
+      error = YLib::Susefireewall2::last_error
+      puts "returned error: #{error}" if error
+    end
 rescue DbusClients::BackendException => e
   puts e.backend_backtrace
   raise
