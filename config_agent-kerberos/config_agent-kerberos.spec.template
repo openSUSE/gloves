@@ -19,7 +19,7 @@ Release:        0
 Summary:        Set of dbus services for basic access to kerberos config
 Source:         %{name}-%{version}.tar.bz2
 Source1:        %{name}-rpmlintrc
-Requires:       libconfigagent
+Requires:       libconfigagent > 0.2.0
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
 Requires:       rubygem-ruby-dbus
@@ -27,7 +27,6 @@ Requires:       rubygem-ruby-dbus
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging_rake_tasks
-BuildRequires:  libconfigagent
 
 # This is for Hudson (build service) to setup the build env correctly
 %if 0
