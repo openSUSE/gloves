@@ -12,17 +12,17 @@ Rights for setting/getting user permissions
 -->
 
   
-  <action id="org.opensuse.config_agent.file.etc_sysconfig_language.read">
-    <description>Reading file /etc/sysconfig/language</description>
-    <message>Authentication is required to read file /etc/sysconfig/language</message>
+  <action id="org.opensuse.config_agent.file.clock.read">
+    <description>Reading file /etc/sysconfig/clock</description>
+    <message>Authentication is required to read file /etc/sysconfig/clock</message>
     <defaults>
       <allow_inactive>no</allow_inactive>
       <allow_active>no</allow_active>
     </defaults>
   </action>
-  <action id="org.opensuse.config_agent.file.etc_sysconfig_language.write">
-    <description>Writing to file /etc/sysconfig/language</description>
-    <message>Authentication is required to write to /etc/sysconfig/language</message>
+  <action id="org.opensuse.config_agent.file.clock.write">
+    <description>Writing to file /etc/sysconfig/clock</description>
+    <message>Authentication is required to write to /etc/sysconfig/clock</message>
     <defaults>
       <allow_inactive>no</allow_inactive>
       <allow_active>no</allow_active>

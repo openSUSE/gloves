@@ -22,6 +22,6 @@ module ConfigAgent
   class Keyboard < DbusClients::FileClient
 
     # identification of relevant DBUS service
-    agent_id "etc_sysconfig_keyboard"
+    agent_id "file.keyboard"
   end
 end

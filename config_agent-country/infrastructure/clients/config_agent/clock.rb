@@ -22,6 +22,6 @@ module ConfigAgent
   class Clock < DbusClients::FileClient
 
     # identification of relevant DBUS service
-    agent_id "etc_sysconfig_clock"
+    agent_id "file.clock"
   end
 end
