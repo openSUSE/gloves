@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-country (Version 0.1.0)
+# spec file for package yast++lib-kerberos_client (Version 0.1.0)
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -9,21 +9,20 @@
 #
 
 
-Name:           yast++lib-country
-License:	LGPLv2.1 or LGPLv3
+Name:           yast++lib-global_config
+License:	      LGPL-2.1; LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
 Version:        0.1.0
 Release:        0
-Summary:        Library for high level access to country configuration
+Summary:        Support for global options for yast++ libraries like chroot directory
 Source:         %{name}-%{version}.tar.bz2
-Requires:	config_agent-country
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Requires:       libconfigagent
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging_rake_tasks
-BuildRequires:  config_agent-country
 
 # This is for Hudson (build service) to setup the build env correctly
 %if 0
@@ -32,10 +31,9 @@ BuildRequires:  rubygem-rcov >= 0.9.3.2
 %endif
 
 %description
-Library for high level access to country configuration. Part of yast++ project.
+Support for global options for yast++ libraries like chroot directory. Part of yast++ project.
 Authors:
 --------
-    Jiri Suchomel <jsuchome@suse.cz>
     Josef Reidinger <jreidinger@suse.cz>
 
 
@@ -55,7 +53,7 @@ rake install[%{buildroot}/,%{rb_vendorlib}]
 rm -rf $RPM_BUILD_ROOT
 
 #---------------------------------------------------------------
-%files 
+%files
 %defattr(-,root,root)
 %{rb_vendorlib}/y_lib
 

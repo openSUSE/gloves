@@ -3,18 +3,18 @@
 #--
 # Config Agents Framework
 #
-# Copyright (C) 2011 Novell, Inc. 
+# Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
 # it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
-# License as published by the Free Software Foundation. 
+# License as published by the Free Software Foundation.
 #
 #   This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
-# details. 
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
 #
 #   You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software 
+# License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
@@ -24,6 +24,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
 require "rubygems"
 require "dbus"
 require "config_agent_service/policykit_checker"
+require "config_agent_service/chroot_env"
 require "config_agent_service/logger"
 require "config_agent_service/backend_exception"
 
@@ -59,7 +60,6 @@ class ConfigAgentDbusService < DBus::Object
   end
   def dispatch(msg)
     msg.params << msg.sender
-    log.info msg.params.inspect
     super(msg)
   end
 
@@ -68,7 +68,7 @@ class ConfigAgentDbusService < DBus::Object
       #at first ensure permission is given
       begin
         Sync.last_call = Time.now
-        check_permissions sender, id+"."+method, data 
+        check_permissions sender, id+"."+method, data
         [ConfigAgentDbusService.call_method(id,method,data)]
       rescue ConfigAgentService::BackendException => e
           [ e.to_hash ]
@@ -87,13 +87,18 @@ class ConfigAgentDbusService < DBus::Object
     service = parts[-1]
     file_path = File.join(SERVICE_PATH,type,service+".rb")
     if !File.exist? file_path
-      return { "error" => "missing service for id #{id}" } 
+      return { "error" => "missing service for id #{id}" }
     end
     require file_path
     class_name = service.gsub(/(^|_)(.)/) { $2.upcase }
     obj = Kernel.const_get(class_name.to_sym).new
     return { "error" => "unknown method for class" } unless obj.respond_to? method
-    return obj.send(method,data)
+    if data["__chroot"]
+      return { "error" => "Chroot directory not exist or is not directory" } unless File.directory?(data["__chroot"])
+      return ConfigAgentService::ChrootEnv.run(data["__chroot"]) { obj.send(method,data) }
+    else
+      return obj.send(method,data)
+    end
   end
 end
 

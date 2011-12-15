@@ -1,18 +1,18 @@
 #--
 # Config Agents Framework
 #
-# Copyright (C) 2011 Novell, Inc. 
+# Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
 # it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
-# License as published by the Free Software Foundation. 
+# License as published by the Free Software Foundation.
 #
 #   This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
-# details. 
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
 #
 #   You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software 
+# License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
@@ -33,7 +33,7 @@ class Language < ConfigAgentService::FileService
       aug.close
       return language
     end
-      
+
     aug.match("/files/etc/sysconfig/language/*").each do |key_path|
       key        = key_path.split("/").last
       next if key.start_with? "#comment"

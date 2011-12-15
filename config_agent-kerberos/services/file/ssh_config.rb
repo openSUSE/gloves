@@ -1,18 +1,18 @@
 #--
 # Config Agents Framework
 #
-# Copyright (C) 2011 Novell, Inc. 
+# Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
 # it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
-# License as published by the Free Software Foundation. 
+# License as published by the Free Software Foundation.
 #
 #   This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
-# details. 
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
 #
 #   You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software 
+# License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
@@ -25,11 +25,11 @@ class SshConfig < ConfigAgentService::FileService
     aug		= params["_aug_internal"] || Augeas::open(nil, "/usr/share/augeas/lenses/", Augeas::NO_MODL_AUTOLOAD)
     aug.transform(:lens => "Ssh.lns", :incl => "/etc/ssh/ssh_config")
     aug.load
-  
+
     ret = {
       # we have to create list (not hash), because order matters
       "Host"	=> []
-    } 
+    }
 
     aug.match("/files/etc/ssh/ssh_config/Host").each do |host_path|
 

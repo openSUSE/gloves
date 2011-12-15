@@ -1,18 +1,18 @@
 #--
 # YaST++ Timezone Library
 #
-# Copyright (C) 2011 Novell, Inc. 
+# Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
 # it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
-# License as published by the Free Software Foundation. 
+# License as published by the Free Software Foundation.
 #
 #   This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
-# details. 
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
 #
 #   You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software 
+# License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
@@ -28,6 +28,9 @@ module YLib
       return @error
     end
 
+    YAST_TIMEZONES      = "/usr/share/YaST2/data/timezone_raw.ycp"
+    ZONETAB             = "/usr/share/zoneinfo/zone.tab"
+
     @sysconfig2yast	= {
       "TIMEZONE"	=> "timezone",
       "HWCLOCK"		=> "hwclock",
@@ -39,15 +42,25 @@ module YLib
 
       # get the list of available time zones
       if (params["kind"] == "timezones")
-	# this is read only system call, no need for an agent here
-	timezones = `grep -v "#" /usr/share/zoneinfo/zone.tab | cut -f 3 | sort`.split("\n")
+        return {} unless File.exists? ZONETAB
+	timezones = `grep -v "#" #{ZONETAB} | cut -f 3 | sort`.split("\n")
       	return {
 	    "timezones"	=> timezones
 	}
-# TODO return time zones for given region
+      # return the hash mapping regions to time zones
+      elsif (params["kind"] == "regions")
+        full_timezones  = read_timezones_with_regions
+        region          = params["only"]
+        unless region.nil?
+          return full_timezones[region] if full_timezones.has_key? region
+          # log.error = "No such region: '#{region}'"
+          return {}
+        else
+          return full_timezones
+        end
       end
 
-      # read config files    
+      # read config files
       begin
         sysconfig_timezone	= ConfigAgent::Clock.read({})
       rescue DbusClients::InsufficientPermission => e
@@ -94,6 +107,32 @@ module YLib
       return nil
     end
 
+
+  private
+
+    # read all the timezones splitted into regions defined by YaST, also read timezone labels
+    # return hash scructure of kind { region => { timezone => label } }
+    def self.read_timezones_with_regions
+      full      = {}
+      region    = ""
+      unless File.exists? YAST_TIMEZONES
+        @error  = "File #{YAST_TIMEZONES} does not exist"
+        return nil
+      end
+      input = `grep ":" #{YAST_TIMEZONES} | sed 's/^[[:space:]]*//'`
+      input.split("\n").each do |line|
+        next if (line.start_with?("*") || line.start_with?('"entries"') || line.start_with?('"central"'))
+        # take key and value from inside the quotes
+        key,val = line.gsub(/^[^"]*"([^"]+)"[^"]*"([^"]+)".*$/,"\\1:\\2").split(':')
+        if key == "name"
+          region = val
+          full[region]  = {}
+        else
+          full[region][key]     = val
+        end
+      end
+      return full
+    end
 
   end
 end
