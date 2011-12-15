@@ -36,3 +36,16 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['test/*.rb']
   t.verbose = true
 end
+
+Packaging::Configuration.run do |conf|
+  conf.obs_project = "YaST:Head:YaST++"
+  conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
+  conf.package_name = "config_agent-<%= identifier %>"
+end
+
+task :generate_spec do
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' config_agent-<%= identifier %>.spec.template > package/config_agent-<%= identifier %>.spec"
+end
+
+#add generation of spec file as dependency for package task
+Rake.application.lookup(:package).prerequisites << "generate_spec"

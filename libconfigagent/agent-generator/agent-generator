@@ -27,6 +27,7 @@ if ARGV.size < 2 || (!["file","script"].include?(ARGV[0]) && !["file","script"].
 end
 
 require "erb"
+require "fileutils"
 
 file = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
 TEMPLATES_DIR = File.dirname(file)
@@ -47,7 +48,7 @@ type = ARGV[index].to_sym
 file_name = ARGV[index+1]
 identifier = file_name.split("/")[-1].gsub(/[-\.\/]/,"_").gsub(/^_/,"").downcase
 
-`mkdir -p infrastructure/polkit-definitions services/#{type} infrastructure/clients/config_agent test` #create dir structure
+`mkdir -p infrastructure/polkit-definitions services/#{type} infrastructure/clients/config_agent test package` #create dir structure
 
 agent_class_file = file_name.gsub(/^.*\//,"").gsub(/[-\.]/,"_").downcase
 agent_class = agent_class_file.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase } #rails code of camelize
@@ -74,4 +75,23 @@ generated_files.each do |template,result_path|
   result = ERB.new(template,0,"").result(binding)
   File.open(result_path,"w") {|f| f.write result }
   puts "File #{result_path} succesfully generated"
+end
+
+#packaging files has special handling to e.g. disable by option also only for first agent it make sense
+if Dir["**/*.spec*"].empty? #no spec yet
+  template = File.read File.join(TEMPLATES_DIR,"spec_template.erb")
+  result = ERB.new(template,0,"").result(binding)
+  output = "config_agent-#{identifier}.spec.template"
+  File.open(output,"w") {|f| f.write result }
+  puts "File #{output} succesfully generated"
+  output = "package/config_agent-#{identifier}.changes"
+  FileUtils.touch output
+  puts "File #{output} succesfully generated"
+  output = "VERSION"
+  File.open(output,"w") {|f| f.write "0.0.1" }
+  puts "File #{output} succesfully generated"
+  ["COPYING","COPYING.LESSER"].each do |f|
+    FileUtils.cp File.join(TEMPLATES_DIR,f),f
+    puts "File #{f} succesfully generated"
+  end
 end
