@@ -7,7 +7,7 @@ Long term goal:
 Replace whole YaST with better tool, using up-to-date techonology.
 Provide clean, understandable and common API for system configuration related tasks: not only for YaST
 
-Current WebYaST state is limited to replacing backend part of YaST.
+Current YaST++ state is limited to replacing backend part of YaST.
 For rewriting whole YaST into new language, refer to Amaranth project.
 
 
@@ -17,9 +17,9 @@ Main advantages of YaST++ compared to YaST:
 1. Using modern and well-known language
   
    We chose ruby mostly because of
-   	  - wide user community
+   	- wide user community
 	  - good testing framework 
-	  - good knowldeadge inside SUSE
+	  - good knowledge inside SUSE
 
    YaST is mostly written in YCP language, which is not developed any more and is known only to inner circle of initiates.
 
@@ -32,14 +32,14 @@ Main advantages of YaST++ compared to YaST:
    Architecture backend uses D-Bus services that are actually accessing the system.
    Those services have rights of system administrator (root).
 
-   Only if user is allowed to perform certain task, D-Bus service is started and action is done.
+   Only if user is allowed to perform certain task, D-Bus service is started and action is done. D-Bus is used only if non-root access system, so there is no speed penalty for old YaST usage (run as root).
 
 
 3. Better modularity
 
-   By splitting the business logic part (YLib) from UI (Qt, WWW), modules that borrow functionality from other ones do not need to import(install) their UI.
+   By splitting the business logic part (YLib) from UI (Qt, WWW) and from system access (config-agents), modules that borrow functionality from other ones do not need to import(install) their UI.
 
-   In the end, there should be smaller space requirements for situations when only part of YaST++ stack should be installed.
+   In the end, there should be smaller space requirements for situations when only part of YaST++ stack should be installed ( e.g. WebYaST usage).
 
 
 The architecture in short
@@ -57,7 +57,7 @@ The API consists of these functions
 	modify ({}, {}) -
 	delete ({}, {})	- those modify functions take 2 hash argument (first is meant e.g. for object specification,
 			  second contains the actual data to be written)
-	propose ({})	- propose new confiuration
+	propose ({})	- propose new configuration (note: not yet decided if it should be in ylib or library above it, that just take input and return map for ylib modules)
 
 See https://github.com/yast/yast--/wiki/YLib-Use-Cases for more about YLib API.
 
@@ -95,6 +95,9 @@ What YLib developer needs to do
 
 What Config Agent developer needs to do
 ---------------------------------------
+
+There is generator for code. Developer need only to fill up read/write or execute method that do real action and fill test for such functionality. See tutorial.txt for more information.
+
 
 Defining Policies 
 -----------------

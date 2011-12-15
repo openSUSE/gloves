@@ -22,7 +22,7 @@ require "y_lib/language"
 require "dbus_clients/backend_exception"
 begin
   args = {}
-  args = { "languages" => 1 } if ARGV[0] == "languages"
+  args = { "kind" => "languages" } if ARGV[0] == "languages"
 
   if ARGV.empty? || ARGV[0] == "languages"
     language = YLib::Language::read(args)
