@@ -34,16 +34,17 @@ module YLib
       "DEFAULT_TIMEZONE"=> "default_timezone"
     }
 
-    # Read all settings relevant for timezone configuration (key:value map).
+    # Read all settings relevant for timezone configuration
     def self.read(params)
 
       # get the list of available time zones
-      if (params.has_key? "timezones")
+      if (params["kind"] == "timezones")
 	# this is read only system call, no need for an agent here
 	timezones = `grep -v "#" /usr/share/zoneinfo/zone.tab | cut -f 3 | sort`.split("\n")
       	return {
 	    "timezones"	=> timezones
 	}
+# TODO return time zones for given region
       end
 
       # read config files    

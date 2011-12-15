@@ -40,7 +40,7 @@ module YLib
     def self.read(params)
 
       # get the list of available languages (not only YaST supported)
-      if (params.has_key? "languages")
+      if (params["kind"] == "languages")
 	# this is read only system call, no need for an agent here
 	locales = `locale -a | grep -i utf`.split("\n")
       	return {
