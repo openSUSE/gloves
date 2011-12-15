@@ -69,10 +69,8 @@ class ConfigAgentDbusService < DBus::Object
       #at first ensure permission is given
       begin
         Sync.last_call = Time.now
-        check_permissions sender, id+"."+method, data 
-        ret = [ConfigAgentDbusService.call_method(id,method,data)]
-        log.info ret.inspect
-        ret
+        check_permissions sender, id+"."+method, data
+        [ConfigAgentDbusService.call_method(id,method,data)]
       rescue ConfigAgentService::BackendException => e
           [ e.to_hash ]
       rescue Exception => e
@@ -90,7 +88,7 @@ class ConfigAgentDbusService < DBus::Object
     service = parts[-1]
     file_path = File.join(SERVICE_PATH,type,service+".rb")
     if !File.exist? file_path
-      return { "error" => "missing service for id #{id}" } 
+      return { "error" => "missing service for id #{id}" }
     end
     require file_path
     class_name = service.gsub(/(^|_)(.)/) { $2.upcase }
