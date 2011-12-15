@@ -17,6 +17,7 @@
 #++
 
 require 'config_agent_service/file_service'
+require 'augeas'
 
 class Windowmanager < ConfigAgentService::FileService
 
@@ -32,6 +33,8 @@ class Windowmanager < ConfigAgentService::FileService
       "default_wm" => default_wm
     }
     aug.close
+
+    log.info windowmanager_conf.inspect
 
     return windowmanager_conf
   end
