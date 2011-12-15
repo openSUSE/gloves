@@ -17,41 +17,73 @@
 #++
 
 require 'config_agent_service/file_service'
+require 'augeas'
 
 class Passwd < ConfigAgentService::FileService
 
+  # read users from /etc/passwd
   def read(params)
 
     aug        	= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
     aug.transform(:lens => "Passwd.lns", :incl => "/etc/passwd")
     aug.load
 
-    passwd = {}
+    ret         = {}
+    retlist     = []
 
     # possible error: parse_failed
     unless aug.get("/augeas/files/etc/passwd/error").nil?
       aug.close
-      return passwd
+      return ret
     end
 
-    aug.match("/files/etc/passwd/*").each do |user_path|
-      user      = user_path.split("/").last
-      next if user.start_with? "#comment"
-      u         = {}
-      aug.match(user_path + "/*").each do |key_path|
-        key     = key_path.split("/").last
-        u[key]  = aug.get(key_path)
+    only = params["only"]
+    unless params["id"].nil?
+      ret       = read_one_user(aug, "/files/etc/passwd/" + params["id"])
+    else
+      # read all users
+      aug.match("/files/etc/passwd/*").each do |user_path|
+        user      = user_path.split("/").last
+        next if user.start_with? "#comment"
+        # when 'only' is specified, we return list of values, not hash
+        unless only.nil?
+          if (only == "username" || only == "login")
+            val = user
+          else
+            val = aug.get("#{user_path}/#{only}")
+          end
+          retlist << val unless val.nil?
+        else
+          ret[user]      = read_one_user(aug, user_path)
+        end
       end
-      passwd[user]      = u
     end
 
     aug.close
-    return passwd
+    unless only.nil?
+      ret = {
+        "result" => retlist
+      }
+    end
+    return ret
   end
 
   def write(params)
     #TODO add your code here
     return {}
+  end
+
+  private
+
+  # read the data about one user from /etc/passwd
+  def read_one_user aug, user_path
+    u   = {}
+    aug.match(user_path + "/*").each do |key_path|
+      key     = key_path.split("/").last
+      val     = aug.get(key_path)
+      u[key]  = val unless val.nil?
+    end
+    return u
   end
 
 end
