@@ -18,7 +18,6 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Set of dbus services for basic access to user configuration
 Source:         %{name}-%{version}.tar.bz2
-Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent >= 0.2.0
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
