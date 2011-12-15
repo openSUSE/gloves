@@ -19,7 +19,7 @@ module DbusClients
   module DbusClient
     class << self
       alias_method :ylib_conf_extended_call, :call
-      def self.call name, id, type, method, options
+      def call name, id, type, method, options
         options = YLib::Configuration.instance.agent_parameters.merge options
         ylib_conf_extended_call name, id, type, method, options
       end
