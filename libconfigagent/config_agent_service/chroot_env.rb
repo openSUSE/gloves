@@ -5,16 +5,19 @@ module ConfigAgentService
     def self.run dir
       rd,wr = IO.pipe
       fork do
+	Dir.chroot(dir)
         rd.close
-        wr.write YAML::dump yield
+	result = YAML::dump(yield) rescue $!
+        wr.write result
         wr.close
         exit 0
       end
       wr.close
-      result = rd.read
+      result = YAML::load rd.read
       rd.close
       Process.wait
-      return YAML::load result
+      raise result if result.is_a? Exception
+      return result
     end
   end
 end
