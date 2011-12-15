@@ -47,15 +47,17 @@ module YLib
 
       ret = {}
 
-      case params["kind"]
+      case params["kind"] || "all"
         when "open_port"
           ret = handle_open_port(susefirewall2, params, "read")
         when "interface"
           ret = handle_interface_in_zone(susefirewall2, params, "read")
-        else
+        when "all"
           susefirewall2.each do |key, val|
             ret[key] = val
           end
+        else
+          raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
 
       return ret
