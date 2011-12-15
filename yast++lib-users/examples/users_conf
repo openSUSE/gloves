@@ -23,7 +23,15 @@ require "dbus_clients/backend_exception"
 begin
   args = {}
 
-  if ARGV.empty?
+  unless ARGV[0].nil?
+    if ARGV[0] == "only" && !ARGV[1].nil?
+      args = { "only" => ARGV[1] }
+    else
+      args = { "id" => ARGV[0] }
+    end
+  end
+
+  if ARGV.empty? || !args.empty?
     users = YLib::Users::read(args)
     puts users.inspect unless users.nil?
     if users.nil?

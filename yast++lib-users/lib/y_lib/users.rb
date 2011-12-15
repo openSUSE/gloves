@@ -30,16 +30,15 @@ module YLib
 
     # Read all settings relevant for Users configuration
     def self.read(params)
-      users     = {}
+      ret       = {}
 
       begin
-        users   = ConfigAgent::Passwd.read({})
+        ret     = ConfigAgent::Passwd.read(params)
       rescue DbusClients::InsufficientPermission => e
         @error	= "User has no permission for action '#{e.permission}'."
         return nil
       end
-
-      return users;
+      return ret;
     end
 
     def self.modify(config,params)
