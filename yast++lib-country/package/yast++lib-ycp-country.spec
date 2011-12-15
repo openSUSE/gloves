@@ -35,7 +35,7 @@ ln -sf %{rb_vendorlib}/y_lib/timezone.rb $RPM_BUILD_ROOT/usr/share/YaST2/modules
 
 
 #---------------------------------------------------------------
-%files 
+%files
 %defattr(-,root,root)
 %dir /usr/share/YaST2/modules/YLib
 /usr/share/YaST2/modules/YLib/Language.rb
