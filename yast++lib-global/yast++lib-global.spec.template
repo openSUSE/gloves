@@ -10,7 +10,7 @@
 
 
 Name:           yast++lib-global_config
-License:	      LGPL-2.1; LGPL-3
+License:	      LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on

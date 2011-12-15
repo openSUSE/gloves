@@ -10,7 +10,7 @@
 
 
 Name:           yast++lib-ycp-kerberos-client
-License:	LGPLv2.1 or LGPLv3
+License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    1
