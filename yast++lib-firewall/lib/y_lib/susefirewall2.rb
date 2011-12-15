@@ -98,6 +98,8 @@ module YLib
       case params["kind"]
         when "open_port"
           handle_open_port(susefirewall2, params, "add")
+        when "interface"
+          handle_interface_in_zone(susefirewall2, params, "add")
         else
           raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
@@ -126,6 +128,8 @@ module YLib
       case params["kind"]
         when "open_port"
           handle_open_port(susefirewall2, params, "remove")
+        when "interface"
+          handle_interface_in_zone(susefirewall2, params, "remove")
         else
           raise NotImplementedError, "Unknown kind '#{params["kind"]}'"
       end
@@ -182,7 +186,16 @@ module YLib
     end
 
     #
-    # Handles FW_DEV_$ZONE
+    # Opens a new port
+    #   handle_interface_in_zone({...current configuration...}, {"action" => "add", "interface" => "eth4", "zone" => "EXT"})
+    #
+    # Removes a port
+    #   handle_interface_in_zone({...current configuration...}, {"action" => "remove", "interface" => "eth4", "zone" => "EXT"})
+    #
+    # Checks whether a port is open
+    #   handle_interface_in_zone({...current configuration...}, {"action" => "read", "interface" => "eth4", "zone" => "EXT"})
+    #
+    # Handles the FW_DEV_$ZONE entry
     #
     def self.handle_interface_in_zone(config, params, action)
       check_parameters(params, ["interface"])
@@ -193,7 +206,15 @@ module YLib
       key = "FW_DEV_#{zone}".upcase
       val = config[key].split
 
-      if action == "read"
+      if action == "add" && !val.include?(interface)
+        val << interface
+        config[key] = val.join CONFIG_DELIMITER
+        return true
+      elsif action == "remove" && val.include?(interface)
+        val.delete interface
+        config[key] = val.join CONFIG_DELIMITER
+        return true
+      elsif action == "read"
         if val.include?(interface)
           return params
         else
