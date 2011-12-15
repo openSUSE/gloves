@@ -33,7 +33,7 @@ module ConfigAgentService
       flags &= 1 if interactive
       result = iface.CheckAuthorization ["system-bus-name",{"name"=> sender}],permission, {}, flags,""
       #result structure http://hal.freedesktop.org/docs/polkit/eggdbus-interface-org.freedesktop.PolicyKit1.Authority.html#eggdbus-struct-AuthorizationResult
-      log.info result.inspect
+      log.warn "User '#{bus.proxy.GetConnectionUnixUser(sender)[0]}' attemp to obtain #{permission} and failed" unless result[0][0]
       raise InsufficientPermission.new(permission) unless result[0][0]
     end
   end
