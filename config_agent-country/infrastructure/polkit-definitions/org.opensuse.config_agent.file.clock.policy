@@ -11,7 +11,7 @@
 Rights for setting/getting user permissions
 -->
 
-  
+
   <action id="org.opensuse.config_agent.file.clock.read">
     <description>Reading file /etc/sysconfig/clock</description>
     <message>Authentication is required to read file /etc/sysconfig/clock</message>
@@ -28,6 +28,6 @@ Rights for setting/getting user permissions
       <allow_active>no</allow_active>
     </defaults>
   </action>
-  
+
 
 </policyconfig>

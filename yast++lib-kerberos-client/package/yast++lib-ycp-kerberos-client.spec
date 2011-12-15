@@ -33,7 +33,7 @@ ln -sf %{rb_vendorlib}/y_lib/kerberos_client.rb $RPM_BUILD_ROOT/usr/share/YaST2/
 
 
 #---------------------------------------------------------------
-%files 
+%files
 %defattr(-,root,root)
 %dir /usr/share/YaST2/modules/YLib
 /usr/share/YaST2/modules/YLib/KerberosClient.rb

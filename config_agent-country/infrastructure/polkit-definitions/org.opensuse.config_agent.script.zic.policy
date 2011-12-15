@@ -11,7 +11,7 @@
 Rights for setting/getting user permissions
 -->
 
-  
+
   <action id="org.opensuse.config_agent.script.zic.execute">
     <description>Execute script /usr/sbin/zic</description>
     <message>Authentication is required to execute script /usr/sbin/zic</message>
@@ -20,6 +20,6 @@ Rights for setting/getting user permissions
       <allow_active>no</allow_active>
     </defaults>
   </action>
-  
+
 
 </policyconfig>

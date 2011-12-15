@@ -1,18 +1,18 @@
 #--
 # YaST++ Kerberos Client Library
 #
-# Copyright (C) 2011 Novell, Inc. 
+# Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
 # it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
-# License as published by the Free Software Foundation. 
+# License as published by the Free Software Foundation.
 #
 #   This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
-# details. 
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
 #
 #   You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software 
+# License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
@@ -34,7 +34,7 @@ module YLib
 
     # Read all settings relevant for Kerberos client configuration
     def self.read(params)
-      # read config files    
+      # read config files
       begin
         krb5_conf	= ConfigAgent::Krb5Conf.read({})
         pam_krb5	= pam_query("krb5")
@@ -72,7 +72,7 @@ module YLib
 
       unless krb5_conf.nil? && krb5_conf.empty?
         ret	= ConfigAgent::Krb5Conf.write(krb5_conf)
-        return ret unless ret["success"] 
+        return ret unless ret["success"]
       end
 
       ret = write_ssh_support(ssh_support) unless ssh_support.nil?
@@ -141,7 +141,7 @@ module YLib
     def self.read_ssh_support
       hostname	= Socket.gethostname
       ssh_config	= ConfigAgent::SshConfig.read({})
-      
+
       ssh_support	= false
       ssh_config["Host"].each do |host|
 	if (host["Host"] == "*" || host["Host"] == hostname) &&
