@@ -100,7 +100,7 @@ There is generator for code. Developer need only to fill up read/write or execut
 Every function gets as input Hash and must return Hash. Hash can contain only primitive types which support dbus ( numbers, strings, arrays, hashes ) also nil values cannot pass dbus, so it is forbidded and should be encoded to other type.
 Raising exception is safe. Exception is handled and on front side it raise DbusClient::BackendException. For own exception as base should be used ConfigAgentService::BackendException and on front register exception as shown for InsufficientPermission one.
 Code runs as root, so expect intensive review.
-Every config agent include Logger via log method ( usage log.info "value" )
+Every config agent include Logger via log method ( usage log.info "value" ). Log output is available at /var/log/config_agent/services.log ( or under respective chroot if run in chroot ).
 
 
 Defining Policies
