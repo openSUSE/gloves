@@ -40,8 +40,8 @@ class TestSusefirewall2 < Test::Unit::TestCase
       "FW_MASQ_DEV" => "zone:int",
     }
     ret = file.write params
-    assert_equal true, ret["success"]
-    assert_equal nil, ret["message"]
+    assert_equal true, ret["success"], ret.inspect
+    assert_equal nil,  ret["message"], ret.inspect
   end
 end
 
