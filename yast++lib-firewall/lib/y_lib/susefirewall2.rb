@@ -164,25 +164,9 @@ module YLib
       # These are optional
       zone     = params["zone"]     || DEFAULT_ZONE
       protocol = params["protocol"] || DEFAULT_PROTOCOL
-
       key = "FW_SERVICES_#{zone}_#{protocol}".upcase
-      val = config[key].split
 
-      if action == "add" && !val.include?(port)
-        val << port
-        config[key] = val.join CONFIG_DELIMITER
-        return true
-      elsif action == "remove" && val.include?(port)
-        val.delete port
-        config[key] = val.join CONFIG_DELIMITER
-        return true
-      elsif action == "read"
-        if val.include?(port)
-          return params
-        else
-          return nil
-        end
-      end
+      return self.read_add_remove(config, params, action, key, port)
     end
 
     #
@@ -199,23 +183,33 @@ module YLib
     #
     def self.handle_interface_in_zone(config, params, action)
       check_parameters(params, ["interface"])
-
       interface = params["interface"]
-      zone      = params["zone"] || DEFAULT_ZONE
 
+      # Zone is optional
+      zone = params["zone"] || DEFAULT_ZONE
       key = "FW_DEV_#{zone}".upcase
+
+      return self.read_add_remove(config, params, action, key, interface)
+    end
+
+    #
+    # Handles a sysconfig entry separated by whitespaces.
+    # Possible actions are 'add', 'remove', and 'read'
+    # Parameter key defines the sysconfig entry
+    #
+    def self.read_add_remove(config, params, action, key, entry)
       val = config[key].split
 
-      if action == "add" && !val.include?(interface)
-        val << interface
+      if action == "add" && !val.include?(entry)
+        val << entry
         config[key] = val.join CONFIG_DELIMITER
         return true
-      elsif action == "remove" && val.include?(interface)
-        val.delete interface
+      elsif action == "remove" && val.include?(entry)
+        val.delete entry
         config[key] = val.join CONFIG_DELIMITER
         return true
       elsif action == "read"
-        if val.include?(interface)
+        if val.include?(entry)
           return params
         else
           return nil
