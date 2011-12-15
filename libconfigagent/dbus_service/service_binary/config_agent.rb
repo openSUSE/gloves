@@ -60,7 +60,6 @@ class ConfigAgentDbusService < DBus::Object
   end
   def dispatch(msg)
     msg.params << msg.sender
-    log.info msg.params.inspect
     super(msg)
   end
 
