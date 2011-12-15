@@ -22,17 +22,22 @@ require "y_lib/timezone"
 require "dbus_clients/backend_exception"
 begin
   args = {}
-  args = { "kind" => "timezones" } if ARGV[0] == "timezones"
+  args = { "kind" => ARGV[0] } if (ARGV[0] == "timezones" || ARGV[0] == "regions")
 
-  if ARGV.empty? || ARGV[0] == "timezones"
-    timezone = YLib::Timezone::read(args)
-    puts timezone.inspect unless timezone.nil?
-    if timezone.nil?
+  if (ARGV[0] == "regions" && !ARGV[1].nil?)
+    args["only"]        = ARGV[1]
+  end
+
+  if ARGV.empty? || !args.empty?
+    ret = YLib::Timezone::read(args)
+    if ret.nil?
       error	= YLib::Timezone::last_error
       puts "returned error: #{error}" if error
+    else
+      puts ret.inspect 
     end
   else
-    puts YLib::Timezone::modify({}, {"timezone"=>ARGV[0]})
+    puts YLib::Timezone::modify({}, {"timezone"=>ARGV[0]}).inspect
   end
 
 rescue DbusClients::BackendException => e

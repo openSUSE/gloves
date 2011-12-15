@@ -28,6 +28,9 @@ module YLib
       return @error
     end
 
+    YAST_TIMEZONES      = "/usr/share/YaST2/data/timezone_raw.ycp"
+    ZONETAB             = "/usr/share/zoneinfo/zone.tab"
+
     @sysconfig2yast	= {
       "TIMEZONE"	=> "timezone",
       "HWCLOCK"		=> "hwclock",
@@ -39,12 +42,22 @@ module YLib
 
       # get the list of available time zones
       if (params["kind"] == "timezones")
-	# this is read only system call, no need for an agent here
-	timezones = `grep -v "#" /usr/share/zoneinfo/zone.tab | cut -f 3 | sort`.split("\n")
+        return {} unless File.exists? ZONETAB
+	timezones = `grep -v "#" #{ZONETAB} | cut -f 3 | sort`.split("\n")
       	return {
 	    "timezones"	=> timezones
 	}
-# TODO return time zones for given region
+      # return the hash mapping regions to time zones
+      elsif (params["kind"] == "regions")
+        full_timezones  = read_timezones_with_regions
+        region          = params["only"]
+        unless region.nil?
+          return full_timezones[region] if full_timezones.has_key? region
+          # log.error = "No such region: '#{region}'"
+          return {}
+        else
+          return full_timezones
+        end
       end
 
       # read config files    
@@ -94,6 +107,32 @@ module YLib
       return nil
     end
 
+
+  private
+
+    # read all the timezones splitted into regions defined by YaST, also read timezone labels
+    # return hash scructure of kind { region => { timezone => label } }
+    def self.read_timezones_with_regions
+      full      = {}
+      region    = ""
+      unless File.exists? YAST_TIMEZONES 
+        @error  = "File #{YAST_TIMEZONES} does not exist"
+        return nil
+      end
+      input = `grep ":" #{YAST_TIMEZONES} | sed 's/^[[:space:]]*//'`
+      input.split("\n").each do |line|
+        next if (line.start_with?("*") || line.start_with?('"entries"') || line.start_with?('"central"'))
+        # take key and value from inside the quotes
+        key,val = line.gsub(/^[^"]*"([^"]+)"[^"]*"([^"]+)".*$/,"\\1:\\2").split(':')
+        if key == "name"
+          region = val
+          full[region]  = {}
+        else
+          full[region][key]     = val
+        end
+      end
+      return full
+    end
 
   end
 end

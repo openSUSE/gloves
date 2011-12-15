@@ -38,6 +38,30 @@ class TestTimezone < Test::Unit::TestCase
     assert_equal "--localtime", ret["hwclock"]
   end
 
+  def test_read_timezones
+    ret = YLib::Timezone.read({ "kind" => "timezones" })
+    assert_kind_of Hash, ret
+    assert_kind_of Array, ret["timezones"]
+  end
+
+  def test_read_regions_map
+    ret = YLib::Timezone.read({ "kind" => "regions" })
+    assert_kind_of Hash, ret
+    assert_kind_of Hash, ret["Europe"]
+    assert_equal "Czech Republic", ret["Europe"]["Europe/Prague"]
+  end
+
+  def test_read_region
+    ret = YLib::Timezone.read({ "kind" => "regions", "only" => "USA" })
+    assert_kind_of Hash, ret
+    assert_equal "Eastern (New York)", ret["America/New_York"]
+  end
+
+  def test_read_wrong_region
+    ret = YLib::Timezone.read({ "kind" => "regions", "only" => "US" })
+    assert_kind_of Hash, ret
+    assert_equal 0, ret.size
+  end
 
 end
 
