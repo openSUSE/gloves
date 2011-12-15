@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 require 'config_agent_service/backend_exception'
+require "config_agent_service/chroot_env"
 
 module DbusClients
   module Utils
@@ -37,7 +38,14 @@ module DbusClients
         require "#{type}/#{module_path}"
         require "config_agent_service/backend_exception"
         begin
-          ret = Kernel.const_get(base_name).send(:new).send(method,params) #name is same
+          if params["__chroot"]
+            return { "error" => "Chroot directory not exist or is not directory" } unless File.directory?(params["__chroot"])
+            ret = ConfigAgentService::ChrootEnv.run("__chroot") do
+              Kernel.const_get(base_name).send(:new).send(method,params) #FIXME DRY
+            end
+          else
+            ret = Kernel.const_get(base_name).send(:new).send(method,params) #name is same
+          end
         rescue ConfigAgentService::BackendException => e
           ret = e.to_hash
         end

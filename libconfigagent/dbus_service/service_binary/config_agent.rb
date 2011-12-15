@@ -24,6 +24,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
 require "rubygems"
 require "dbus"
 require "config_agent_service/policykit_checker"
+require "config_agent_service/chroot_env"
 require "config_agent_service/logger"
 require "config_agent_service/backend_exception"
 
@@ -69,7 +70,9 @@ class ConfigAgentDbusService < DBus::Object
       begin
         Sync.last_call = Time.now
         check_permissions sender, id+"."+method, data 
-        [ConfigAgentDbusService.call_method(id,method,data)]
+        ret = [ConfigAgentDbusService.call_method(id,method,data)]
+        log.info ret.inspect
+        ret
       rescue ConfigAgentService::BackendException => e
           [ e.to_hash ]
       rescue Exception => e
@@ -93,7 +96,12 @@ class ConfigAgentDbusService < DBus::Object
     class_name = service.gsub(/(^|_)(.)/) { $2.upcase }
     obj = Kernel.const_get(class_name.to_sym).new
     return { "error" => "unknown method for class" } unless obj.respond_to? method
-    return obj.send(method,data)
+    if data["__chroot"]
+      return { "error" => "Chroot directory not exist or is not directory" } unless File.directory?(data["__chroot"])
+      return ConfigAgentService::ChrootEnv.run(data["__chroot"]) { obj.send(method,data) }
+    else
+      return obj.send(method,data)
+    end
   end
 end
 
