@@ -20,6 +20,7 @@ require "dbus_clients/dbus_client"
 
 module DbusClients
   class FileClient
+    PERMISSION_PREFIX="org.opensuse.config_agent"
     def self.agent_id(value=nil)
       instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
       raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
@@ -32,6 +33,13 @@ module DbusClients
 
     def self.write (options)
       DbusClient.call(self.name,agent_id,"file","write",options)
+    end
+
+    def self.polkit_permissions
+      return {
+          :read => [PERMISSION_PREFIX,agent_id,"read"].join("."),
+          :write => [PERMISSION_PREFIX,agent_id,"write"].join(".")
+        }
     end
   end
 end
