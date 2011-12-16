@@ -95,3 +95,10 @@ if Dir["**/*.spec*"].empty? #no spec yet
     puts "File #{f} succesfully generated"
   end
 end
+
+#generated gitignore. Have it separate if someone use other VCS so we can add it optional
+outfile = "package/.gitignore"
+if !File.exist? outfile
+  FileUtils.copy File.join(TEMPLATES_DIR,"gitignore_template"),outfile
+  puts "File #{outfile} succesfully generated"
+end
