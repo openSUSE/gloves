@@ -17,14 +17,29 @@
 #++
 
 module ConfigAgentService
+  # Represents exception thrown by intention from backend part like missing permission or wrong argument.
+  # 
+  # Contain features:
+  # serialization to dbus
+  # contain type from which can be automatic recovered on read
+  # @see DbusClients::BackendException
   class BackendException < StandardError
+    # Unique identifier of exception kind
     attr_reader :type
 
+    # Exception defined by message and type. Usually child overload it.
+    # @example Common usage in child
+    #   class BigProblem < BackendException
+    #     def initialize(msg = "Big problem happen")
+    #       super(msg,"BIGPROBLEM")
+    #     end
+    #   end
     def initialize(msg,type)
       super(msg)
       @type = type
     end
 
+    # Serializes exception to hash. Needed to by-pass DBus.
     def to_hash
       return {
         "error" => message,
