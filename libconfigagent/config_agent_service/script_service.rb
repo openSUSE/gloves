@@ -23,9 +23,12 @@ module ConfigAgentService
   class ScriptService
     include ConfigAgentService::Logger
 
+    # Runs given command. Argument processing is without shell using popen call.
+    # @arg [Array[String]] command to execute
+    # @return [Hash] result of command in map with keys stdout,stderr and exitstatus 
     def run command
       ret = {}
-      status = Open4::popen4(command) do |pid,stdin,stdout,stderr|
+      status = Open4::popen4(*command) do |pid,stdin,stdout,stderr|
         stdin.close
         ret["stdout"] = stdout.read.strip
         ret["stderr"] = stderr.read.strip
