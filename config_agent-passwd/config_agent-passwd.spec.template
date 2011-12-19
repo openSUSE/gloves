@@ -21,6 +21,7 @@ Source:         %{name}-%{version}.tar.bz2
 Requires:       libconfigagent >= 0.2.0
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
+Requires:       pwdutils
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
