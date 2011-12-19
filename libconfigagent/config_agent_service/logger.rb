@@ -20,7 +20,10 @@ require "logger"
 require "fileutils"
 
 module ConfigAgentService
+  # provides unified logging mechanism
   module Logger
+    # logger object
+    # @return [Logger] instance of logger
     def log
       if !@log_instance
         FileUtils.mkdir_p("/var/log/config_agents") unless File.exist?("/var/log/config_agents")

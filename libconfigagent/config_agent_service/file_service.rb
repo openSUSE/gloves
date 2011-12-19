@@ -20,6 +20,8 @@ require "config_agent_service/backend_exception"
 require "config_agent_service/logger"
 
 module ConfigAgentService
+  # Represent service for reading and writing files.
+  # @abstract Subclass and implement read and write methods
   class FileService
     include ConfigAgentService::Logger
   end

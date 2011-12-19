@@ -19,13 +19,18 @@
 require "config_agent_service/backend_exception"
 
 module ConfigAgentService
+  # Represents exception when user doesn't have sufficient permissions to run config agent.
   class InsufficientPermission < BackendException
+    # identifier of permission
     attr_reader :permission
+
+    # @param [String] permission which missing
     def initialize(permission)
       super("Permission(#{permission} not granted.","ERR_PERMISSION")
       @permission = permission
     end
 
+    # enhance hash with permission information
     def to_hash
       ret = super
       ret["permission"] = permission

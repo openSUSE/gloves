@@ -20,6 +20,8 @@ require "open4"
 require "config_agent_service/logger"
 
 module ConfigAgentService
+  # Represent service for executing script.
+  # @abstract Subclass and implement execute method.
   class ScriptService
     include ConfigAgentService::Logger
 
