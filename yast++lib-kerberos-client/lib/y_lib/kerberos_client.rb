@@ -126,15 +126,15 @@ module YLib
 
   private
     def self.pam_query(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_params" => "-q --" + mod })["stdout"] || ""
+      return ConfigAgent::PamConfig.execute({ "exec_args" => ["-q", "--" + mod] })["stdout"] || ""
     end
 
     def self.pam_add(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_params" => "-a --" + mod })
+      return ConfigAgent::PamConfig.execute({ "exec_args" => ["-a", "--" + mod] })
     end
 
     def self.pam_delete(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_params" => "-d --" + mod })
+      return ConfigAgent::PamConfig.execute({ "exec_params" => ["-d",  "--" + mod] })
     end
 
     # Read state of ssh support from /etc/ssh/ssh_config
