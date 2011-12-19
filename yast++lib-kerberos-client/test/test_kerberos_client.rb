@@ -46,7 +46,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --sss" ).returns(sss_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--sss"] ).returns(sss_pam_module_out)
     ConfigAgent::SshConfig.stubs(:read).returns({"Host" => []})
   end
 
@@ -56,7 +56,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "auth:\naccount: ignore_unknown_principals\npassword:\nsession:\n",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
 
     ret = YLib::KerberosClient.read({})
     assert_equal "300",ret["kerberos_client"]["clockskew"]
@@ -73,7 +73,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
 
     ret = YLib::KerberosClient.read({})
     assert_equal false,ret["pam_login"]["use_kerberos"]
@@ -88,7 +88,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "auth:\naccount:\npassword:\nsession:\n",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_params" => "-q --krb5" ).returns(krb5_pam_module_out)
+    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
 
     ret = YLib::KerberosClient.read({})
     assert_equal true,ret["pam_login"]["use_kerberos"]
