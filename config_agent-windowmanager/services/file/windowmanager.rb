@@ -24,7 +24,7 @@ class Windowmanager < ConfigAgentService::FileService
   def read(params)
 
     aug = params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
-    aug.transform(:lens => "windowsmanager.lns", :incl => "/etc/sysconfig/windowmanager")
+    aug.transform(:lens => "Sysconfig.lns", :incl => "/etc/sysconfig/windowmanager")
     aug.load
 
     default_wm = aug.get("/files/etc/sysconfig/windowmanager/DEFAULT_WM")
