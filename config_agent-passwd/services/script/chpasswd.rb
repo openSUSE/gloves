@@ -22,21 +22,19 @@ require 'tempfile'
 class Chpasswd < ConfigAgentService::ScriptService
 
   def execute(params)
-
-
     ret = {}
 
-    user      = params["user"] || ""
-    pw        = params["pw"] || ""
-    unless (user.empty? && pw.empty?)
-      f = Tempfile.new('pwchange')
-      begin
-        f.puts("#{user}:#{pw}")
-        ret = run ["/usr/sbin/chpasswd", f.path]
-      ensure
-        f.close
-        f.unlink
-      end
+    config = params["config_file"] || [params] #allow one hash with user+pass or array of values
+    correct_data = config.all? {|i| !(i["user"]).empty? && !(i["pw"]).empty? }
+    return ret unless correct_data #TODO exception
+
+    f = Tempfile.new('pwchange','/root')
+    begin
+      config.each { |i| f.puts("#{i["user"]}:#{i["pw"]}") }
+      ret = run(["/usr/sbin/chpasswd"]+(params["exec_params"]||[])+[f.path])
+    ensure
+      f.close
+      f.unlink
     end
 
     return ret
