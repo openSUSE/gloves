@@ -29,7 +29,7 @@ class Chpasswd < ConfigAgentService::ScriptService
     user      = params["user"] || ""
     pw        = params["pw"] || ""
     unless (user.empty? && pw.empty?)
-      f = Tempfile.new('pwchange')
+      f = Tempfile.new('pwchange','/root')
       begin
         f.puts("#{user}:#{pw}")
         ret = run ["/usr/sbin/chpasswd", f.path]
