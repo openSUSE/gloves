@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-ycp-kerberos_client (Version 0.1.0)
+# spec file for package yast++lib-ycp (Version 0.1.0)
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -9,18 +9,18 @@
 #
 
 
-Name:           yast++lib-ycp-kerberos-client
+Name:           yast++lib-ycp
 License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    1
 Version:        0.1.0
 Release:        0
-Summary:        YCP bindings to yast++lib-kerberos-client
+Summary:        YCP bindings to YLib
 
 
-Requires:	yast++lib-kerberos-client
-BuildRequires:	yast++lib-kerberos-client yast2
+Requires:       yast++lib-global
+BuildRequires:	yast2 yast++lib-global
 BuildArchitectures: noarch
 
 
@@ -28,15 +28,14 @@ BuildArchitectures: noarch
 
 #---------------------------------------------------------------
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/share/YaST2/modules/YLib
-ln -sf %{rb_vendorlib}/y_lib/kerberos_client.rb $RPM_BUILD_ROOT/usr/share/YaST2/modules/YLib/KerberosClient.rb
+mkdir -p $RPM_BUILD_ROOT/usr/share/YaST2/modules
+ln -sf %{rb_vendorlib}/y_lib $RPM_BUILD_ROOT/usr/share/YaST2/modules/y_lib
 
 
 #---------------------------------------------------------------
 %files
 %defattr(-,root,root)
-%dir /usr/share/YaST2/modules/YLib
-/usr/share/YaST2/modules/YLib/KerberosClient.rb
+%dir /usr/share/YaST2/modules/y_lib
 
 #---------------------------------------------------------------
 %changelog

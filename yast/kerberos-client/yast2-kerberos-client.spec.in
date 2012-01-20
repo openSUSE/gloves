@@ -6,7 +6,7 @@ License: GPL v2 or later
 BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite yast++lib-ycp-kerberos-client yast2-ruby-bindings
 
 # API for system access
-Requires:	yast++lib-ycp-kerberos-client yast2-ruby-bindings
+Requires:	yast++lib-ycp yast2-ruby-bindings
 
 # Hostname::CurrentDomain, CurrentHostname
 Requires:	yast2 >= 2.16.48
