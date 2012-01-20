@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-global (Version VERSION_TEMPLATE)
+# spec file for package yast++lib-global (Version 0.1.0)
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -10,11 +10,11 @@
 
 
 Name:           yast++lib-global
-License:	      LGPL-2.1 OR LGPL-3
+License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
-Version:        VERSION_TEMPLATE
+Version:        0.1.0
 Release:        0
 Summary:        Support for global options for yast++ libraries like chroot directory
 Source:         %{name}-%{version}.tar.bz2
