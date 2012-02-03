@@ -22,6 +22,8 @@ Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent >= 0.2.0
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
+# applications used by script agents
+Requires:       timezone util-linux xorg-x11 kbd
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
