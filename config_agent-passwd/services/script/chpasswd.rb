@@ -31,7 +31,7 @@ class Chpasswd < ConfigAgentService::ScriptService
     f = Tempfile.new('pwchange','/root')
     begin
       config.each { |i| f.puts("#{i["user"]}:#{i["pw"]}") }
-      ret = run(["/usr/sbin/chpasswd"]+(params["exec_params"]||[])+[f.path])
+      ret = run(["/usr/sbin/chpasswd"]+(params["exec_args"]||[])+[f.path])
     ensure
       f.close
       f.unlink

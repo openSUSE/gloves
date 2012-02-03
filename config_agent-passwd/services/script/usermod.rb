@@ -21,8 +21,7 @@ require 'config_agent_service/script_service'
 class Usermod < ConfigAgentService::ScriptService
 
   def execute(params)
-    exec_params = params["exec_params"] || ""
-    run "/usr/sbin/usermod #{exec_params}"
+    run ["/usr/sbin/usermod"] + (params["exec_args"] || [])
   end
 
 end

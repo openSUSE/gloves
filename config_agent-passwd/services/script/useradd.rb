@@ -21,8 +21,7 @@ require 'config_agent_service/script_service'
 class Useradd < ConfigAgentService::ScriptService
 
   def execute(params)
-    exec_params = params["exec_params"] || ""
-    run "/usr/sbin/useradd #{exec_params}"
+    run ["/usr/sbin/useradd"] + (params["exec_args"] || [])
   end
 
 end

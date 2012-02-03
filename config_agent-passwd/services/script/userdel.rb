@@ -21,8 +21,7 @@ require 'config_agent_service/script_service'
 class Userdel < ConfigAgentService::ScriptService
 
   def execute(params)
-    exec_params = params["exec_params"] || ""
-    run "/usr/sbin/userdel #{exec_params}"
+    run ["/usr/sbin/userdel"] + (params["exec_args"] || [])
   end
 
 end
