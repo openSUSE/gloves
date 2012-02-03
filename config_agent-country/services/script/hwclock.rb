@@ -21,8 +21,7 @@ require 'config_agent_service/script_service'
 class Hwclock < ConfigAgentService::ScriptService
 
   def execute(params)
-    exec_params	= params["exec_params"] || ""
-    run "/sbin/hwclock #{exec_params}"
+    run ["/sbin/hwclock"] + (params["exec_args"] || [])
   end
 
 end

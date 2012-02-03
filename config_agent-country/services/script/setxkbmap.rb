@@ -21,8 +21,7 @@ require 'config_agent_service/script_service'
 class Setxkbmap < ConfigAgentService::ScriptService
 
   def execute(params)
-    exec_params	= params["exec_params"] || ""
-    run "/usr/bin/setxkbmap #{exec_params}"
+    run ["/usr/bin/setxkbmap"] + (params["exec_args"] || [])
   end
 
 end
