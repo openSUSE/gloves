@@ -134,7 +134,7 @@ module YLib
     end
 
     def self.pam_delete(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_params" => ["-d",  "--" + mod] })
+      return ConfigAgent::PamConfig.execute({ "exec_args" => ["-d",  "--" + mod] })
     end
 
     # Read state of ssh support from /etc/ssh/ssh_config
