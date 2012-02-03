@@ -90,11 +90,11 @@ module YLib
         ret	= ConfigAgent::Clock.write(sysconfig_params)
       end
 
-      if config.has_key? "apply_timezone" && config["apply_timezone"]
+      if config.has_key? "apply" && config["apply"]
       	timezone	= params["timezone"] # FIXME read it if it wasn't provided?
-	ConfigAgent::Zic.execute({ "exec_params" => "-l #{timezone}" }) unless timezone.nil?
+	ConfigAgent::Zic.execute({ "exec_args" => ["-l",  timezone] }) unless timezone.nil?
 	hwclock		= params["hwclock"]
-	ConfigAgent::Hwclock.execute({ "exec_params" => " --hctosys #{hwclock}"}) unless hwclock.nil?
+	ConfigAgent::Hwclock.execute({ "exec_args" => [" --hctosys", hwclock]}) unless hwclock.nil?
       end
 
       # TODO set time

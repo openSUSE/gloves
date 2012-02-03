@@ -85,13 +85,16 @@ module YLib
         ret	= ConfigAgent::Keyboard.write(sysconfig_params)
       end
 
+      if config.has_key? "apply" && config["apply"]
       # FIXME set the new keyboard layout for console and X11
       # in YaST:
       #		1. find out keymap: based on current_kbd value and data from keyboard_raw.ycp
       #		2. /bin/loadkeys " + keymap (or use "keymap" if it was passed as argument)
       #		3. /usr/sbin/xkbctrl us.map.gz -> "Apply" -> setxkbmap Apply
       # FIXME call set commands always, or only when certain argument is provided?
-      # ConfigAgent::Setxkbmap.execute({ "exec_params" => apply })
+      # ConfigAgent::Setxkbmap.execute({ "exec_args" => apply })
+      # ConfigAgent::Loadkeys.execute({ "exec_args" => apply })
+      end
 
       return ret
     rescue DbusClients::InsufficientPermission => e
