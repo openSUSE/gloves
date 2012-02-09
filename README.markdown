@@ -2,6 +2,7 @@
 
 
 ##Project State
+
 It is in heavy developemnt. You can try it, but it is not for production use.
 
 ##Documentation
@@ -13,6 +14,7 @@ Various written documenation is located at doc directory.
 
 ### How to try it from git
 install rubygem dependencies from the OpenSUSE build system's Ruby Extensions repository
+
     sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
     sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
 
