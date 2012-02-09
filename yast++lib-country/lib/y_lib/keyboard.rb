@@ -69,9 +69,11 @@ module YLib
     # Write Keyboard configuration
     def self.modify(config,params)
 
-      ret		= {
+      ret       = {
 	"success"	=> true
       }
+
+      keymap    = ""
 
       # write sysconfig settings
       unless params.nil? && params.empty?
@@ -79,21 +81,25 @@ module YLib
 	params.each do |key, value|
       	  sysconfig_params[key.upcase] = value if @sysconfig_values.include? key.upcase
 	end
-	ret["YAST_KEYBOARD"]	= (params["current_kbd"] || "") + "," + (params["kb_model"] || "")
+        if params.has_key?("current_kbd") && params.has_key?("kb_model")
+	  sysconfig_params["YAST_KEYBOARD"]     = (params["current_kbd"] || "") + "," + (params["kb_model"] || "")
+        end
         ret["COMPOSETABLE"]	= params["compose_table"] if params.has_key? "compose_table"
-        ret["KEYTABLE"]		= params["keymap"] if params.has_key? "keymap"
+        if params.has_key? "keymap"
+          keymap                = params["keymap"]
+          sysconfig_params["KEYTABLE"]  = keymap
+        end
         ret	= ConfigAgent::Keyboard.write(sysconfig_params)
       end
 
-      if config.has_key? "apply" && config["apply"]
-      # FIXME set the new keyboard layout for console and X11
-      # in YaST:
-      #		1. find out keymap: based on current_kbd value and data from keyboard_raw.ycp
-      #		2. /bin/loadkeys " + keymap (or use "keymap" if it was passed as argument)
-      #		3. /usr/sbin/xkbctrl us.map.gz -> "Apply" -> setxkbmap Apply
-      # FIXME call set commands always, or only when certain argument is provided?
-      # ConfigAgent::Setxkbmap.execute({ "exec_args" => apply })
-      # ConfigAgent::Loadkeys.execute({ "exec_args" => apply })
+      # set the new keyboard layout for console and X11
+      if config["apply"] && keymap
+        # TODO: if keymap is empty, find out from current_kbd value and data from keyboard_raw.ycp
+        if File.exists?("/usr/sbin/xkbctrl")
+          apply   = `/usr/sbin/xkbctrl #{keymap} | grep Apply`.gsub(/"/,"").split(":")[1].chop
+          ConfigAgent::Setxkbmap.execute({ "exec_args" => apply.split(" ") })
+        end
+        ConfigAgent::Loadkeys.execute({ "exec_args" => keymap })
       end
 
       return ret
