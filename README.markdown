@@ -13,19 +13,19 @@ Various written documenation is located at doc directory.
 
 ### How to try it from git
 install rubygem dependencies from the OpenSUSE build system's Ruby Extensions repository
-`sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
-sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
+    sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
+    sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
 
-sudo rake install
-cd yast++lib-kerberos-client
-ruby examples/kerberos_conf
-`
+    sudo rake install
+    cd yast++lib-kerberos-client
+    ruby examples/kerberos_conf
+
 
 #### How to obtain permission for common user:
-`  su
-  mkdir -p /etc/polkit-1/localauthority/50.local.d
-  cp doc/org.opensuse.config_agent.pkla /etc/polkit-1/localauthority/50.local.d
-#replace <yourcooluser> with real user in /etc/polkit-1/localauthority/50.local.d/org.opensuse.config_agent.pkla`
+    su
+    mkdir -p /etc/polkit-1/localauthority/50.local.d
+    cp doc/org.opensuse.config_agent.pkla /etc/polkit-1/localauthority/50.local.d
+    #replace <yourcooluser> with real user in /etc/polkit-1/localauthority/50.local.d/org.opensuse.config_agent.pkla
 
 ### How to try it from packages
 [OpenSUSE Build Service project with packages](https://build.opensuse.org/project/show?project=YaST:Head:YaST%2B%2B)
