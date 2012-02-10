@@ -19,6 +19,7 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'config_agent/passwd'
+require 'config_agent/useradd'
 
 # module for users configuration
 module YLib
@@ -41,6 +42,28 @@ module YLib
       return ret;
     end
 
+    # add a new user
+    def self.add(config, params)
+
+      ret		= {
+    	"success"	=> true
+      }
+
+      unless params.has_key? "username"
+        @error  = "Username not provided"
+        return nil
+      end
+
+      ConfigAgent::Useradd.execute({ "exec_args" => [ params["username"] ]})
+
+      return ret
+
+    rescue DbusClients::InsufficientPermission => e
+      @error	= "User has no permission for action '#{e.permission}'."
+      return nil
+    end
+
+    # modify existing user
     def self.modify(config,params)
 
       ret		= {
