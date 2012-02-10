@@ -60,13 +60,8 @@ module YLib
         end
       end
 
-      # read config files
-      begin
-        sysconfig_timezone	= ConfigAgent::Clock.read({})
-      rescue DbusClients::InsufficientPermission => e
-        @error	= "User has no permission for action '#{e.permission}'."
-        return nil
-      end
+      sysconfig_timezone        = read_sysconfig
+      return nil if sysconfig_timezone.nil?
 
       ret	= {}
       sysconfig_timezone.each do |key, val|
@@ -90,16 +85,28 @@ module YLib
         ret	= ConfigAgent::Clock.write(sysconfig_params)
       end
 
-      if config.has_key? "apply" && config["apply"]
-      	timezone	= params["timezone"] # FIXME read it if it wasn't provided?
-	ConfigAgent::Zic.execute({ "exec_args" => ["-l",  timezone] }) unless timezone.nil?
-	hwclock		= params["hwclock"]
-	ConfigAgent::Hwclock.execute({ "exec_args" => [" --hctosys", hwclock]}) unless hwclock.nil?
-      end
+      timezone  = params["timezone"]
+      hwclock   = params["hwclock"]
+      if config["apply"] && timezone
 
-      # TODO set time
-      # TODO sync sys to hwclock
-      # TODO mkinitrd call
+        # read timezone/hwclock if it wasn't provided
+        if hwclock.nil? || timezone.nil?
+          sysconfig_timezone        = read_sysconfig
+          return nil if sysconfig_timezone.nil?
+          hwclock = sysconfig_timezone["HWCLOCK"] if hwclock.nil?
+          timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
+        end
+
+	ConfigAgent::Zic.execute({ "exec_args" => ["-l",  timezone] })
+        # synchronize hw clock to system clock
+	ConfigAgent::Hwclock.execute({ "exec_args" => [" --hctosys", hwclock]})
+        if hwclock == "--localtime"
+          ConfigAgent::Mkinitrd.execute({ "exec_args" => [
+            ">>", "/var/log/YaST2/y2logmkinitrd",
+            ">>", "/var/log/YaST2/y2logmkinitrd"
+          ]})
+        end
+      end
 
       return ret
     rescue DbusClients::InsufficientPermission => e
@@ -109,6 +116,17 @@ module YLib
 
 
   private
+
+    def self.read_sysconfig
+      # read config files
+      begin
+        sysconfig	= ConfigAgent::Clock.read({})
+      rescue DbusClients::InsufficientPermission => e
+        @error	= "User has no permission for action '#{e.permission}'."
+        return nil
+     end
+      return sysconfig
+    end
 
     # read all the timezones splitted into regions defined by YaST, also read timezone labels
     # return hash scructure of kind { region => { timezone => label } }
