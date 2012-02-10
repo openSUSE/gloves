@@ -23,7 +23,7 @@ Requires:       libconfigagent >= 0.2.0
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
 # applications used by script agents
-Requires:       timezone util-linux xorg-x11 kbd
+Requires:       timezone util-linux xorg-x11 kbd mkinitrd
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
