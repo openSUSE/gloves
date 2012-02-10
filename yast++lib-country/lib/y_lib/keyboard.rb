@@ -19,7 +19,8 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'config_agent/keyboard'
-require "config_agent/setxkbmap"
+require 'config_agent/setxkbmap'
+require 'config_agent/loadkeys'
 
 # module for keyboard configuration
 module YLib

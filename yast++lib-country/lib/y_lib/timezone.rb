@@ -19,6 +19,9 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'config_agent/clock'
+require 'config_agent/hwclock'
+require 'config_agent/zic'
+require 'config_agent/mkinitrd'
 
 # module for timezone configuration
 module YLib
