@@ -104,10 +104,7 @@ module YLib
         # synchronize hw clock to system clock
 	ConfigAgent::Hwclock.execute({ "exec_args" => [" --hctosys", hwclock]})
         if hwclock == "--localtime"
-          ConfigAgent::Mkinitrd.execute({ "exec_args" => [
-            ">>", "/var/log/YaST2/y2logmkinitrd",
-            ">>", "/var/log/YaST2/y2logmkinitrd"
-          ]})
+          ConfigAgent::Mkinitrd.execute({ "exec_args" => [] })
         end
       end
 
