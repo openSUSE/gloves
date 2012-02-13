@@ -97,10 +97,15 @@ module YLib
       if config["apply"] && keymap
         # TODO: if keymap is empty, find out from current_kbd value and data from keyboard_raw.ycp
         if File.exists?("/usr/sbin/xkbctrl")
-          apply   = `/usr/sbin/xkbctrl #{keymap} | grep Apply`.gsub(/"/,"").split(":")[1].chop
-          ConfigAgent::Setxkbmap.execute({ "exec_args" => apply.split(" ") })
+          apply = `/usr/sbin/xkbctrl #{keymap} | grep Apply`
+          apply = apply[apply.index(":") + 1 ..apply.size].gsub(/"/,"").chop
+          ConfigAgent::Setxkbmap.execute({
+              "DISPLAY" => ENV["DISPLAY"] || "",
+              "exec_args" => apply.split }
+          ) unless apply.empty?
         end
-        ConfigAgent::Loadkeys.execute({ "exec_args" => keymap })
+        # FIXME pick correct console font!
+        ConfigAgent::Loadkeys.execute({ "exec_args" => [ keymap ] })
       end
 
       return ret
