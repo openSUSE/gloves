@@ -55,7 +55,7 @@ module YLib
         full_timezones  = read_timezones_with_regions
         region          = params["only"]
         unless region.nil?
-          return full_timezones[region] if full_timezones.has_key? region
+          return full_timezones[region] if full_timezones && full_timezones.has_key?(region)
           # log.error = "No such region: '#{region}'"
           return {}
         else
