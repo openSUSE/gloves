@@ -21,7 +21,9 @@ require 'config_agent_service/script_service'
 class Mkinitrd < ConfigAgentService::ScriptService
 
   def execute(params)
-    run ["/sbin/mkinitrd"] + (params["exec_args"] || [])
+    ret = run ["/sbin/mkinitrd"] + (params["exec_args"] || [])
+    log.info "mkinitrd output: #{ret.inspect}"
+    return ret
   end
 
 end
