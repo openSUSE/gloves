@@ -27,7 +27,7 @@ module ConfigAgentService
 
     # Runs given command. Argument processing is without shell using popen call.
     # @arg [Array[String]] command to execute
-    # @return [Hash] result of command in map with keys stdout,stderr and exitstatus 
+    # @return [Hash] result of command in map with keys stdout,stderr and exit
     def run command
       ret = {}
       status = Open4::popen4(*command) do |pid,stdin,stdout,stderr|
@@ -35,7 +35,7 @@ module ConfigAgentService
         ret["stdout"] = stdout.read.strip
         ret["stderr"] = stderr.read.strip
       end
-      ret["exitstatus"] = status.exitstatus
+      ret["exit"] = status.exitstatus
       ret
     end
   end
