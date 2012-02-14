@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 14 14:48:01 CET 2012 - jsuchome@suse.cz
+
+- require yast++lib-kerberos-client
+- 3.0.1 
+
+-------------------------------------------------------------------
 Fri Jan 20 09:47:13 CET 2012 - jsuchome@suse.cz
 
 - require generic yast++lib-ycp 
