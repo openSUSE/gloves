@@ -23,12 +23,8 @@ Requires:       libconfigagent >= 0.2.0
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging_rake_tasks
-
-# This is for Hudson (build service) to setup the build env correctly
-%if 0
 BuildRequires:  rubygem-test-unit
 BuildRequires:  rubygem-rcov >= 0.9.3.2
-%endif
 
 %description
 config_agent-<%= identifier %> - Set of config agents for access to <%= file_name %> file.
@@ -40,6 +36,7 @@ config_agent-<%= identifier %> - Set of config agents for access to <%= file_nam
 %build
 
 %check
+rake test
 
 #---------------------------------------------------------------
 %install
