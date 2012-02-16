@@ -40,7 +40,7 @@ rake test
 
 #---------------------------------------------------------------
 %install
-rake install[%{buildroot}/,%{rb_vendorlib}]
+rake --verbose install[%{buildroot}/,%{rb_vendorlib}]
 
 #---------------------------------------------------------------
 %clean
