@@ -3,7 +3,8 @@
 
 ##Project State
 
-It is in heavy developemnt. You can try it, but it is not for production use.
+Currently, it is still in a research phase.
+You can try it, but it is not for production use. We'd like to hear any comments.
 
 ##Documentation
 
