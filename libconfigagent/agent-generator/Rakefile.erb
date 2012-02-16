@@ -48,4 +48,4 @@ task :generate_spec do
 end
 
 #add generation of spec file as dependency for package task
-Rake.application.lookup(:package).prerequisites << "generate_spec"
+task :package => :generate_spec
