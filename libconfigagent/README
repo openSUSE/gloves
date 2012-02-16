@@ -1,5 +1,5 @@
 Directory Structure
 
-dbus_clients - library for dbus client part
-config_agent_service - library for services which do real work
-dbus_service - dbus service itself, then distribute calls
+lib/dbus_clients - library for dbus client part
+lib/config_agent_service - library for services which do real work
+dbus-configuration - configuration for dbus service itself
