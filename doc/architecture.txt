@@ -1,45 +1,50 @@
 YaST++
 ------
 
-Long term goal:
+Long term goal
 --------------
 
-Replace whole YaST with better tool, using up-to-date techonology.
-Provide clean, understandable and common API for system configuration related tasks: not only for YaST
-
-Current YaST++ state is limited to replacing backend part of YaST.
-For rewriting whole YaST into new language, refer to Amaranth project.
+Provide an alternative for the YaST business logic using up-to-date techonology.
+Provide clean, understandable and common API for system configuration related
+tasks, not only for YaST.
 
 
-Main advantages of YaST++ compared to YaST:
+Main advantages of YaST++ compared to YaST
 ------------------------------------------
 
 1. Using modern and well-known language
-  
-   We chose ruby mostly because of
-   	- wide user community
-	  - good testing framework 
-	  - good knowledge inside SUSE
 
-   YaST is mostly written in YCP language, which is not developed any more and is known only to inner circle of initiates.
+    We chose Ruby mostly because of
+        - wide user community
+        - good testing framework
+        - good knowledge inside SUSE
 
-   Popular language not only helps development, but (primary!) the maintenance.
+    YaST is mostly written in YCP language, which is not developed any more and
+    is known only to inner circle of initiates.
+
+    Popular language not only helps development, but (primarily!) the
+    maintenance.
 
 2. Role based access management
 
-   The architecture uses Policykit to define rights to the configuration tasks and check if current user has such right.
+    The architecture uses Policykit to define rights to the configuration tasks
+    and check if current user has such right.
 
-   Architecture backend uses D-Bus services that are actually accessing the system.
-   Those services have rights of system administrator (root).
+    Architecture backend uses D-Bus services that are actually accessing the
+    system. Those services have rights of system administrator (root).
 
-   Only if user is allowed to perform certain task, D-Bus service is started and action is done. D-Bus is used only if non-root access system, so there is no speed penalty for old YaST usage (run as root).
-
+    Only if user is allowed to perform certain task, D-Bus service is started
+    and action is done. D-Bus is used only for non-root access system, so
+    there is no speed penalty for Classical YaST usage (run as root).
 
 3. Better modularity
 
-   By splitting the business logic part (YLib) from UI (Qt, WWW) and from system access (config-agents), modules that borrow functionality from other ones do not need to import(install) their UI.
+    By splitting the business logic part (YLib) from UI (Qt, WWW) and from
+    system access (config-agents), modules that borrow functionality from
+    other ones do not need to import (install) their UI.
 
-   In the end, there should be smaller space requirements for situations when only part of YaST++ stack should be installed ( e.g. WebYaST usage).
+    In the end, there should be smaller space requirements for situations when
+    only part of YaST++ stack should be installed (e.g. WebYaST usage).
 
 
 The architecture in short
@@ -49,58 +54,69 @@ Look at doc/architecture.svg diagram.
 
 YaST++ consist of two new layers: YLib and Config Agents.
 
-YLib is the public library layer. It provides simple API for those who want to configure the system.
+YLib is the public library layer. It provides simple API for those who want to
+configure the system.
+
 The API consists of these functions
 
-	read ({})	- read function: takes one hash argument and returns hash
-	add ({}, {})	-
-	modify ({}, {}) -
-	delete ({}, {})	- those modify functions take 2 hash argument (first is meant e.g. for object specification,
-			  second contains the actual data to be written)
-	propose ({})	- propose new configuration (note: not yet decided if it should be in ylib or library above it, that just take input and return map for ylib modules)
+    read ({})           - read function: takes one hash argument and returns
+                          hash
+    add ({}, {})        - 
+    modify ({}, {})     - 
+    delete ({}, {})     - those modify functions take 2 hash argument (first is
+                          meant e.g. for object specification, second contains
+                          the actual data to be written)
+    propose ({})        - propose new configuration (note: not yet decided if it
+                          should be in ylib or library above it, that just take
+                          input and return map for ylib modules)
 
 See https://github.com/yast/yast--/wiki/YLib-Use-Cases for more about YLib API.
 
-The Config Agent is working with the system, by which we mean it either modifies files or runs the scripts.
-There are 2 kinds of Config Agents, File Agents handle files, Script Agents are running the scripts.
+Config agent is works with system, by which we mean it either modifies files or
+runs scripts.
 
-There are 2 defined policies for File Agents (rights to read and write) and one for Script Agents (right to execute).
+There are 2 kinds of config agents
 
-The implementation of Config Agents should very simple, basically File Agents only parse the file they manage and return its structure as hash (for read command) and write the new contents in case of write command. Script Agent just executes its script with the given arguments. Config Agents do not have the knowleadge about the semantics of the data, this is the task of YLib library.
+    - File agents handle files
+    - Script agents are running the scripts
+
+There are 2 defined policies for file agents (rights to read and write) and
+one for script agents (right to execute).
+
+The implementation of config agents should very simple, basically file agents
+only parse a file they manage and return its structure as hash (for read
+command) and write the new contents in case of write command. Script agent just
+executes its script with the given arguments. Config agents do not have any
+knowleadge about the data semantics, this is the task for YLib library.
 
 Using YaST++
 ------------
 
     YLib can be imported for any ruby code, see
 
-       yast++lib-kerberos-client/examples/kerberos_conf for an example
+        yast++lib-kerberos-client/examples/kerberos_conf for an example
 
-    YLib can be directly used from current YaST modules using yast2-ruby-bindings.
-    See 
-    	yast++lib-kerberos-client/examples/kerberos-example.ycp for simple example of calling YLib
+    YLib can be directly used from current classical YaST modules using
+    yast2-ruby-bindings, see
 
-	yast--/yast/kerberos-client for whole YaST module where system access is replaced with YLib calls
+        yast++lib-kerberos-client/examples/kerberos-example.ycp for simple
+        example of calling YLib
 
-    In mid-term, we want to replace Read/Write calls of YaST modules by YLib calls.
+        yast--/yast/kerberos-client for whole YaST module where system
+        access is replaced with YLib calls
+
+    TODO: usage from WebYast
 
 
-    TODO: usage from WebYaST
-
-
-The architecture in details
----------------------------
-
-What YLib developer needs to do
--------------------------------
-
-What Config Agent developer needs to do
+What config agent developer needs to do
 ---------------------------------------
 
-There is generator for code. Developer need only to fill up read/write or execute method that do real action and fill test for such functionality. See tutorial.txt for more information.
+There is code generator for a config agent. Developer only needs to fill up
+read/write or execute method that do real action and fill test for such
+functionality. See tutorial.txt for details.
 
 
-Defining Policies 
+Defining Policies
 -----------------
 
-    See doc/org.opensuse.config_agent.pkla for example of policy config file.
-
+    See doc/org.opensuse.config_agent.pkla for policy config file example.

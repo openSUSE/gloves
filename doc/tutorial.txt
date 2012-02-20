@@ -1,5 +1,5 @@
 
-## This document isn't finished. 
+## This document isn't finished yet.
 ## Stay tuned
 
 
@@ -10,7 +10,7 @@ First of all you need checkout the sources and install needed ruby gems:
 
 Follow the README file, doc/architecture.txt document and install needed dependencies:
 
-# sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_11.4/devel:languages:ruby:extensions.repo
+# sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
 # sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
 
 Run rake install from the yast-- directory:
