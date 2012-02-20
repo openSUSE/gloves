@@ -1,0 +1,5 @@
+README
+**/lib/**/*.rb
+**/services/**/*.rb
+libconfigagent/dbus_*/**/*.rb
+libconfigagent/config_agent_*/**/*.rb

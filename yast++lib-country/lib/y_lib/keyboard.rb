@@ -19,7 +19,8 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'config_agent/keyboard'
-require "config_agent/setxkbmap"
+require 'config_agent/setxkbmap'
+require 'config_agent/loadkeys'
 
 # module for keyboard configuration
 module YLib
@@ -69,9 +70,11 @@ module YLib
     # Write Keyboard configuration
     def self.modify(config,params)
 
-      ret		= {
+      ret       = {
 	"success"	=> true
       }
+
+      keymap    = ""
 
       # write sysconfig settings
       unless params.nil? && params.empty?
@@ -79,19 +82,31 @@ module YLib
 	params.each do |key, value|
       	  sysconfig_params[key.upcase] = value if @sysconfig_values.include? key.upcase
 	end
-	ret["YAST_KEYBOARD"]	= (params["current_kbd"] || "") + "," + (params["kb_model"] || "")
+        if params.has_key?("current_kbd") && params.has_key?("kb_model")
+	  sysconfig_params["YAST_KEYBOARD"]     = (params["current_kbd"] || "") + "," + (params["kb_model"] || "")
+        end
         ret["COMPOSETABLE"]	= params["compose_table"] if params.has_key? "compose_table"
-        ret["KEYTABLE"]		= params["keymap"] if params.has_key? "keymap"
+        if params.has_key? "keymap"
+          keymap                = params["keymap"]
+          sysconfig_params["KEYTABLE"]  = keymap
+        end
         ret	= ConfigAgent::Keyboard.write(sysconfig_params)
       end
 
-      # FIXME set the new keyboard layout for console and X11
-      # in YaST:
-      #		1. find out keymap: based on current_kbd value and data from keyboard_raw.ycp
-      #		2. /bin/loadkeys " + keymap (or use "keymap" if it was passed as argument)
-      #		3. /usr/sbin/xkbctrl us.map.gz -> "Apply" -> setxkbmap Apply
-      # FIXME call set commands always, or only when certain argument is provided?
-      # ConfigAgent::Setxkbmap.execute({ "exec_params" => apply })
+      # set the new keyboard layout for console and X11
+      if config["apply"] && keymap
+        # TODO: if keymap is empty, find out from current_kbd value and data from keyboard_raw.ycp
+        if File.exists?("/usr/sbin/xkbctrl")
+          apply = `/usr/sbin/xkbctrl #{keymap} | grep Apply`
+          apply = apply[apply.index(":") + 1 ..apply.size].gsub(/"/,"").chop
+          ConfigAgent::Setxkbmap.execute({
+              "DISPLAY" => ENV["DISPLAY"] || "",
+              "exec_args" => apply.split }
+          ) unless apply.empty?
+        end
+        # FIXME pick correct console font!
+        ConfigAgent::Loadkeys.execute({ "exec_args" => [ keymap ] })
+      end
 
       return ret
     rescue DbusClients::InsufficientPermission => e

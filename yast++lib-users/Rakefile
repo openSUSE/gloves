@@ -31,7 +31,7 @@ end
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:YaST++"
   conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
-  conf.package_name = "yast++lib-kerberos-client"
+  conf.package_name = "yast++lib-users"
 end
 
 Rake::TestTask.new do |t|
@@ -40,7 +40,7 @@ Rake::TestTask.new do |t|
 end
 
 task :generate_spec do
-  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' yast++lib-kerberos-client.spec.template > package/yast++lib-kerberos-client.spec"
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' yast++lib-users.spec.template > package/yast++lib-users.spec"
 end
 
 #add generation of spec file as dependency for package task

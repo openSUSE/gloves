@@ -21,8 +21,13 @@ require 'config_agent_service/script_service'
 class Setxkbmap < ConfigAgentService::ScriptService
 
   def execute(params)
-    exec_params	= params["exec_params"] || ""
-    run "/usr/bin/setxkbmap #{exec_params}"
-  end
+    old_display         = ENV["DISPLAY"]
+    ENV["DISPLAY"]      = params["DISPLAY"] if params["DISPLAY"]
 
+    ret = run ["/usr/bin/setxkbmap"] + (params["exec_args"] || [])
+    log.warn "setxkbmap output: #{ret.inspect}" unless ret["exit"] == 0
+    return ret
+  ensure
+    ENV["DISPLAY"] = old_display
+  end
 end

@@ -3,10 +3,12 @@
 @HEADER@
 Group:	System/YaST
 License: GPL v2 or later
-BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite yast++lib-ycp-kerberos-client yast2-ruby-bindings
+BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite yast++lib-ycp yast++lib-kerberos-client
+BuildRequires:  yast2-ruby-bindings >= 0.3.9
 
 # API for system access
-Requires:	yast++lib-ycp-kerberos-client yast2-ruby-bindings
+Requires:	yast++lib-ycp yast++lib-kerberos-client
+Requires:       yast2-ruby-bindings >= 0.3.9
 
 # Hostname::CurrentDomain, CurrentHostname
 Requires:	yast2 >= 2.16.48

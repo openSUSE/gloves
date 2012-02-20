@@ -25,7 +25,7 @@ Main advantages of YaST++ compared to YaST
     Popular language not only helps development, but (primarily!) the
     maintenance.
 
-2. Role based access management
+2. Optional role based access management
 
     The architecture uses Policykit to define rights to the configuration tasks
     and check if current user has such right.
@@ -72,7 +72,7 @@ The API consists of these functions
 
 See https://github.com/yast/yast--/wiki/YLib-Use-Cases for more about YLib API.
 
-Config agent is works with system, by which we mean it either modifies files or
+Config agent works with system, by which we mean it either modifies files or
 runs scripts.
 
 There are 2 kinds of config agents
@@ -96,24 +96,42 @@ Using YaST++
 
         yast++lib-kerberos-client/examples/kerberos_conf for an example
 
-    YLib can be directly used from current classical YaST modules using
-    yast2-ruby-bindings, see
+    YLib can be directly used from current YaST modules using
+    yast2-ruby-bindings
 
         yast++lib-kerberos-client/examples/kerberos-example.ycp for simple
         example of calling YLib
 
-        yast--/yast/kerberos-client for whole YaST module where system
-        access is replaced with YLib calls
+        yast--/yast/kerberos-client for whole YaST module where system access
+        is replaced with YLib calls
 
     TODO: usage from WebYast
 
 
-What config agent developer needs to do
+What YLib developer should know
+-------------------------------
+
+What Config Agent developer should know
 ---------------------------------------
 
-There is code generator for a config agent. Developer only needs to fill up
-read/write or execute method that do real action and fill test for such
-functionality. See tutorial.txt for details.
+We have a code generator. Developer only need to fill up read/write or execute
+method that do real action and fill test for such functionality. See
+tutorial.txt for details.
+
+Every function gets a Hash as input and must return Hash. Hash can contain only
+primitive types which support dbus (numbers, strings, arrays, hashes) also nil
+and Symbol values cannot pass dbus, so it is forbidded and should be encoded to
+other type.
+
+Raising an exception is safe. Exception is handled and on front side it raise
+DbusClient::BackendException. For own exception as base should be used
+ConfigAgentService::BackendException and on front register exception as shown
+for InsufficientPermission one.
+
+Code runs as root, so expect an intensive security review.
+Every config agent include Logger via log method (usage log.info "value"). Log
+output is available at /var/log/config_agent/services.log (or under respective
+chroot if run in chroot).
 
 
 Defining Policies

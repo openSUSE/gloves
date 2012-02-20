@@ -10,7 +10,7 @@
 
 
 Name:           config_agent-passwd
-License:	LGPLv2.1 or LGPLv3
+License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
@@ -18,10 +18,10 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Set of dbus services for basic access to user configuration
 Source:         %{name}-%{version}.tar.bz2
-Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent >= 0.2.0
 Requires:       rubygem-ruby-augeas
 Requires:       augeas
+Requires:       pwdutils
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby

@@ -26,6 +26,9 @@ class TestSetxkbmap < Test::Unit::TestCase
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
   end
+
+  def test_reading
+  end
 end
 
 Test::Unit::UI::Console::TestRunner.run(TestSetxkbmap)

@@ -16,11 +16,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
+# AUTOMATIC GENERATED FILE, DO NOT MODIFY!
+# IT IS JUST INTERFACE TO CALL CONFIG AGENT
+
 require 'dbus_clients/<%= type.to_s.downcase %>_client'
 
 module ConfigAgent
   class <%= agent_class %> < DbusClients::<%= type.to_s.capitalize %>Client
-
+    # exact location of file, stored for observers usage
+    def location
+      return '<%= file_name %>'
+    end
     # identification of relevant DBUS service
     agent_id "<%= type.to_s.downcase %>.<%= identifier %>"
   end

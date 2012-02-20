@@ -20,7 +20,6 @@ require 'config_agent_service/script_service'
 
 class PamConfig < ConfigAgentService::ScriptService
   def execute(params)
-    exec_params	= params["exec_params"] || ""
-    run "/usr/sbin/pam-config #{exec_params}" #FIXME escape parameters
+    run ["/usr/sbin/pam-config"] + (params["exec_args"] || [])
   end
 end

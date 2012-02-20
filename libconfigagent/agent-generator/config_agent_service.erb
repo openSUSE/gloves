@@ -31,8 +31,9 @@ class <%= agent_class %> < ConfigAgentService::<%= type.to_s.capitalize %>Servic
   end
 <% elsif type == :script %>
   def execute(params)
-    #TODO add your code here
-    return {}
+    # TODO adapt this code if necessary
+    # exec_args is the array of arguments
+    run ["<%= file_name %>"] + (params["exec_args"] || [])
   end
 <% else
   raise "unknown type"

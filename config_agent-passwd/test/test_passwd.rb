@@ -35,6 +35,20 @@ class TestPasswd < Test::Unit::TestCase
     assert_equal "hh", ret["hh"]["name"]
   end
 
+  def test_read_one
+    file = Passwd.new
+    ret = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD), "id" => "hh"
+    assert_equal "/home/hh", ret["home"]
+    assert_equal "hh", ret["name"]
+  end
+
+  def test_read_usernames
+    file = Passwd.new
+    ret = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD), "only" => "login"
+    assert_equal 6, ret["result"].size
+    assert_equal ["at", "bin", "daemon", "root", "hh", "@nisdefault"], ret["result"]
+  end
+
 end
 
 Test::Unit::UI::Console::TestRunner.run(TestPasswd)
