@@ -134,7 +134,9 @@ output is available at /var/log/config_agent/services.log (or under respective
 chroot if run in chroot).
 
 
-Defining Policies
+Policies
 -----------------
 
-    See doc/org.opensuse.config_agent.pkla for policy config file example.
+Policies is needed to define what can common user run. We use now PolicyKit.
+If YLib is run as root, then policy checking wouldn't be performed.
+Each agent have method polkit_definitions which allow to introspect which permission is needed for given task.
