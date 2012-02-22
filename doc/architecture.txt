@@ -5,8 +5,8 @@ Long term goal
 --------------
 
 Provide an alternative for the YaST business logic using up-to-date techonology.
-Provide clean, understandable and common API for system configuration related
-tasks, not only for YaST.
+Provide clean, understandable, backward compatible and common API for system 
+configuration related tasks, not only for YaST.
 
 
 Main advantages of YaST++ compared to YaST
@@ -97,7 +97,7 @@ Using YaST++
         yast++lib-kerberos-client/examples/kerberos_conf for an example
 
     YLib can be directly used from current YaST modules using
-    yast2-ruby-bindings
+    yast2-ruby-bindings and yast++lib-ycp
 
         yast++lib-kerberos-client/examples/kerberos-example.ycp for simple
         example of calling YLib
