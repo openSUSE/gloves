@@ -20,7 +20,7 @@ module ConfigAgentService
   # Represents exception thrown by intention from backend part like missing permission or wrong argument.
   # 
   # Contain features:
-  # serialization to dbus
+  # serialization via transportation layer
   # contain type from which can be automatic recovered on read
   # @see DbusClients::BackendException
   class BackendException < StandardError
@@ -39,7 +39,7 @@ module ConfigAgentService
       @type = type
     end
 
-    # Serializes exception to hash. Needed to by-pass DBus.
+    # Serializes exception to hash. Needed to by-pass transportation layer.
     def to_hash
       return {
         "error" => message,

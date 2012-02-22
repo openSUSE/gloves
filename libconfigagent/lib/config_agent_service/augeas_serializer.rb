@@ -18,9 +18,17 @@
 
 require "augeas"
 
+# Module for easy work with augeas ruby bindings. Could be in future replaced by improved augeas bindings
+# @TODO error handling
+# @TODO serialize
 module ConfigAgentService
   module AugeasSerializer
 
+    # Loads parsed tree as hash from given path with given lense
+    # @param[String] path to file
+    # @param[String] lense to use
+    # @param[Hash] options for future extension
+    # @return[Hash] with parsed content of file
     def augeas_load (path,lense,options={})
       aug = Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => lense, :incl => path)

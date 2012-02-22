@@ -19,6 +19,7 @@ require 'config_agent_service/backend_exception'
 require "config_agent_service/chroot_env"
 
 module DbusClients
+  # Utility modul for internal usage
   module Utils
     #taken from active support for automagic
     def self.underscore input
@@ -30,6 +31,9 @@ module DbusClients
     end
 
     BACKEND_LOCATION = "/usr/share/config_agents/services"
+    # This method in fact implements direct transportation layer.
+    # So call method without need to get root permission, so we should
+    # be already root.
     def self.direct_call class_name, type, method, params
       $LOAD_PATH << BACKEND_LOCATION
       base_name = class_name.split('::').last

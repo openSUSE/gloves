@@ -21,16 +21,20 @@ require "dbus_clients/dbus_client"
 module DbusClients
   class ScriptClient
     PERMISSION_PREFIX="org.opensuse.config_agent"
+    # gets/sets agent id
     def self.agent_id(value=nil)
       instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
       raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
       filename_for_service
     end
 
+    # call execute method on backend
     def self.execute (options)
       DbusClient.call(self.name,agent_id,"script","execute",options)
     end
 
+    # get list of permission that given file can use
+    # @return [Hash] returns hash in format method => permissions
     def self.polkit_permissions
       return {
           :execute => [PERMISSION_PREFIX,agent_id,"execute"].join(".")

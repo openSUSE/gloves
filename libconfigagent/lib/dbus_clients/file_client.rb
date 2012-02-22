@@ -19,22 +19,28 @@
 require "dbus_clients/dbus_client"
 
 module DbusClients
+  #Represents frontend side for agent ( before transport to root runned code )
   class FileClient
     PERMISSION_PREFIX="org.opensuse.config_agent"
+    # gets/sets agent id
     def self.agent_id(value=nil)
       instance_eval "def filename_for_service() \"#{value}\" end" if value #FIXME escape VALUE!!
       raise "File service doesn't define value its file name" unless respond_to? :filename_for_service
       filename_for_service
     end
 
+    # call read method on backend
     def self.read (options)
       DbusClient.call(self.name,agent_id,"file","read",options)
     end
 
+    # call write method on backend
     def self.write (options)
       DbusClient.call(self.name,agent_id,"file","write",options)
     end
 
+    # get list of permission that given file can use
+    # @return [Hash] returns hash in format method => permissions
     def self.polkit_permissions
       return {
           :read => [PERMISSION_PREFIX,agent_id,"read"].join("."),

@@ -27,6 +27,14 @@ INTERFACE = "org.opensuse.config_agent"
 #Internal only module, do not use outside of config agent, unstable API
 module DbusClients
   module DbusClient
+    # call method in given agent name identified by id, with given type
+    # @param [String] name bypass agent name for easier direct call
+    # @param [String] id identifier of agent
+    # @param [String] type of agent
+    # @param [String] method to call
+    # @param [Hash] options to pass to method
+    # @return [Hash] with result from method
+    # @raise [BackendException] if exception occur on backend
     def self.call name, id, type, method, options
       ret = if Process.euid == 0
           Utils.direct_call name, type, method.to_sym, options

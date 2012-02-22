@@ -23,6 +23,10 @@ module ConfigAgentService
   # provides unified logging mechanism
   module Logger
     # logger object
+    #
+    # ensures that logging directory exists
+    # @todo log rotation
+    #   Logger don't support log rotation yet, so it can be added
     # @return [Logger] instance of logger
     def log
       if !@log_instance
