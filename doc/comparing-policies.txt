@@ -1,0 +1,70 @@
+We have discussed potential problems facing our current level of policy handling.
+In current architecture, the policy handling is done at the lower layer.
+For example WebYaST goes the other way, defininf policies at the API level.
+
+
+1. Policy level set at API level, just like in WebYaST
+
+  - advantages
+    - better understandable to end-user
+    - not too many
+    - we know easily, if API function call is allowed for a user
+
+  - disadvantages
+    - API layer needs root privilegies (= YaPI called by WebYaST)
+
+  - example
+
+    Change time zone
+    Add new user
+    Active Directory client configuration
+
+
+2. Policy level set on lower level (config agents)
+
+  - advantages:
+    - (much) less code running as root
+    - detailed granularity
+
+  - disadvantages
+    - too many policies, hardly understandable
+      - we can group them and create new higher level of 'pretty rights'
+
+    - some tasks hard to define (remove certain directory, change the mode/rights, copy files)
+      - path to target file/directory does not have to be known, so it could not be part of policy definition
+
+  - examples (high-level is logic grouping, but real policies are low level)
+
+    Change time zone
+      - modify /etc/sysconfig/clock
+      - run zic
+      - run hwclock
+      - run mkinitrd
+
+    Add new user
+      - run 'useradd'
+        (probably does not cover all current cases done by YaST, e.g. work with encrypted directory)
+
+      or
+
+      - write /etc/passwd
+      - create home directory (either by mkdir <target> or 'cp -r /etc/skel <target>')
+        - <target> could be anything
+      - change directory ownership and mode
+
+    Active Directory client configuration
+
+      - write /etc/samba/smb.conf
+      - write /etc/sysconfig/displaymanager
+      - write /etc/krb/krb5.conf
+      - write /etc/ssh/ssh_config
+      - write /etc/nsswitch.conf
+      - update firewall configuration (probably more tasks)
+      - run pam-config
+
+      - write /etc/security/pam_mount.conf.xml
+      - start/stop and enable/sdisable services (run /sbin/service(?) and /sbin/chkconfig)
+
+      - create/delete shares directory (mkdir + chmod or rm -rf calls)
+        - directory can be anywhere
+
