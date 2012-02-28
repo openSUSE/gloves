@@ -12,6 +12,8 @@ For example WebYaST goes the other way, defininf policies at the API level.
 
   - disadvantages
     - API layer needs root privilegies (= YaPI called by WebYaST)
+      - this result in more code that need security review ( old YaST is run only as root, so it is not affected )
+    - It is not easy to decide what user can really change on system ( e.g. if http server configuration contain its installation with choose which server to install )
 
   - example
 
@@ -25,6 +27,7 @@ For example WebYaST goes the other way, defininf policies at the API level.
   - advantages:
     - (much) less code running as root
     - detailed granularity
+    - direct mapping to system actions, so it is easy to see what user really can
 
   - disadvantages
     - too many policies, hardly understandable
@@ -49,8 +52,8 @@ For example WebYaST goes the other way, defininf policies at the API level.
 
       - write /etc/passwd
       - create home directory (either by mkdir <target> or 'cp -r /etc/skel <target>')
-        - <target> could be anything
-      - change directory ownership and mode
+        - <target> could be anything ( JR: question - how does we determine location? )
+      - change directory ownership and mode ( JR: question - why it is needed to create user and how we determine such directory? )
 
     Active Directory client configuration
 
@@ -66,5 +69,5 @@ For example WebYaST goes the other way, defininf policies at the API level.
       - start/stop and enable/sdisable services (run /sbin/service(?) and /sbin/chkconfig)
 
       - create/delete shares directory (mkdir + chmod or rm -rf calls)
-        - directory can be anywhere
+        - directory can be anywhere ( JR: question how user decide which directories it is? )
 
