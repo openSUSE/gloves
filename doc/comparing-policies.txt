@@ -43,6 +43,16 @@ For example WebYaST goes the other way, defininf policies at the API level.
       change the mode/rights, copy files)
       - path to target file/directory does not have to be known, so
         it could not be part of policy definition
+      - MV: then we must use helpers that do specific actions,
+        like "lib/rm-user-home $USER" instead of "rm -rf $USER_HOME"
+        Then we no longer have policies only on elementary agents
+        but also on helpers that do some non-elementary but still simple
+        combinations to be meaningful security wise
+        (eg: find user's home (read passwd or run getent); remove it)
+    - direct mapping to system actions,
+      exposing the implementation: this library exists to encapsulate the
+      complexity of configuring the system, yet we require the admin
+      to control it all via the rights
 
   - examples (high-level is logic grouping, but real policies are low level)
 
@@ -76,6 +86,8 @@ For example WebYaST goes the other way, defininf policies at the API level.
       - write /etc/ssh/ssh_config
       - write /etc/nsswitch.conf
       - update firewall configuration (probably more tasks)
+         - MV: too wide? restrict to "open/close TCP ports" or even
+           "open/close Samba ports"?
       - run pam-config
 
       - write /etc/security/pam_mount.conf.xml
