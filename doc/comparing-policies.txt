@@ -1,4 +1,5 @@
-We have discussed potential problems facing our current level of policy handling.
+We have discussed potential problems facing our current level of policy
+ handling.
 In current architecture, the policy handling is done at the lower layer.
 For example WebYaST goes the other way, defininf policies at the API level.
 
@@ -12,8 +13,11 @@ For example WebYaST goes the other way, defininf policies at the API level.
 
   - disadvantages
     - API layer needs root privilegies (= YaPI called by WebYaST)
-      - this result in more code that need security review ( old YaST is run only as root, so it is not affected )
-    - It is not easy to decide what user can really change on system ( e.g. if http server configuration contain its installation with choose which server to install )
+      - this result in more code that need security review ( old YaST is run
+        only as root, so it is not affected )
+    - It is not easy to decide what user can really change on system
+      ( e.g. if http server configuration includes its installation with
+      a choice which server to install )
       (if this should be user's decision, it should be part of input parameters)
 
   - examples
@@ -28,14 +32,17 @@ For example WebYaST goes the other way, defininf policies at the API level.
   - advantages:
     - (much) less code running as root
     - detailed granularity
-    - direct mapping to system actions, so it is easy to see what user really can
+    - direct mapping to system actions, so it is easy to see
+      what the user really can do
 
   - disadvantages
     - too many policies, hardly understandable
       - we can group them and create new higher level of 'pretty rights'
 
-    - some tasks hard to define (remove certain directory, change the mode/rights, copy files)
-      - path to target file/directory does not have to be known, so it could not be part of policy definition
+    - some tasks hard to define (remove certain directory,
+      change the mode/rights, copy files)
+      - path to target file/directory does not have to be known, so
+        it could not be part of policy definition
 
   - examples (high-level is logic grouping, but real policies are low level)
 
@@ -47,14 +54,19 @@ For example WebYaST goes the other way, defininf policies at the API level.
 
     Add new user
       - run 'useradd'
-        (probably does not cover all current cases done by YaST, e.g. work with encrypted directory)
+        (probably does not cover all current cases done by YaST,
+        e.g. work with encrypted directory)
 
       or
 
       - write /etc/passwd
-      - create home directory (either by mkdir <target> or 'cp -r /etc/skel <target>')
-        - <target> could be anything ( JR: question - how does we determine location? By reading /etc/passwd)
-      - change home directory ownership and mode (mostly to new user; group ownership can be different)
+      - create home directory (either by mkdir <target>
+        or 'cp -r /etc/skel <target>')
+        - <target> could be anything
+          ( JR: question - how does we determine location?
+            A: By reading /etc/passwd)
+      - change home directory ownership and mode
+        (mostly to new user; group ownership can be different)
 
     Active Directory client configuration
 
@@ -67,10 +79,11 @@ For example WebYaST goes the other way, defininf policies at the API level.
       - run pam-config
 
       - write /etc/security/pam_mount.conf.xml
-      - start/stop and enable/sdisable services (run /sbin/service(?) and /sbin/chkconfig)
+      - start/stop and enable/disable services
+        (run /sbin/service(?) and /sbin/chkconfig)
 
       - create/delete shares directory (mkdir + chmod or rm -rf calls)
-        - directory can be anywhere ( JR: question how user decide which directories it is? User does not decide this,
+        - directory can be anywhere
+        ( JR: question how user decide which directories it is?
+        A: User does not decide this,
         it is stored in config file)
-          
-
