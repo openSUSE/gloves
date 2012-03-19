@@ -1,7 +1,7 @@
 We have discussed potential problems facing our current level of policy
  handling.
 In current architecture, the policy handling is done at the lower layer.
-For example WebYaST goes the other way, defininf policies at the API level.
+But for example WebYaST goes the other way, defining policies at the API level.
 
 
 1. Policy level set at API level, just like in WebYaST
@@ -10,6 +10,7 @@ For example WebYaST goes the other way, defininf policies at the API level.
     - better understandable to end-user
     - not too many
     - we know easily, if API function call is allowed for a user
+    - logic policy structure: Add User, Write LDAP Configuration, Add Samba Share
 
   - disadvantages
     - API layer needs root privilegies (= YaPI called by WebYaST)
@@ -53,6 +54,24 @@ For example WebYaST goes the other way, defininf policies at the API level.
       exposing the implementation: this library exists to encapsulate the
       complexity of configuring the system, yet we require the admin
       to control it all via the rights
+
+    - Does not enable e.g. editing only part of configuration files
+      example: High level API could provide function (1-1 mapped to policy)
+      that allows user editing just one section of config file, e.g. shares.
+      But at lower level, the action (and policy) is always 'write to config
+      file' so if only low level policy is used, user could modify whole file
+      always.
+
+    - We cannot offer 'logical' roles like 'Add User'/'Delete User', but only
+      'technical' ones like 'Manage Users'. Because 'Add User' would need to
+      contain the policy 'allow writing /etc/passwd', but such right could be
+      used directly to modify or delete users as well.
+
+    - Possibility to run scripts out of their context
+      example: In the Change time zone example below, user granted with all its
+      privilegies could run specific scripts (e.g. mkinitrd) directly any time,
+      not just in context of changing the time
+
 
   - examples (high-level is logic grouping, but real policies are low level)
 
