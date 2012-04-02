@@ -28,7 +28,7 @@ begin
     puts susefirewall2.inspect
 
     if susefirewall2.nil?
-      error = YLib::Susefireewall2::last_error
+      error = YLib::Susefirewall2::last_error
       puts "returned error: #{error}" if error
     end
   else
