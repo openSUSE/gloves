@@ -1,0 +1,65 @@
+#
+# spec file for package yast++lib-kerberos_client (Version VERSION_TEMPLATE)
+#
+# Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# This file and all modifications and additions to the pristine
+# package are under the same license as the package itself.
+#
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+
+Name:           yast++lib-kerberos-client
+License:	LGPL-2.1 OR LGPL-3
+Group:          System/Management
+URL:            https://github.com/yast/yast--
+Autoreqprov:    on
+Version:        VERSION_TEMPLATE
+Release:        0
+Summary:        Library for high level access to kerberos client configuration
+Source:         %{name}-%{version}.tar.bz2
+Requires:  config_agent-kerberos
+Requires:  config_agent-pam
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  ruby
+BuildRequires:  rubygem-packaging_rake_tasks
+BuildRequires:  config_agent-kerberos
+BuildRequires:  config_agent-pam
+
+# This is for Hudson (build service) to setup the build env correctly
+%if 0
+BuildRequires:  rubygem-test-unit
+BuildRequires:  rubygem-rcov >= 0.9.3.2
+%endif
+
+%description
+Library for high level access to kerberos client configuration. Part of yast++ project.
+Authors:
+--------
+    Jiri Suchomel <jsuchome@suse.cz>
+    Josef Reidinger <jreidinger@suse.cz>
+
+
+%prep
+%setup
+
+%build
+
+%check
+
+#---------------------------------------------------------------
+%install
+rake install[%{buildroot}/,%{rb_vendorlib}]
+
+#---------------------------------------------------------------
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+#---------------------------------------------------------------
+%files 
+%defattr(-,root,root)
+%{rb_vendorlib}/y_lib
+
+#---------------------------------------------------------------
+%changelog
