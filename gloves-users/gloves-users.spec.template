@@ -57,7 +57,7 @@ rm -rf $RPM_BUILD_ROOT
 #---------------------------------------------------------------
 %files 
 %defattr(-,root,root)
-%{rb_vendorlib}/y_lib
+%{rb_vendorlib}/glove
 
 #---------------------------------------------------------------
 %changelog
