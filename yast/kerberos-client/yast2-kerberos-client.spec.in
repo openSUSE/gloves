@@ -3,7 +3,7 @@
 @HEADER@
 Group:	System/YaST
 License: GPL v2 or later
-BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite gloves-ycp gloves-kerberos-client
+BuildRequires:	doxygen perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite gloves-ycp-bindings gloves-kerberos-client
 BuildRequires:  yast2-ruby-bindings >= 0.3.9
 
 # API for system access
