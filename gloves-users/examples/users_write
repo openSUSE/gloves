@@ -1,5 +1,6 @@
+#!/usr/bin/env ruby
 #--
-# YaST++ Users Library
+# Gloves Users Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -16,21 +17,27 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH << File.join(File.dirname(__FILE__),'..')
-require "rubygems"
-require "mocha"
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
-require "y_lib/users"
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
+require "glove/users"
+require "dbus_clients/backend_exception"
+begin
+  args = {}
 
-class TestUsers < Test::Unit::TestCase
-  def setup
+  unless ARGV[0].nil?
+    if ARGV[0] == "add" && !ARGV[1].nil?
+      args = { "username" => ARGV[1] }
+    end
   end
 
-  def test_read_common
-# FIXME
+  unless args.empty?
+    ret = Glove::Users::add({}, args)
+    puts ret.inspect unless ret.nil?
+    if ret.nil?
+      error	= Glove::Users::last_error
+      puts "returned error: #{error}" if error
+    end
   end
-
+rescue DbusClients::BackendException => e
+  puts e.backend_backtrace
+  raise
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestUsers)

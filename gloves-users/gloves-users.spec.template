@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-users (Version VERSION_TEMPLATE)
+# spec file for package gloves-users (Version VERSION_TEMPLATE)
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -9,7 +9,7 @@
 #
 
 
-Name:           yast++lib-users
+Name:           gloves-users
 License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
@@ -32,7 +32,7 @@ BuildRequires:  rubygem-rcov >= 0.9.3.2
 %endif
 
 %description
-Library for high level access to users configuration. Part of yast++ project.
+Library for high level access to users configuration. Part of Gloves project.
 Authors:
 --------
     Jiri Suchomel <jsuchome@suse.cz>

@@ -1,5 +1,5 @@
 #--
-# YaST++ Users Library
+# Gloves Users Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ require 'config_agent/passwd'
 require 'config_agent/useradd'
 
 # module for users configuration
-module YLib
+module Glove
   module Users
 
     def self.last_error
