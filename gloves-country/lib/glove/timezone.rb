@@ -1,5 +1,5 @@
 #--
-# YaST++ Timezone Library
+# Gloves Timezone Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ require 'config_agent/zic'
 require 'config_agent/mkinitrd'
 
 # module for timezone configuration
-module YLib
+module Glove
   module Timezone
 
     def self.last_error

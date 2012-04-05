@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #--
-# YaST++ Language Library
+# Gloves Language Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -18,21 +18,21 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "y_lib/language"
+require "glove/language"
 require "dbus_clients/backend_exception"
 begin
   args = {}
   args = { "kind" => "languages" } if ARGV[0] == "languages"
 
   if ARGV.empty? || ARGV[0] == "languages"
-    language = YLib::Language::read(args)
+    language = Glove::Language::read(args)
     puts language.inspect unless language.nil?
     if language.nil?
-      error	= YLib::Language::last_error
+      error	= Glove::Language::last_error
       puts "returned error: #{error}" if error
     end
   else
-    puts YLib::Language::modify({}, {"language"=>ARGV[0]})
+    puts Glove::Language::modify({}, {"language"=>ARGV[0]})
   end
 rescue DbusClients::BackendException => e
   puts e.backend_backtrace

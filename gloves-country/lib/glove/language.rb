@@ -1,5 +1,5 @@
 #--
-# YaST++ Language Library
+# Gloves Language Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'config_agent/language'
 
 # module for language configuration
-module YLib
+module Glove
   module Language
 
     def self.last_error

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr  5 14:07:52 CEST 2012 - jsuchome@suse.cz
+
+- renamed to gloves-country
+- 0.2.0 
+
+-------------------------------------------------------------------
 Wed Dec 14 13:51:19 CET 2011 - jsuchome@suse.cz
 
 - added support for timezone, keyboard, language

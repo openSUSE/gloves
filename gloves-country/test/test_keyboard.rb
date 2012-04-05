@@ -1,5 +1,5 @@
 #--
-# YaST++ Keyboard Library
+# Gloves Keyboard Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ require "rubygems"
 require "mocha"
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "y_lib/keyboard"
+require "glove/keyboard"
 
 class TestKeyboard < Test::Unit::TestCase
   def setup
@@ -33,7 +33,7 @@ class TestKeyboard < Test::Unit::TestCase
   end
 
   def test_read_sysconfig
-    ret = YLib::Keyboard.read({})
+    ret = Glove::Keyboard.read({})
     assert_equal "us.map.gz",ret["keymap"]
     assert_equal "english-us", ret["current_kbd"]
     assert_equal "pc104", ret["kb_model"]

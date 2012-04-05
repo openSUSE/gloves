@@ -1,5 +1,5 @@
 #--
-# YaST++ Keyboard Library
+# Gloves Keyboard Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ require 'config_agent/setxkbmap'
 require 'config_agent/loadkeys'
 
 # module for keyboard configuration
-module YLib
+module Glove
   module Keyboard
 
     def self.last_error

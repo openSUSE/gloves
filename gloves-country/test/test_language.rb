@@ -1,5 +1,5 @@
 #--
-# YaST++ Language Library
+# Gloves Language Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ require "rubygems"
 require "mocha"
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "y_lib/language"
+require "glove/language"
 
 class TestLanguage < Test::Unit::TestCase
   def setup
@@ -33,7 +33,7 @@ class TestLanguage < Test::Unit::TestCase
   end
 
   def test_read_sysconfig
-    ret = YLib::Language.read({})
+    ret = Glove::Language.read({})
     assert_equal "cs_CZ.UTF-8",ret["language"]
     assert_equal "cs_CZ,de_DE,en_US",ret["languages"]
   end

@@ -1,5 +1,5 @@
 #--
-# YaST++ Timezone Library
+# Gloves Timezone Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ require "rubygems"
 require "mocha"
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "y_lib/timezone"
+require "glove/timezone"
 
 class TestTimezone < Test::Unit::TestCase
   def setup
@@ -33,32 +33,32 @@ class TestTimezone < Test::Unit::TestCase
   end
 
   def test_read_sysconfig
-    ret = YLib::Timezone.read({})
+    ret = Glove::Timezone.read({})
     assert_equal "Europe/Prague",ret["timezone"]
     assert_equal "--localtime", ret["hwclock"]
   end
 
   def test_read_timezones
-    ret = YLib::Timezone.read({ "kind" => "timezones" })
+    ret = Glove::Timezone.read({ "kind" => "timezones" })
     assert_kind_of Hash, ret
     assert_kind_of Array, ret["timezones"]
   end
 
   def test_read_regions_map
-    ret = YLib::Timezone.read({ "kind" => "regions" })
+    ret = Glove::Timezone.read({ "kind" => "regions" })
     assert_kind_of Hash, ret
     assert_kind_of Hash, ret["Europe"]
     assert_equal "Czech Republic", ret["Europe"]["Europe/Prague"]
   end
 
   def test_read_region
-    ret = YLib::Timezone.read({ "kind" => "regions", "only" => "USA" })
+    ret = Glove::Timezone.read({ "kind" => "regions", "only" => "USA" })
     assert_kind_of Hash, ret
     assert_equal "Eastern (New York)", ret["America/New_York"]
   end
 
   def test_read_wrong_region
-    ret = YLib::Timezone.read({ "kind" => "regions", "only" => "US" })
+    ret = Glove::Timezone.read({ "kind" => "regions", "only" => "US" })
     assert_kind_of Hash, ret
     assert_equal 0, ret.size
   end
