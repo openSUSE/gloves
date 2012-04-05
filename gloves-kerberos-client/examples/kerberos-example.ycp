@@ -1,6 +1,6 @@
 /*
 --
- YaST++ Kerberos Client Library
+ Gloves Kerberos Client Library
 
  Copyright (C) 2011 Novell, Inc. 
    This library is free software; you can redistribute it and/or modify
@@ -20,13 +20,13 @@
 
 {
     // FIXME installation:
-    // mkdir -p /usr/share/YaST2/modules/YLib
-    // ln -sf /usr/lib64/ruby/vendor_ruby/1.8/y_lib/kerberos_client.rb /usr/share/YaST2/modules/YLib/KerberosClient.rb
+    // mkdir -p /usr/share/YaST2/modules/Glove
+    // ln -sf /usr/lib64/ruby/vendor_ruby/1.8/glove/kerberos_client.rb /usr/share/YaST2/modules/Glove/KerberosClient.rb
 
 
     // run this example with '/sbin/yast2 ./kerberos-example.ycp'
 
-    import "YLib::KerberosClient";
+    import "Glove::KerberosClient";
 
-    y2internal ("read: %1", YLib::KerberosClient::read ($[]));
+    y2internal ("read: %1", Glove::KerberosClient::read ($[]));
 }

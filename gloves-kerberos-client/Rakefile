@@ -1,5 +1,5 @@
 #--
-# YaST++ Kerberos Client Library
+# Gloves Kerberos Client Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -24,14 +24,14 @@ desc "install all things on system"
 task :install, :prefix, :ruby_path do |t,args|
   args.with_defaults :prefix => '/',:ruby_path => Dir["/usr/lib*/ruby/vendor_ruby/1.*"][0]
   sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/"
-  sh "cd #{args[:prefix]}#{args[:ruby_path]}/; mkdir -p y_lib; cd -"
-  sh "cp lib/y_lib/* #{args[:prefix]}#{args[:ruby_path]}/y_lib"
+  sh "cd #{args[:prefix]}#{args[:ruby_path]}/; mkdir -p glove; cd -"
+  sh "cp lib/glove/* #{args[:prefix]}#{args[:ruby_path]}/glove"
 end
 
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:YaST++"
   conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
-  conf.package_name = "yast++lib-kerberos-client"
+  conf.package_name = "gloves-kerberos-client"
 end
 
 Rake::TestTask.new do |t|
@@ -40,7 +40,7 @@ Rake::TestTask.new do |t|
 end
 
 task :generate_spec do
-  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' yast++lib-kerberos-client.spec.template > package/yast++lib-kerberos-client.spec"
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' gloves-kerberos-client.spec.template > package/gloves-kerberos-client.spec"
 end
 
 #add generation of spec file as dependency for package task

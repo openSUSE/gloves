@@ -1,5 +1,5 @@
 #--
-# YaST++ Kerberos Client Library
+# Gloves Kerberos Client Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ require "rubygems"
 require "mocha"
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "y_lib/kerberos_client"
+require "glove/kerberos_client"
 
 class TestKerberosClient < Test::Unit::TestCase
   def setup
@@ -58,7 +58,7 @@ class TestKerberosClient < Test::Unit::TestCase
     }
     ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
 
-    ret = YLib::KerberosClient.read({})
+    ret = Glove::KerberosClient.read({})
     assert_equal "300",ret["kerberos_client"]["clockskew"]
     assert_equal true,ret["kerberos_client"]["ignore_unknown"]
     assert_equal true,ret["pam_login"]["use_kerberos"]
@@ -75,7 +75,7 @@ class TestKerberosClient < Test::Unit::TestCase
     }
     ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
 
-    ret = YLib::KerberosClient.read({})
+    ret = Glove::KerberosClient.read({})
     assert_equal false,ret["pam_login"]["use_kerberos"]
     assert_equal nil,ret["kerberos_client"]["ignore_unknown"]
   end
@@ -90,7 +90,7 @@ class TestKerberosClient < Test::Unit::TestCase
     }
     ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
 
-    ret = YLib::KerberosClient.read({})
+    ret = Glove::KerberosClient.read({})
     assert_equal true,ret["pam_login"]["use_kerberos"]
     assert_equal false,ret["kerberos_client"]["ignore_unknown"]
   end

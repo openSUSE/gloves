@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr  5 13:47:47 CEST 2012 - jsuchome@suse.cz
+
+- renamed to gloves-kerberos-client
+- 0.2.0
+
+-------------------------------------------------------------------
 Wed Dec 14 13:52:57 CET 2011 - jsuchome@suse.cz
 
 - new version

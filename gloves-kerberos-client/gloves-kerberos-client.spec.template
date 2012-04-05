@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-kerberos_client (Version VERSION_TEMPLATE)
+# spec file for package gloves-kerberos_client (Version VERSION_TEMPLATE)
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -9,7 +9,7 @@
 #
 
 
-Name:           yast++lib-kerberos-client
+Name:           gloves-kerberos-client
 License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
@@ -34,7 +34,7 @@ BuildRequires:  rubygem-rcov >= 0.9.3.2
 %endif
 
 %description
-Library for high level access to kerberos client configuration. Part of yast++ project.
+Library for high level access to kerberos client configuration. Part of Gloves project.
 Authors:
 --------
     Jiri Suchomel <jsuchome@suse.cz>
@@ -59,7 +59,7 @@ rm -rf $RPM_BUILD_ROOT
 #---------------------------------------------------------------
 %files 
 %defattr(-,root,root)
-%{rb_vendorlib}/y_lib
+%{rb_vendorlib}/glove
 
 #---------------------------------------------------------------
 %changelog

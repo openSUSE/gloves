@@ -1,5 +1,5 @@
 #--
-# YaST++ Kerberos Client Library
+# Gloves Kerberos Client Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ require 'config_agent/pam_config'
 require 'socket'
 
 # module for kerberos-client configuration
-module YLib
+module Glove
   module KerberosClient
 
     def self.last_error
