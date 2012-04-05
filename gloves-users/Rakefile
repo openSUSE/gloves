@@ -1,5 +1,5 @@
 #--
-# YaST++ Kerberos Client Library
+# Gloves Users Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ end
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:YaST++"
   conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
-  conf.package_name = "yast++lib-users"
+  conf.package_name = "gloves-users"
 end
 
 Rake::TestTask.new do |t|
@@ -40,7 +40,7 @@ Rake::TestTask.new do |t|
 end
 
 task :generate_spec do
-  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' yast++lib-users.spec.template > package/yast++lib-users.spec"
+  sh "sed 's/VERSION_TEMPLATE/#{Packaging::Configuration.instance.version}/g' gloves-users.spec.template > package/gloves-users.spec"
 end
 
 #add generation of spec file as dependency for package task
