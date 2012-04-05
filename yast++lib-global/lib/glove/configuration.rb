@@ -1,5 +1,5 @@
 #--
-# YLib Global module
+# Gloves Global module
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 require "singleton"
 require "dbus_clients/dbus_client"
 
-module YLib
+module Glove
   class Configuration
     include Singleton
     attr_accessor :chroot
@@ -32,14 +32,14 @@ module YLib
   end
 end
 
-#reopen config_agents so all ylib implicitelly use agent parameters
+#reopen config_agents so all gloves lib implicitelly use agent parameters
 module DbusClients
   module DbusClient
     class << self
-      alias_method :ylib_conf_extended_call, :call
+      alias_method :gloves_conf_extended_call, :call
       def call name, id, type, method, options
-        options = YLib::Configuration.instance.agent_parameters.merge options
-        ylib_conf_extended_call name, id, type, method, options
+        options = Glove::Configuration.instance.agent_parameters.merge options
+        gloves_conf_extended_call name, id, type, method, options
       end
     end
   end

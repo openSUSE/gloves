@@ -1,5 +1,5 @@
 #--
-# YaST++ Kerberos Client Library
+# Gloves Global Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
