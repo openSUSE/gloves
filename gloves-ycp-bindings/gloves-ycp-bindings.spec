@@ -1,5 +1,5 @@
 #
-# spec file for package yast++lib-ycp (Version 0.1.0)
+# spec file for package gloves-ycp-bindings
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -9,18 +9,18 @@
 #
 
 
-Name:           yast++lib-ycp
+Name:           gloves-ycp-bindings
 License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    1
-Version:        0.1.0
+Version:        0.2.0
 Release:        0
 Summary:        YCP bindings to YLib
 
 
-Requires:       yast++lib-global
-BuildRequires:	yast2 yast++lib-global
+Requires:       gloves-global
+BuildRequires:	yast2 gloves-global
 BuildArchitectures: noarch
 
 
@@ -29,13 +29,13 @@ BuildArchitectures: noarch
 #---------------------------------------------------------------
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/share/YaST2/modules
-ln -sf %{rb_vendorlib}/y_lib $RPM_BUILD_ROOT/usr/share/YaST2/modules/y_lib
+ln -sf %{rb_vendorlib}/glove $RPM_BUILD_ROOT/usr/share/YaST2/modules/glove
 
 
 #---------------------------------------------------------------
 %files
 %defattr(-,root,root)
-%dir /usr/share/YaST2/modules/y_lib
+%dir /usr/share/YaST2/modules/glove
 
 #---------------------------------------------------------------
 %changelog
