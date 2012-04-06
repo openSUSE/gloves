@@ -1,5 +1,5 @@
 #--
-# YaST++ Keyboard Library
+# Gloves Windowmanager Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'config_agent/windowmanager'
 
 # module for windowmanager configuration
-module YLib
+module Glove
   module Windowmanager
 
     def self.last_error
