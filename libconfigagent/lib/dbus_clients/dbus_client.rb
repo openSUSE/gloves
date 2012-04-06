@@ -18,7 +18,6 @@
 
 require "dbus_clients/backend_exception"
 require "dbus_clients/utils"
-require "rubygems"
 
 SERVICE_NAME = "org.opensuse.config_agent"
 OBJECT_PATH = "/org/opensuse/config_agent"
