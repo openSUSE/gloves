@@ -28,7 +28,7 @@ import "Stage";
 import "Summary";
 
 // ruby API
-import "YLib::KerberosClient";
+import "Glove::KerberosClient";
 
 /**
  * Required packages for this module to operate
@@ -196,11 +196,11 @@ global define map Export () ``{
  */
 global define boolean Read () ``{
 
-    map read	= (map) YLib::KerberosClient::read ($[]);
+    map read	= (map) Glove::KerberosClient::read ($[]);
 
     if (read == nil)
     {
-	string message	= (string) YLib::KerberosClient::last_error ();
+	string message	= (string) Glove::KerberosClient::last_error ();
 	if (message != nil && message != "")
 	{
 	    Report::Error (message);
@@ -387,11 +387,11 @@ global define boolean Write () ``{
     // -- write to /etc/krb5.conf
     Progress::NextStage ();
 
-    map write_ret	= (map) YLib::KerberosClient::modify ($[], write);
+    map write_ret	= (map) Glove::KerberosClient::modify ($[], write);
 
     if (write_ret == nil)
     {
-	string message	= (string) YLib::KerberosClient::last_error ();
+	string message	= (string) Glove::KerberosClient::last_error ();
 	if (message != nil && message != "")
 	{
 	    Report::Error (message);
