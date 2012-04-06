@@ -1,5 +1,5 @@
 #--
-# YaST++ SuSEfirewall2 Library
+# Gloves SuSEfirewall2 Library
 #
 # Copyright (C) 2011 Novell, Inc. 
 #   This library is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ require "mocha"
 require 'augeas'
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "y_lib/susefirewall2"
+require "glove/susefirewall2"
 require "config_agent/susefirewall2"
 
 class TestFirewall < Test::Unit::TestCase
@@ -58,62 +58,62 @@ class TestFirewall < Test::Unit::TestCase
 
   # Generic read
   def test_read
-    firewall = YLib::Susefirewall2.read({})
+    firewall = Glove::Susefirewall2.read({})
     assert_equal "any eth0", firewall["FW_DEV_EXT"]
   end
 
   # Read with unknown kind
   def test_read_syntax_error
     assert_raise NotImplementedError do
-      firewall = YLib::Susefirewall2.read({"kind" => "unknown kind"})
+      firewall = Glove::Susefirewall2.read({"kind" => "unknown kind"})
     end
   end
 
   # Read interface from zone
   def test_read_interface
-    firewall = YLib::Susefirewall2.read({"kind" => "interface", "interface" => "eth0", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2.read({"kind" => "interface", "interface" => "eth0", "zone" => "EXT"})
     assert_equal "eth0", firewall["interface"], firewall.inspect
 
-    firewall = YLib::Susefirewall2.read({"kind" => "interface", "interface" => "eth5", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2.read({"kind" => "interface", "interface" => "eth5", "zone" => "EXT"})
     assert_equal nil, firewall, firewall.inspect
   end
 
   # Read open port from zone
   def test_read_port
-    firewall = YLib::Susefirewall2.read({"kind" => "open_port", "port" => "22", "zone" => "EXT", "protocol" => "TCP"})
+    firewall = Glove::Susefirewall2.read({"kind" => "open_port", "port" => "22", "zone" => "EXT", "protocol" => "TCP"})
     assert_equal "22", firewall["port"], firewall.inspect
 
-    firewall = YLib::Susefirewall2.read({"kind" => "open_port", "port" => "888", "zone" => "EXT", "protocol" => "TCP"})
+    firewall = Glove::Susefirewall2.read({"kind" => "open_port", "port" => "888", "zone" => "EXT", "protocol" => "TCP"})
     assert_equal nil, firewall, firewall.inspect
   end
 
   # Add new open port
   def test_add_open_port
-    firewall = YLib::Susefirewall2::add({}, {"kind" => "open_port", "port" => "335", "protocol" => "TCP", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2::add({}, {"kind" => "open_port", "port" => "335", "protocol" => "TCP", "zone" => "EXT"})
     assert_equal GENERIC_SUCCESS, firewall
   end
 
   # Remove open port
   def test_remove_open_port
-    firewall = YLib::Susefirewall2::add({}, {"kind" => "open_port", "port" => "22", "protocol" => "TCP", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2::add({}, {"kind" => "open_port", "port" => "22", "protocol" => "TCP", "zone" => "EXT"})
     assert_equal GENERIC_SUCCESS, firewall
 
-    firewall = YLib::Susefirewall2::add({}, {"kind" => "open_port", "port" => "any_port", "protocol" => "TCP", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2::add({}, {"kind" => "open_port", "port" => "any_port", "protocol" => "TCP", "zone" => "EXT"})
     assert_equal GENERIC_SUCCESS, firewall
   end
 
   # Add interface to zone
   def test_add_interface
-    firewall = YLib::Susefirewall2::add({}, {"kind" => "interface", "interface" => "eth4", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2::add({}, {"kind" => "interface", "interface" => "eth4", "zone" => "EXT"})
     assert_equal GENERIC_SUCCESS, firewall
   end
 
   # Remove interface from zone
   def test_remove_interface
-    firewall = YLib::Susefirewall2::add({}, {"kind" => "interface", "interface" => "eth0", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2::add({}, {"kind" => "interface", "interface" => "eth0", "zone" => "EXT"})
     assert_equal GENERIC_SUCCESS, firewall
 
-    firewall = YLib::Susefirewall2::add({}, {"kind" => "interface", "interface" => "any_interface", "zone" => "EXT"})
+    firewall = Glove::Susefirewall2::add({}, {"kind" => "interface", "interface" => "any_interface", "zone" => "EXT"})
     assert_equal GENERIC_SUCCESS, firewall
   end
 

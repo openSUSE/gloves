@@ -1,5 +1,5 @@
 #--
-# YaST++ SuSEfirewall2 Library
+# Gloves SuSEfirewall2 Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'config_agent/susefirewall2'
 
 # module for SuSEfirewall2 configuration
-module YLib
+module Glove
   module Susefirewall2
 
     DEFAULT_RET = { "success" => true }

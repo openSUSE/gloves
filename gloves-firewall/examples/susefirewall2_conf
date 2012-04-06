@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #--
-# YaST++ Keyboard Library
+# Gloves Keyboard Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -18,21 +18,21 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "y_lib/susefirewall2"
+require "glove/susefirewall2"
 require "dbus_clients/backend_exception"
 begin
   args = {}
 
   if ARGV.empty?
-    susefirewall2 = YLib::Susefirewall2::read(args)
+    susefirewall2 = Glove::Susefirewall2::read(args)
     puts susefirewall2.inspect
 
     if susefirewall2.nil?
-      error = YLib::Susefireewall2::last_error
+      error = Glove::Susefireewall2::last_error
       puts "returned error: #{error}" if error
     end
   else
-    puts YLib::Susefirewall2::modify({}, {"susefirewall2"=>ARGV[0]})
+    puts Glove::Susefirewall2::modify({}, {"susefirewall2"=>ARGV[0]})
   end
 rescue DbusClients::BackendException => e
   puts e.backend_backtrace
