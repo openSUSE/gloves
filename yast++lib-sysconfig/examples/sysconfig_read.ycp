@@ -1,0 +1,5 @@
+{
+    import "YLib::Sysconfig";
+
+    y2internal( "read %1", YLib::Sysconfig::read( $[ "file" : "/etc/sysconfig/network/ifcfg-eth0" ] ) );
+}
