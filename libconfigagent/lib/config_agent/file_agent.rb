@@ -16,27 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "open4"
-require "config_agent_service/logger"
+require "config_agent/logger"
 
-module ConfigAgentService
-  # Represent service for executing script.
-  # @abstract Subclass and implement execute method.
-  class ScriptService
-    include ConfigAgentService::Logger
-
-    # Runs given command. Argument processing is without shell using popen call.
-    # @arg [Array[String]] command to execute
-    # @return [Hash] result of command in map with keys stdout,stderr and exit
-    def run command
-      ret = {}
-      status = Open4::popen4(*command) do |pid,stdin,stdout,stderr|
-        stdin.close
-        ret["stdout"] = stdout.read.strip
-        ret["stderr"] = stderr.read.strip
-      end
-      ret["exit"] = status.exitstatus
-      ret
-    end
+module ConfigAgent
+  # Represent service for reading and writing files.
+  # @abstract Subclass and implement read and write methods
+  class FileAgent
+    include ConfigAgent::Logger
   end
 end

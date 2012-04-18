@@ -19,7 +19,7 @@
 require "logger"
 require "fileutils"
 
-module ConfigAgentService
+module ConfigAgent
   # provides unified logging mechanism
   module Logger
     # logger object

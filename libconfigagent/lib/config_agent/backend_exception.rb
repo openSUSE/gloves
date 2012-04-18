@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-module ConfigAgentService
+module ConfigAgent
   # Represents exception thrown by intention from backend part like missing permission or wrong argument.
   # 
   # Contain features:

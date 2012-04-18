@@ -21,7 +21,7 @@ require "augeas"
 # Module for easy work with augeas ruby bindings. Could be in future replaced by improved augeas bindings
 # @TODO error handling
 # @TODO serialize
-module ConfigAgentService
+module ConfigAgent
   module AugeasSerializer
 
     # Loads parsed tree as hash from given path with given lense

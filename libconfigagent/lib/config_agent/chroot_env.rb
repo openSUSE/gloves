@@ -17,6 +17,7 @@ module ConfigAgentService
         rd.close
         result = YAML::dump(yield) rescue $!
         result = result.to_hash if result.is_a? BackendException
+        #FIXME convert exception handling
         result = { "error" => result.message, "backtrace" => result.backtrace } if result.is_a?(Exception)
         wr.write result
         wr.close
