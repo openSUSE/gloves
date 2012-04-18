@@ -2,7 +2,7 @@ require 'yaml'
 
 require "config_agent_service/backend_exception"
 
-module ConfigAgentService
+module ConfigAgent
   # Provides chrooting ability
   module ChrootEnv
     # Run block in changed root to dir
