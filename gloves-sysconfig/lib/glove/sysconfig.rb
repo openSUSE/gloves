@@ -1,6 +1,5 @@
-#!/usr/bin/env ruby
 #--
-# Gloves Keyboard Library
+# YaST++ Users Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -17,24 +16,42 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "glove/susefirewall2"
-require "dbus_clients/backend_exception"
-begin
-  args = {}
+$LOAD_PATH << File.dirname(__FILE__)
 
-  if ARGV.empty?
-    susefirewall2 = Glove::Susefirewall2::read(args)
-    puts susefirewall2.inspect
+require 'config_agent/sysconfig'
 
-    if susefirewall2.nil?
-      error = Glove::Susefirewall2::last_error
-      puts "returned error: #{error}" if error
+# module for users configuration
+module Glove
+
+  module Sysconfig
+
+    def self.last_error
+      return @error
     end
-  else
-    puts Glove::Susefirewall2::modify({}, {"susefirewall2"=>ARGV[0]})
+
+    # Read all settings relevant for Users configuration
+    # Standard Gloves way
+    def self.read(params)
+      ret       = {}
+
+      begin
+        ret     = ConfigAgent::Sysconfig.read(params)
+      rescue DbusClients::InsufficientPermission => e
+        @error	= "User has no permission for action '#{e.permission}'."
+        return nil
+      end
+      return ret;
+    end
+
+    def self.write( params)
+        ret = {}
+
+        ret = ConfigAgent::Sysconfig.write( params)
+
+        return ret
+    end
+
+private
+
   end
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
-  raise
 end

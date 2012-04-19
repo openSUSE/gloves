@@ -1,6 +1,5 @@
-#!/usr/bin/env ruby
 #--
-# Gloves Keyboard Library
+# YaST++ Users Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -17,24 +16,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "glove/susefirewall2"
-require "dbus_clients/backend_exception"
-begin
-  args = {}
+$LOAD_PATH << File.join(File.dirname(__FILE__),'..')
+require "rubygems"
+require "mocha"
+require "test/unit/testcase"
+require 'test/unit/ui/console/testrunner'
 
-  if ARGV.empty?
-    susefirewall2 = Glove::Susefirewall2::read(args)
-    puts susefirewall2.inspect
-
-    if susefirewall2.nil?
-      error = Glove::Susefirewall2::last_error
-      puts "returned error: #{error}" if error
-    end
-  else
-    puts Glove::Susefirewall2::modify({}, {"susefirewall2"=>ARGV[0]})
+class TestSysconfig < Test::Unit::TestCase
+  def setup
   end
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
-  raise
+
+  def test_read_common
+# FIXME
+  end
+
 end
+
+Test::Unit::UI::Console::TestRunner.run(TestUsers)
