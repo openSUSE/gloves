@@ -15,18 +15,18 @@ module ConfigAgent
       fork do
         Dir.chroot(dir)
         rd.close
-        result = YAML::dump(yield) rescue $!
-        result = result.to_hash if result.is_a? BackendException
-        #FIXME convert exception handling
-        result = { "error" => result.message, "backtrace" => result.backtrace } if result.is_a?(Exception)
-        wr.write result
+        result = yield rescue $!
+        wr.write result Marshal.dump(result)
         wr.close
         exit 0
       end
       wr.close
-      result = YAML::load rd.read
+      result = Marshal.load rd.read
       rd.close
       Process.wait
+      if result.is_a? Exception
+        raise result.class,result.message,result.backtrace #continue with exception
+      end
       return result
     end
   end
