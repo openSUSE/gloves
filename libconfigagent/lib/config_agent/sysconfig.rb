@@ -16,30 +16,30 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent_service/file_service' # Gloves only
+require 'config_agent/file_service' # Gloves only
 require 'augeas'
-require 'lib/SysconfigGlibShell'                # extension / stub to libglib (unquoting)
 
-# TODO: read, write: params[ "file"] should contain absolute path - add check
-class Sysconfig < ConfigAgentService::FileService
-#class Sysconfig    # YaST2
+class Sysconfig < ConfigAgent::FileAgent
 
     SYSCONFIG_LENS = "Shellvars.lns"
 
-    def read(params)
-        return {} if !params.has_key?( "file");
+    def initialize path,params={}
+      raise ArgumentError,"Path argument must be absolut path" unless path.start_with? '/'
+      @file_path = path
+    end
 
-        file = params[ "file"];
+    def read(params)
         ret = {}
 
         aug = load_augeas(params)
 
         unless aug.get("/augeas/files#{file}/error").nil?
+          #FIXME report it. TODO have universal wrapper for this (augeas serializer)
             aug.close
             return ret
         end
 
-        aug.match("/files#{file}/*").each do |key_path|
+        aug.match("/files#{@file_path}/*").each do |key_path|
             key = key_path.split("/").last
 # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
 # TODO: configurable option?
@@ -55,9 +55,6 @@ class Sysconfig < ConfigAgentService::FileService
     end
 
     def write(params)
-        return { "success" => false, "message" => "Missing desc file" } if !params.has_key?( "file");
-
-        file = params[ "file"];
         ret = {
           "success" => true
         }
@@ -66,8 +63,7 @@ class Sysconfig < ConfigAgentService::FileService
 
         params.each do |key, value|
             next if key.start_with? "_"   # skip internal keys
-            next if key == "file"         # destination flag.
-            aug.set("/files#{file}/#{key}", value)
+            aug.set("/files#{@file_path}/#{key}", value) #shell escape here???
         end
 
         unless aug.save
@@ -90,18 +86,56 @@ private
         return aug
     end
 
+     # to get correct value it is needed to unescape too
+     # @example
+     #   VAR_1="a\"b\"c"
+     #   VAR_2='a\"b\"c'
+     #   echo $VAR_1 ---> a"b"c
+     #   echo $VAR_2 ---> a\"b\"c
+     #
+     # we do just best efford, there is more possible outputs and more shell expansions
+    STATES = [ :double_quote, :single_quote, :unquote ]
     def unpack( string)
-        # to get correct value it is needed to unescape too
-        # Examples:
-        # VAR_1="a\"b\"c"
-        # VAR_2='a\"b\"c'
-        #
-        # echo $VAR_1 ---> a"b"c
-        # echo $VAR_2 ---> a\"b\"c
-        #
-# for testing only otherwise danger (does full expansion)
-#        return %x( echo #{string})
-        return SysconfigGlibShell.unquote( string);
+      # Lets do it iterative, so when something not comform adapt it
+      # we use state machine for such task
+      state = :unquote
+      result = ''
+      1.upto(string.size) do |char_pos_p|
+        char = string[char_pos_p-1]
+        case state
+        when :unquote
+          if char == "'"
+            state = :single_quote
+          elsif char == '"'
+            state = :double_quote
+          else
+            result << char
+          end
+        when :single_quote
+          if char == "'"
+            state = :unquote
+          else
+            result << char
+          end
+        when :double_quote
+          if char == '"'
+            state = :unquote
+          elsif char == '\\'
+            state = :escape
+          else
+            result << char
+          end
+        when :escape
+          if ['\\',"\n",'$','`','"'].include? char
+            result << char
+          else #not special escape
+            result << '\\' << char
+          end 
+          state = :double_quote
+        else
+          raise "Invalid state. Internal Error"
+        end
+      end
     end
 
 end
