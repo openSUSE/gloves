@@ -1,6 +1,5 @@
-#!/usr/bin/env ruby
 #--
-# Gloves Keyboard Library
+# Config Agents Framework
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -17,24 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "glove/susefirewall2"
-require "dbus_clients/backend_exception"
-begin
-  args = {}
+require 'dbus_clients/file_client'
 
-  if ARGV.empty?
-    susefirewall2 = Glove::Susefirewall2::read(args)
-    puts susefirewall2.inspect
+module ConfigAgent
+  class Sysconfig < DbusClients::FileClient
 
-    if susefirewall2.nil?
-      error = Glove::Susefirewall2::last_error
-      puts "returned error: #{error}" if error
-    end
-  else
-    puts Glove::Susefirewall2::modify({}, {"susefirewall2"=>ARGV[0]})
+    # identification of relevant DBUS service
+    agent_id "file.sysconfig"
   end
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
-  raise
 end

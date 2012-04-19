@@ -1,0 +1,6 @@
+*.sw?
+.nfs*
+*.so
+*.o
+*.log
+Makefile
