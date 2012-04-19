@@ -21,7 +21,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'config_agent/sysconfig'
 
 # module for users configuration
-module YLib
+module Glove
 
   module Sysconfig
 

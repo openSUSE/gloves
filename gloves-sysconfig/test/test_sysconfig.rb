@@ -21,7 +21,6 @@ require "rubygems"
 require "mocha"
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
-require "y_lib/users"
 
 class TestSysconfig < Test::Unit::TestCase
   def setup

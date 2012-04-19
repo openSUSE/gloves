@@ -18,7 +18,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "y_lib/sysconfig"
+require "glove/sysconfig"
 require "dbus_clients/backend_exception"
 begin
   args = {}
@@ -34,10 +34,10 @@ begin
   puts "Src file: " + args.inspect
 
     # read
-    ifcfg = YLib::Sysconfig::read(args)
+    ifcfg = Glove::Sysconfig::read(args)
     puts "Read values: " + ifcfg.inspect unless ifcfg.nil?
     if ifcfg.nil?
-      error = YLib::Sysconfig::last_error
+      error = Glove::Sysconfig::last_error
       puts "returned error: #{error}" if error
     end
 
@@ -45,13 +45,13 @@ begin
     ifcfg[ "WIRELESS_ESSID"] = "\"b'b\"";
     puts "Write values: " + ifcfg.inspect unless ifcfg.nil?
 
-    ret = YLib::Sysconfig::write( args.merge( ifcfg))
+    ret = Glove::Sysconfig::write( args.merge( ifcfg))
     if ret[ "success"] != true
         puts "Write error."
         puts "Desc: " +  ret[ "message"] unless ret[ "message"].nil?;
     end
 
     # re-read
-    ifcfg = YLib::Sysconfig::read(args)
+    ifcfg = Glove::Sysconfig::read(args)
     puts "Current values: " + ifcfg.inspect unless ifcfg.nil?
 end

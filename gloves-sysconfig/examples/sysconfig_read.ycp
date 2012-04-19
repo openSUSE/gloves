@@ -1,5 +1,5 @@
 {
-    import "YLib::Sysconfig";
+    import "Glove::Sysconfig";
 
-    y2internal( "read %1", YLib::Sysconfig::read( $[ "file" : "/etc/sysconfig/network/ifcfg-eth0" ] ) );
+    y2internal( "read %1", Glove::Sysconfig::read( $[ "file" : "/etc/sysconfig/network/ifcfg-eth0" ] ) );
 }
