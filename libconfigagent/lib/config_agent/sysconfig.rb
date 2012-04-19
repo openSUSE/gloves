@@ -136,6 +136,8 @@ private
           raise "Invalid state. Internal Error"
         end
       end
+      raise "invalid string value" if state != :unquote
+      return result
     end
 
 end
