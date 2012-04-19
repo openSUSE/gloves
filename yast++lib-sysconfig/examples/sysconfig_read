@@ -42,7 +42,7 @@ begin
     end
 
     # write
-    ifcfg[ "WIRELESS_ESSID"] = "b'b";
+    ifcfg[ "WIRELESS_ESSID"] = "\"b'b\"";
     puts "Write values: " + ifcfg.inspect unless ifcfg.nil?
 
     ret = YLib::Sysconfig::write( args.merge( ifcfg))

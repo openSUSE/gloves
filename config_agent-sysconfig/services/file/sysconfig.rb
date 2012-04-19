@@ -18,6 +18,7 @@
 
 require 'config_agent_service/file_service' # Gloves only
 require 'augeas'
+require 'lib/SysconfigGlibShell'                # extension / stub to libglib (unquoting)
 
 # TODO: read, write: params[ "file"] should contain absolute path - add check
 class Sysconfig < ConfigAgentService::FileService
@@ -44,8 +45,8 @@ class Sysconfig < ConfigAgentService::FileService
 # TODO: configurable option?
 #      next if key.start_with? "#comment"
 
-            # remove quotes from value (Shellvars.lns keeps quoting)
-            ret[key] = aug.get(key_path)[/[^'"].*[^'"]/]
+            # remove quotes from value (Shellvars.lns keeps quoting), unescape values
+            ret[key] = unpack( aug.get(key_path))
         end
 
         aug.close
@@ -79,14 +80,28 @@ class Sysconfig < ConfigAgentService::FileService
         return ret
     end
 
-  private
+private
 
-  def load_augeas(params)
-    aug = params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
-    aug.transform(:lens => SYSCONFIG_LENS, :incl => params[ "file"])
-    aug.load
+    def load_augeas(params)
+        aug = params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+        aug.transform(:lens => SYSCONFIG_LENS, :incl => params[ "file"])
+        aug.load
 
-    return aug
-  end
+        return aug
+    end
+
+    def unpack( string)
+        # to get correct value it is needed to unescape too
+        # Examples:
+        # VAR_1="a\"b\"c"
+        # VAR_2='a\"b\"c'
+        #
+        # echo $VAR_1 ---> a"b"c
+        # echo $VAR_2 ---> a\"b\"c
+        #
+# for testing only otherwise danger (does full expansion)
+#        return %x( echo #{string})
+        return SysconfigGlibShell.unquote( string);
+    end
 
 end
