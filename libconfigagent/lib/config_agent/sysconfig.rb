@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent/file_service' # Gloves only
+require 'config_agent/file_agent' # Gloves only
 require 'augeas'
 
 class Sysconfig < ConfigAgent::FileAgent
