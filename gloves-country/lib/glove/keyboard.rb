@@ -16,8 +16,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH << File.dirname(__FILE__)
-
 require 'config_agent/keyboard'
 require 'config_agent/setxkbmap'
 
@@ -29,7 +27,7 @@ module Glove
       return @error
     end
 
-    @sysconfig_values = [
+    SYSCONFIG_VALUES = [
     	"KBD_TTY",
 	"KBD_RATE",
 	"KBD_DELAY",
@@ -47,7 +45,7 @@ module Glove
 
       ret	= {}
       sysconfig_keyboard.each do |key, val|
-      	ret[key.downcase]	= val if @sysconfig_values.include? key
+      	ret[key.downcase]	= val if SYSCONFIG_VALUES.include? key
       end
       ret["compose_table"]	= sysconfig_keyboard["COMPOSETABLE"] || ""
       ret["keymap"]		= sysconfig_keyboard["KEYTABLE"] || ""
@@ -74,7 +72,7 @@ module Glove
       unless params.nil? && params.empty?
 	sysconfig_params = {}
 	params.each do |key, value|
-      	  sysconfig_params[key.upcase] = value if @sysconfig_values.include? key.upcase
+      	  sysconfig_params[key.upcase] = value if SYSCONFIG_VALUES.include? key.upcase
 	end
         if params.has_key?("current_kbd") && params.has_key?("kb_model")
 	  sysconfig_params["YAST_KEYBOARD"]     = (params["current_kbd"] || "") + "," + (params["kb_model"] || "")
