@@ -34,7 +34,7 @@ module ConfigAgent
 
           aug = load_augeas(params)
 
-          unless aug.get("/augeas/files#{file}/error").nil?
+          unless aug.get("/augeas/files#{@file_path}/error").nil?
             #FIXME report it. TODO have universal wrapper for this (augeas serializer)
               aug.close
               return ret
@@ -69,7 +69,7 @@ module ConfigAgent
 
           unless aug.save
               ret["success"] = false
-              ret["message"] = aug.get("/augeas/files#{file}/error/message")
+              ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
           end
 
           aug.close
@@ -81,7 +81,7 @@ module ConfigAgent
 
       def load_augeas(params)
           aug = params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
-          aug.transform(:lens => SYSCONFIG_LENS, :incl => params[ "file"])
+          aug.transform(:lens => SYSCONFIG_LENS, :incl => @file_path)
           aug.load
 
           return aug
