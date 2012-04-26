@@ -47,7 +47,9 @@ module ConfigAgent
   #      next if key.start_with? "#comment"
 
               # remove quotes from value (Shellvars.lns keeps quoting), unescape values
-              ret[key] = unpack( aug.get(key_path))
+              #do not unpack comments
+              value = aug.get(key_path)
+              ret[key] = key.start_with?("#comment") ? value : unpack(value)
           end
 
           aug.close
