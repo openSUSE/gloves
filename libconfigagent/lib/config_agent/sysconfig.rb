@@ -102,13 +102,15 @@ module ConfigAgent
         state = :unquote
         result = ''
         1.upto(string.size) do |char_pos_p|
-          char = string[char_pos_p-1]
+          char = string[char_pos_p-1].chr
           case state
           when :unquote
             if char == "'"
               state = :single_quote
             elsif char == '"'
               state = :double_quote
+            elsif char == '\\'
+              state = :escape
             else
               result << char
             end
@@ -122,17 +124,20 @@ module ConfigAgent
             if char == '"'
               state = :unquote
             elsif char == '\\'
-              state = :escape
+              state = :escape_double
             else
               result << char
             end
-          when :escape
+          when :escape_double
             if ['\\',"\n",'$','`','"'].include? char
               result << char
             else #not special escape
               result << '\\' << char
             end 
             state = :double_quote
+          when :escape
+            result << char
+            state = :unquote
           else
             raise "Invalid state. Internal Error"
           end
