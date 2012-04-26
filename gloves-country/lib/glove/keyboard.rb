@@ -20,7 +20,6 @@ $LOAD_PATH << File.dirname(__FILE__)
 
 require 'config_agent/keyboard'
 require 'config_agent/setxkbmap'
-require 'config_agent/loadkeys'
 
 # module for keyboard configuration
 module Glove
@@ -44,12 +43,7 @@ module Glove
     def self.read(params)
 
       # read config files
-      begin
-        sysconfig_keyboard	= ConfigAgent::Keyboard.read({})
-      rescue DbusClients::InsufficientPermission => e
-        @error	= "User has no permission for action '#{e.permission}'."
-        return nil
-      end
+      sysconfig_keyboard	= ConfigAgent::Keyboard.new.read({})
 
       ret	= {}
       sysconfig_keyboard.each do |key, val|
@@ -90,7 +84,7 @@ module Glove
           keymap                = params["keymap"]
           sysconfig_params["KEYTABLE"]  = keymap
         end
-        ret	= ConfigAgent::Keyboard.write(sysconfig_params)
+        ret	= ConfigAgent::Keyboard.new.write(sysconfig_params)
       end
 
       # set the new keyboard layout for console and X11
@@ -99,19 +93,16 @@ module Glove
         if File.exists?("/usr/sbin/xkbctrl")
           apply = `/usr/sbin/xkbctrl #{keymap} | grep Apply`
           apply = apply[apply.index(":") + 1 ..apply.size].gsub(/"/,"").chop
-          ConfigAgent::Setxkbmap.execute({
+          ConfigAgent::Setxkbmap.new.execute({
               "DISPLAY" => ENV["DISPLAY"] || "",
               "exec_args" => apply.split }
           ) unless apply.empty?
         end
         # FIXME pick correct console font!
-        ConfigAgent::Loadkeys.execute({ "exec_args" => [ keymap ] })
+        ConfigAgent::ScriptAgent.new.run("/bin/loadkeys",keymap)
       end
 
       return ret
-    rescue DbusClients::InsufficientPermission => e
-      @error	= "User has no permission for action '#{e.permission}'."
-      return nil
     end
 
 

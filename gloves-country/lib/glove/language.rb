@@ -49,12 +49,7 @@ module Glove
       end
 
       # read config files
-      begin
-        sysconfig_language	= ConfigAgent::Language.read({})
-      rescue DbusClients::InsufficientPermission => e
-        @error	= "User has no permission for action '#{e.permission}'."
-        return nil
-      end
+      sysconfig_language	= ConfigAgent::Language.new.read({})
 
       ret	= {}
       sysconfig_language.each do |key, val|
@@ -77,13 +72,10 @@ module Glove
       	  new_key = @sysconfig2yast.invert[key]
       	  sysconfig_params[new_key] = value unless new_key.nil?
 	end
-        ret	= ConfigAgent::Language.write(sysconfig_params)
+        ret	= ConfigAgent::Language.new.write(sysconfig_params)
       end
 
       return ret
-    rescue DbusClients::InsufficientPermission => e
-      @error	= "User has no permission for action '#{e.permission}'."
-      return nil
     end
 
 

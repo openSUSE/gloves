@@ -19,9 +19,6 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'config_agent/clock'
-require 'config_agent/hwclock'
-require 'config_agent/zic'
-require 'config_agent/mkinitrd'
 
 # module for timezone configuration
 module Glove
@@ -85,7 +82,7 @@ module Glove
       	  new_key = @sysconfig2yast.invert[key]
       	  sysconfig_params[new_key] = value unless new_key.nil?
 	end
-        ret	= ConfigAgent::Clock.write(sysconfig_params)
+        ret	= ConfigAgent::Clock.new.write(sysconfig_params)
       end
 
       timezone  = params["timezone"]
@@ -100,18 +97,15 @@ module Glove
           timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
         end
 
-	ConfigAgent::Zic.execute({ "exec_args" => ["-l",  timezone] })
+	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zip","-l",  timezone]
         # synchronize hw clock to system clock
-	ConfigAgent::Hwclock.execute({ "exec_args" => [" --hctosys", hwclock]})
+	ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock"," --hctosys", hwclock]
         if hwclock == "--localtime"
-          ConfigAgent::Mkinitrd.execute({ "exec_args" => [] })
+          ConfigAgent::ScriptAgent.new.run ["/sbin/mkinitrd"]
         end
       end
 
       return ret
-    rescue DbusClients::InsufficientPermission => e
-      @error	= "User has no permission for action '#{e.permission}'."
-      return nil
     end
 
 
@@ -119,13 +113,7 @@ module Glove
 
     def self.read_sysconfig
       # read config files
-      begin
-        sysconfig	= ConfigAgent::Clock.read({})
-      rescue DbusClients::InsufficientPermission => e
-        @error	= "User has no permission for action '#{e.permission}'."
-        return nil
-     end
-      return sysconfig
+      ConfigAgent::Clock.new.read({})
     end
 
     # read all the timezones splitted into regions defined by YaST, also read timezone labels
