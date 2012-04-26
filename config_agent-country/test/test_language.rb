@@ -16,11 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "file/language"
+require "config_agent/language"
 
 class TestLanguage < Test::Unit::TestCase
   def setup
@@ -30,7 +30,7 @@ class TestLanguage < Test::Unit::TestCase
   end
 
   def test_reading
-    file = Language.new
+    file = ConfigAgent::Language.new
     sysconfig_language = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
     assert_equal "cs_CZ.UTF-8", sysconfig_language["RC_LANG"]
     assert_equal "", sysconfig_language["INSTALLED_LANGUAGES"]
@@ -38,7 +38,7 @@ class TestLanguage < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = Language.new
+    file = ConfigAgent::Language.new
     params        = {
         "_aug_internal"		=> Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
         "ROOT_USES_LANG"	=> "yes",
@@ -51,12 +51,12 @@ class TestLanguage < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/language data2/etc/sysconfig/language -> change value of RC_LANG
   def test_overwrite
-    file = Language.new
+    file = ConfigAgent::Language.new
     params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     assert_equal "cs_CZ.UTF-8", params["RC_LANG"]
     assert_equal "", params["INSTALLED_LANGUAGES"]
 
-    file2 = Language.new
+    file2 = ConfigAgent::Language.new
     params["_aug_internal"]        = Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     params["RC_LANG"]        	= "en_US.UTF-8"
     params["INSTALLED_LANGUAGES"]        = "cs_CZ,en_US"
@@ -64,8 +64,6 @@ class TestLanguage < Test::Unit::TestCase
     ret = file2.write params
     assert_equal nil, ret["message"]
   end
-
-
 end
 
 Test::Unit::UI::Console::TestRunner.run(TestLanguage)

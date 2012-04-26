@@ -16,19 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
-require "rubygems"
-require "script/hwclock"
+require 'config_agent/sysconfig'
 
-class TestHwclock < Test::Unit::TestCase
-  def setup
-    @data_dir = File.join(File.dirname(__FILE__),"data")
-  end
-
-  def test_reading
+module ConfigAgent
+  class Clock < ConfigAgent::Sysconfig
+    def initialize params={}
+      super "/etc/sysconfig/clock",params
+    end
   end
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestHwclock)
