@@ -16,18 +16,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent_service/script_service'
+require 'config_agent/script_agent'
 
-class Setxkbmap < ConfigAgentService::ScriptService
+module ConfigAgent
+  class Setxkbmap < ConfigAgentService::ScriptAgent
 
-  def execute(params)
-    old_display         = ENV["DISPLAY"]
-    ENV["DISPLAY"]      = params["DISPLAY"] if params["DISPLAY"]
+    def execute(params)
+      old_display         = ENV["DISPLAY"]
+      ENV["DISPLAY"]      = params["DISPLAY"] if params["DISPLAY"]
 
-    ret = run ["/usr/bin/setxkbmap"] + (params["exec_args"] || [])
-    log.warn "setxkbmap output: #{ret.inspect}" unless ret["exit"] == 0
-    return ret
-  ensure
-    ENV["DISPLAY"] = old_display
+      ret = run ["/usr/bin/setxkbmap"] + (params["exec_args"] || [])
+      log.warn "setxkbmap output: #{ret.inspect}" unless ret["exit"] == 0
+      return ret
+    ensure
+      ENV["DISPLAY"] = old_display
+    end
   end
 end

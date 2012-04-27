@@ -16,12 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent_service/script_service'
+require 'config_agent/sysconfig'
 
-class Hwclock < ConfigAgentService::ScriptService
-
-  def execute(params)
-    run ["/sbin/hwclock"] + (params["exec_args"] || [])
+module ConfigAgent
+  class Keyboard < ConfigAgent::Sysconfig
+    def initialize params={}
+      super "/etc/sysconfig/keyboard",params
+    end
   end
-
 end

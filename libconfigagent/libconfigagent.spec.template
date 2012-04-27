@@ -24,6 +24,7 @@ Source1:        libconfigagent-rpmlintrc
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging_rake_tasks
+Requires:       augeas-lenses
 Recommends:     rubygem-ruby-dbus
 
 # This is for Hudson (build service) to setup the build env correctly

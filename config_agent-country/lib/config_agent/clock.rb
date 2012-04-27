@@ -16,14 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent_service/script_service'
+require 'config_agent/sysconfig'
 
-class Mkinitrd < ConfigAgentService::ScriptService
-
-  def execute(params)
-    ret = run ["/sbin/mkinitrd"] + (params["exec_args"] || [])
-    log.info "mkinitrd output: #{ret.inspect}"
-    return ret
+module ConfigAgent
+  class Clock < ConfigAgent::Sysconfig
+    def initialize params={}
+      super "/etc/sysconfig/clock",params
+    end
   end
-
 end

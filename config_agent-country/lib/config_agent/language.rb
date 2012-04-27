@@ -16,12 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'dbus_clients/script_client'
+require 'config_agent/sysconfig'
 
 module ConfigAgent
-  class Loadkeys < DbusClients::ScriptClient
-
-    # identification of relevant DBUS service
-    agent_id "script.loadkeys"
+  class Language < ConfigAgent::Sysconfig
+    def initialize params={}
+      super "/etc/sysconfig/language",params
+    end
   end
 end

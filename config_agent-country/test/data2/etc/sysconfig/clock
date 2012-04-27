@@ -1,4 +1,20 @@
-DEFAULT_TIMEZONE="US/Eastern"
-TIMEZONE="US/Eastern"
-HWCLOCK="--localtime"
-SYSTOHC="yes"
+DEFAULT_TIMEZONE=US/Eastern
+TIMEZONE=US/Eastern
+HWCLOCK=--localtime
+SYSTOHC=yes
+# # Path:		System/Environment/Clock
+# # Description:		Information about your timezone and time
+# # Type:		string(-u,--utc,--localtime)
+# # ServiceRestart:	boot.clock
+# # Command:		/sbin/refresh_initrd
+# Set to -u if your system clock is set to UTC, and to --localtime
+# # ServiceRestart:	boot.clock
+# # Description: Write back system time to the hardware clock
+# # Type:		yesno
+# # Default:		yes
+# much more inaccurate than system clock.  Set to no if
+# clock at reboot or shutdown. Usefull if hardware clock is
+# # Type:		string(Europe/Berlin,Europe/London,Europe/Paris)
+# this manually by calling zic -l.
+# If set to no the hardware clock adjust feature is also
+# to the contents of the /etc/localtime file and is for internal

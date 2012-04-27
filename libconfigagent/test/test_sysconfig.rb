@@ -16,19 +16,29 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "script/hwclock"
+require "config_agent/sysconfig"
 
-class TestHwclock < Test::Unit::TestCase
-  def setup
-    @data_dir = File.join(File.dirname(__FILE__),"data")
+class TestSysconfig < Test::Unit::TestCase
+
+TEST_QUOTING_MAP = {
+  "string" => "string",
+  "\"double_quote\"" => "double_quote",
+  "'single quote'" => "single quote",
+  "quote' 'in\" \"middle" => "quote in middle",
+  "\"escaping double \\\" \\\n \'\"" => "escaping double \" \n '",
+  "escaping normal \\a\\b\\\" \\c\\d\\n \\'" => "escaping normal ab\" cdn '"
+}
+  def test_unquoting
+    agent = ConfigAgent::Sysconfig.new "/dummy"
+    TEST_QUOTING_MAP.each do |test,result|
+      assert_equal result,agent.send(:unpack,test)
+    end
   end
 
-  def test_reading
-  end
 end
 
-Test::Unit::UI::Console::TestRunner.run(TestHwclock)
+Test::Unit::UI::Console::TestRunner.run(TestSysconfig)
