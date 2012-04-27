@@ -99,6 +99,9 @@ private
       # Lets do it iterative, so when something not comform adapt it
       # we use state machine for such task
       state = :unquote
+      dquote_escapes = ['\\',"\n",'$','`','"'];
+      nquote_escapes = ['\\',"\n",'$','`','"', '\''];
+      escape_set = nil;
       result = ''
       1.upto(string.size) do |char_pos_p|
         char = string[char_pos_p-1]
@@ -108,6 +111,9 @@ private
             state = :single_quote
           elsif char == '"'
             state = :double_quote
+          elsif char == '\\'
+            state = :escape
+            escape_set = nquote_escapes
           else
             result << char
           end
@@ -122,11 +128,12 @@ private
             state = :unquote
           elsif char == '\\'
             state = :escape
+            escape_set = dquote_escapes
           else
             result << char
           end
         when :escape
-          if ['\\',"\n",'$','`','"'].include? char
+          if escape_set.include? char
             result << char
           else #not special escape
             result << '\\' << char
