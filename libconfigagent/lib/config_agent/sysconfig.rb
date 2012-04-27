@@ -153,7 +153,11 @@ module ConfigAgent
         # cannot process escaped space.
         #
         # in fact following simple substitution should be enough
-        result = "\"#{string.gsub(/(["])/n, "\\\\\\1")}\""
+        if string.match( /[ ]/) != nil
+          result = "\"#{string.gsub(/\\\"/n, "\"").gsub(/(["])/n, "\\\\\\1")}\"" 
+        else
+          result = string
+        end        
         return result
       end
 
