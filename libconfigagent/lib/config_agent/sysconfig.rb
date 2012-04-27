@@ -66,7 +66,7 @@ module ConfigAgent
 
           params.each do |key, value|
               next if key.start_with? "_"   # skip internal keys
-              aug.set("/files#{@file_path}/#{key}", value) #shell escape here???
+              aug.set("/files#{@file_path}/#{key}", pack( value))
           end
 
           unless aug.save
@@ -145,6 +145,15 @@ module ConfigAgent
           end
         end
         raise "invalid string value" if state != :unquote
+        return result
+      end
+
+      def pack( string)
+        # cannot use Shellwords::escape - augeas (current version of Shellvars.lns) 
+        # cannot process escaped space.
+        #
+        # in fact following simple substitution should be enough
+        result = "\"#{string.gsub(/(["])/n, "\\\\\\1")}\""
         return result
       end
 
