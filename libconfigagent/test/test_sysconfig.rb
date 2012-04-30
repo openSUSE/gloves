@@ -35,6 +35,7 @@ TEST_UNQUOTING_MAP = {
 
 TEST_QUOTING_MAP = {
   "string" => "string",
+  "Joey's" => "Joey\\'s",
   "string1 string2" => "\"string1 string2\"",
   "string with \"quoted\" value" => "\"string with \\\"quoted\\\" value\"",
   "string with \\\"" => "\"string with \\\"\""

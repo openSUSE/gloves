@@ -18,6 +18,7 @@
 
 require 'config_agent/file_agent' # Gloves only
 require 'augeas'
+require 'shellwords'
 
 module ConfigAgent
   class Sysconfig <  ConfigAgent::FileAgent
@@ -156,7 +157,7 @@ module ConfigAgent
         if string.match( /[ ]/) != nil
           result = "\"#{string.gsub(/\\\"/n, "\"").gsub(/(["])/n, "\\\\\\1")}\"" 
         else
-          result = string
+          result = Shellwords.escape( string)
         end        
         return result
       end
