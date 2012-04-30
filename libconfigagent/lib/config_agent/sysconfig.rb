@@ -18,6 +18,7 @@
 
 require 'config_agent/file_agent' # Gloves only
 require 'augeas'
+require 'shellwords'
 
 module ConfigAgent
   class Sysconfig <  ConfigAgent::FileAgent
@@ -66,7 +67,7 @@ module ConfigAgent
 
           params.each do |key, value|
               next if key.start_with? "_"   # skip internal keys
-              aug.set("/files#{@file_path}/#{key}", value) #shell escape here???
+              aug.set("/files#{@file_path}/#{key}", pack( value))
           end
 
           unless aug.save
@@ -145,6 +146,19 @@ module ConfigAgent
           end
         end
         raise "invalid string value" if state != :unquote
+        return result
+      end
+
+      def pack( string)
+        # cannot use Shellwords::escape - augeas (current version of Shellvars.lns) 
+        # cannot process escaped space.
+        #
+        # in fact following simple substitution should be enough
+        if string.match( /[ ]/) != nil
+          result = "\"#{string.gsub(/\\\"/n, "\"").gsub(/(["])/n, "\\\\\\1")}\"" 
+        else
+          result = Shellwords.escape( string)
+        end        
         return result
       end
 
