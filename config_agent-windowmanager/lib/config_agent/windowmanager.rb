@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 #--
 # Config Agents Framework
 #
@@ -18,10 +16,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$stdout.reopen("/var/log/systemagent.stdout")
-$stderr.reopen("/var/log/systemagent.stderr")
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','..',"services")
-require "rubygems"
-require "config_agent_service/windowmanager"
-require "dbus_services/service_runner"
-DbusServices::ServiceRunner::run(ConfigAgentService::Windowmanager)
+require 'config_agent/sysconfig'
+require 'augeas'
+
+module ConfigAgent
+  class Windowmanager < ConfigAgent::Sysconfig
+    def initialize params={}
+      super "/etc/sysconfig/windowmanager",params
+    end
+  end
+end
