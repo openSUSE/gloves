@@ -16,12 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
 require "augeas"
-require "file/passwd"
+require "config_agent/passwd"
 
 class TestPasswd < Test::Unit::TestCase
   def setup
@@ -29,21 +29,21 @@ class TestPasswd < Test::Unit::TestCase
   end
 
   def test_reading
-    file = Passwd.new
+    file = ConfigAgent::Passwd.new
     ret = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     assert_equal "25", ret["at"]["gid"]
     assert_equal "hh", ret["hh"]["name"]
   end
 
   def test_read_one
-    file = Passwd.new
+    file = ConfigAgent::Passwd.new
     ret = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD), "id" => "hh"
     assert_equal "/home/hh", ret["home"]
     assert_equal "hh", ret["name"]
   end
 
   def test_read_usernames
-    file = Passwd.new
+    file = ConfigAgent::Passwd.new
     ret = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD), "only" => "login"
     assert_equal 6, ret["result"].size
     assert_equal ["at", "bin", "daemon", "root", "hh", "@nisdefault"], ret["result"]

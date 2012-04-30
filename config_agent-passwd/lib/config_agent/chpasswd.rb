@@ -16,12 +16,30 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'dbus_clients/script_client'
+require 'config_agent/script_agent'
+require 'tempfile'
 
 module ConfigAgent
-  class Userdel < DbusClients::ScriptClient
+  class Chpasswd < ConfigAgent::ScriptAgent
 
-    # identification of relevant DBUS service
-    agent_id "script.userdel"
+    def execute(params)
+      ret = {}
+
+      config = params["config_file"] || [params] #allow one hash with user+pass or array of values
+      correct_data = config.all? {|i| !(i["user"]).empty? && !(i["pw"]).empty? }
+      return ret unless correct_data #TODO exception
+
+      f = Tempfile.new('pwchange','/root')
+      begin
+        config.each { |i| f.puts("#{i["user"]}:#{i["pw"]}") }
+        ret = run(["/usr/sbin/chpasswd"]+(params["exec_args"]||[])+[f.path])
+      ensure
+        f.close
+        f.unlink
+      end
+
+      return ret
+    end
+
   end
 end
