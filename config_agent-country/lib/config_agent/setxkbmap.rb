@@ -19,7 +19,7 @@
 require 'config_agent/script_agent'
 
 module ConfigAgent
-  class Setxkbmap < ConfigAgentService::ScriptAgent
+  class Setxkbmap < ConfigAgent::ScriptAgent
 
     def execute(params)
       old_display         = ENV["DISPLAY"]

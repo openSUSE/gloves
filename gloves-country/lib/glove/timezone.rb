@@ -97,7 +97,7 @@ module Glove
           timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
         end
 
-	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zip","-l",  timezone]
+	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zic","-l",  timezone]
         # synchronize hw clock to system clock
 	ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock"," --hctosys", hwclock]
         if hwclock == "--localtime"
