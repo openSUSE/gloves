@@ -56,7 +56,7 @@ service_script_name = agent_class_file+"_service.rb"
 
 GENERATED_FILES = {
   "polkit_policy.erb" => File.join("policy-definitions","org.opensuse.config_agent.#{type}.#{identifier}.policy"),
-  "config_agent_service.erb" => File.join("service-implementation",type.to_s,agent_class_file+".rb"),
+  "config_agent.erb" => File.join("service-implementation",type.to_s,agent_class_file+".rb"),
   "config_agent_client.erb" => File.join("generated-interface","config_agent",agent_class_file+".rb"),
   "agent_test.erb" => File.join("test","test_#{agent_class_file}.rb"),
   "Rakefile.erb" => "Rakefile"

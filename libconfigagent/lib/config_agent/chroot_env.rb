@@ -1,6 +1,6 @@
 require 'yaml'
 
-require "config_agent_service/backend_exception"
+require "config_agent/backend_exception"
 
 module ConfigAgent
   # Provides chrooting ability
