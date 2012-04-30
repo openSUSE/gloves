@@ -16,11 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "file/ssh_config"
+require "config_agent/ssh_config"
 
 class TestSshConfig < Test::Unit::TestCase
   def setup
@@ -29,7 +29,7 @@ class TestSshConfig < Test::Unit::TestCase
   end
 
   def test_reading
-    file = SshConfig.new
+    file = ConfigAgent::SshConfig.new
     ret = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
     hosts	= ret["Host"]
     assert_equal ["LC_IDENTIFICATION", "LC_ALL"], hosts[0]["SendEnv[1]"]
@@ -41,7 +41,7 @@ class TestSshConfig < Test::Unit::TestCase
   # change the values of GSSAPI keys of suse.cz section
   def test_overwrite
 
-    file2 = SshConfig.new
+    file2 = ConfigAgent::SshConfig.new
     params	= {
 	"_aug_internal"	=> Augeas::open(@data2_dir,File.join(File.dirname(__FILE__),'..',"lens"), Augeas::NO_MODL_AUTOLOAD),
 	"Host"	=> [

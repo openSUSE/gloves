@@ -25,19 +25,15 @@ task :install, :prefix, :ruby_path do |t,args|
   args.with_defaults :prefix => '/',:ruby_path => Dir["/usr/lib*/ruby/vendor_ruby/1.*/"][0]
   sh "mkdir -p #{args[:prefix]}usr/share/augeas/lenses/"
   sh "cp -r lens/* #{args[:prefix]}usr/share/augeas/lenses/"
-  sh "mkdir -p #{args[:prefix]}usr/share/config_agents/"
-  sh "cp -r services #{args[:prefix]}usr/share/config_agents/"
-  sh "mkdir -p #{args[:prefix]}usr/share/polkit-1/actions/"
-  sh "cp infrastructure/polkit-definitions/* #{args[:prefix]}usr/share/polkit-1/actions/"
-  sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/" if Dir["#{args[:prefix]}#{args[:ruby_path]}/"].empty?
-  sh "cd #{args[:prefix]}#{args[:ruby_path]}/; mkdir -p config_agent; cd -"
-  sh "cp -r infrastructure/clients/config_agent #{args[:prefix]}usr/lib*/ruby/vendor_ruby/1.*/"
+  sh "mkdir -p #{args[:prefix]}#{args[:ruby_path]}/"
+  sh "cp -r lib/config_agent #{args[:prefix]}#{args[:ruby_path]}/"
 end
 
 Packaging::Configuration.run do |conf|
   conf.obs_project = "YaST:Head:YaST++"
   conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
   conf.package_name = "config_agent-kerberos"
+  conf.skip_license_check << /test\/data/ << /\.aug$/
 end
 
 Rake::TestTask.new do |t|

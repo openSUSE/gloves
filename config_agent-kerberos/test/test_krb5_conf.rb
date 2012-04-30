@@ -16,11 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "file/krb5_conf"
+require "config_agent/krb5_conf"
 
 class TestKrb5Conf < Test::Unit::TestCase
   def setup
@@ -30,7 +30,7 @@ class TestKrb5Conf < Test::Unit::TestCase
   end
 
   def test_reading
-    file = Krb5Conf.new
+    file = ConfigAgent::Krb5Conf.new
     ret = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     assert_equal "example.cz", ret["default_domain"]
     assert_equal "kdc.example.cz", ret["kdc"]
@@ -40,7 +40,7 @@ class TestKrb5Conf < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = Krb5Conf.new
+    file = ConfigAgent::Krb5Conf.new
     params	= {
 	"_aug_internal" => Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
 	"default_domain"	=> "example.de",
@@ -56,11 +56,11 @@ class TestKrb5Conf < Test::Unit::TestCase
 
   # diff data/etc/krb5.conf data2/etc/krb5.conf -> change value of kdc, remove ticket_lifetime
   def test_overwrite
-    file = Krb5Conf.new
+    file = ConfigAgent::Krb5Conf.new
     params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     assert_equal "1d", params["ticket_lifetime"]
 
-    file2 = Krb5Conf.new
+    file2 = ConfigAgent::Krb5Conf.new
     params["_aug_internal"]	= Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
     params["kdc"]		= "kdc.example.de"
     params["ticket_lifetime"]	= ""
