@@ -16,11 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
+require "tmpdir"
 require "rubygems"
-require "file/susefirewall2"
+require "config_agent/susefirewall2"
 
 class TestSusefirewall2 < Test::Unit::TestCase
   def setup
@@ -28,20 +29,23 @@ class TestSusefirewall2 < Test::Unit::TestCase
   end
 
   def test_read
-    file = Susefirewall2.new
+    file = ConfigAgent::Susefirewall2.new
     firewall = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
     assert_equal "zone:ext", firewall["FW_MASQ_DEV"]
   end
 
   def test_write
-    file = Susefirewall2.new
-    params = {
-      "_aug_internal" => Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
-      "FW_MASQ_DEV" => "zone:int",
-    }
-    ret = file.write params
-    assert_equal true, ret["success"], ret.inspect
-    assert_equal nil,  ret["message"], ret.inspect
+    Dir.mktmpdir do |tmp_dir|
+      FileUtils.mkdir_p "#{tmp_dir}/etc/sysconfig/"
+      file = ConfigAgent::Susefirewall2.new
+      params = {
+        "_aug_internal" => Augeas::open(tmp_dir,nil, Augeas::NO_MODL_AUTOLOAD),
+        "FW_MASQ_DEV" => "zone:int",
+      }
+      ret = file.write params
+      assert_equal true, ret["success"], ret.inspect
+      assert_equal nil,  ret["message"], ret.inspect
+    end
   end
 end
 

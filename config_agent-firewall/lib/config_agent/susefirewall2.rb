@@ -16,12 +16,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'dbus_clients/file_client'
+require 'config_agent/sysconfig'
+require 'augeas'
 
 module ConfigAgent
-  class Susefirewall2 < DbusClients::FileClient
+  class Susefirewall2 < ConfigAgent::Sysconfig
 
-    # identification of relevant DBUS service
-    agent_id "file.susefirewall2"
+    FIREWALL_FILE = "/etc/sysconfig/SuSEfirewall2"
+    def initialize params = {}
+      super FIREWALL_FILE,params
+    end
+
   end
 end
