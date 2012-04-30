@@ -24,7 +24,7 @@ require "config_agent/sysconfig"
 
 class TestSysconfig < Test::Unit::TestCase
 
-TEST_QUOTING_MAP = {
+TEST_UNQUOTING_MAP = {
   "string" => "string",
   "\"double_quote\"" => "double_quote",
   "'single quote'" => "single quote",
@@ -32,10 +32,22 @@ TEST_QUOTING_MAP = {
   "\"escaping double \\\" \\\n \'\"" => "escaping double \" \n '",
   "escaping normal \\a\\b\\\" \\c\\d\\n \\'" => "escaping normal ab\" cdn '"
 }
+
+TEST_QUOTING_MAP = {
+  "string" => "string",
+  "Joey's" => "Joey\\'s",
+  "string1 string2" => "\"string1 string2\"",
+  "string with \"quoted\" value" => "\"string with \\\"quoted\\\" value\"",
+  "string with \\\"" => "\"string with \\\"\""
+}
+
   def test_unquoting
     agent = ConfigAgent::Sysconfig.new "/dummy"
-    TEST_QUOTING_MAP.each do |test,result|
+    TEST_UNQUOTING_MAP.each do |test,result|
       assert_equal result,agent.send(:unpack,test)
+    end
+    TEST_QUOTING_MAP.each do |test,result|
+      assert_equal result,agent.send(:pack,test)
     end
   end
 
