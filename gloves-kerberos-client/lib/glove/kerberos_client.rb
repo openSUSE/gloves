@@ -18,9 +18,11 @@
 
 $LOAD_PATH << File.dirname(__FILE__)
 
+require "rubygems"
+
 require 'config_agent/krb5_conf'
 require 'config_agent/ssh_config'
-require 'config_agent/pam_config'
+require 'config_agent/script_agent'
 
 require 'socket'
 
@@ -36,7 +38,7 @@ module Glove
     def self.read(params)
       # read config files
       begin
-        krb5_conf	= ConfigAgent::Krb5Conf.read({})
+        krb5_conf	= ConfigAgent::Krb5Conf.new.read({})
         pam_krb5	= pam_query("krb5")
         sssd	= pam_query("sss")
 
@@ -71,7 +73,7 @@ module Glove
       ignore_unknown	= krb5_conf.delete "ignore_unknown"
 
       unless krb5_conf.nil? && krb5_conf.empty?
-        ret	= ConfigAgent::Krb5Conf.write(krb5_conf)
+        ret	= ConfigAgent::Krb5Conf.new.write(krb5_conf)
         return ret unless ret["success"]
       end
 
@@ -126,21 +128,21 @@ module Glove
 
   private
     def self.pam_query(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_args" => ["-q", "--" + mod] })["stdout"] || ""
+      return ConfigAgent::ScriptAgent.new.run(["/usr/sbin/pam-config","-q", "--" + mod])["stdout"] || ""
     end
 
     def self.pam_add(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_args" => ["-a", "--" + mod] })
+      return ConfigAgent::ScriptAgent.new.run(["/usr/sbin/pam-config","-a", "--" + mod])
     end
 
     def self.pam_delete(mod)
-      return ConfigAgent::PamConfig.execute({ "exec_args" => ["-d",  "--" + mod] })
+      return ConfigAgent::ScriptAgent.new.run(["/usr/sbin/pam-config","-d", "--" + mod])
     end
 
     # Read state of ssh support from /etc/ssh/ssh_config
     def self.read_ssh_support
       hostname	= Socket.gethostname
-      ssh_config	= ConfigAgent::SshConfig.read({})
+      ssh_config	= ConfigAgent::SshConfig.new.read({})
 
       ssh_support	= false
       ssh_config["Host"].each do |host|
@@ -170,7 +172,7 @@ module Glove
 	    }
         ]
       }
-      ret	= ConfigAgent::SshConfig.write(ssh_config)
+      ret	= ConfigAgent::SshConfig.new.write(ssh_config)
       return ret
     end
 
