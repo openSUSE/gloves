@@ -1,0 +1,5 @@
+{
+    import "Glove::Timezone";
+
+    y2internal ("read: %1", Glove::Timezone::read ($[]));
+}
