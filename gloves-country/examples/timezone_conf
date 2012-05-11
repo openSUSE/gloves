@@ -18,7 +18,6 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
-require "rubygems"
 require "glove/timezone"
 require "dbus_clients/backend_exception"
 begin
