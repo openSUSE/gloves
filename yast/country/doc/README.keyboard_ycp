@@ -1,0 +1,30 @@
+> > 
+> > xkbset "" xfree86 complete complete en_US(pc104)+de(nodeadkeys) pc(pc104)
+
+Zur Erklaehrung der einzelnen Parameter:
+-----------------------------------------
+
+1) steht fuer die keymap und ist in den allermeisten Faellen
+   xfree86 oder einfach "" 
+
+2) steht fuer die keycodes und ist im normalfall "xfree86"
+   bei mac`s "macintosh"
+
+3) steht fuer den compatibility mode, ist nur im Zusammenhang
+   mit xkb maps notwendig und eigentlich immer auf 
+   "complete" zu setzen
+
+4) steht fuer die zu unterstutzenden XKB typen (types)
+   hab auch noch nie etwas anderes als "complete" gesetzt
+
+5) steht fuer die Tastatur Symbolic. Standard ist 
+   en_US(pc101)
+
+6) steht fuer die Tastatur Geometry. Standard ist pc(pc101)
+   
+
+Fuer eine Macintosh 102 Tasten Tastatur habe ich folgende 
+Paramter ( deutsches Layout )
+
+
+ xkbset "" macintosh complete complete en_US(pc102)+de(nodeadkeys) pc(pc102)

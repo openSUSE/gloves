@@ -1,0 +1,61 @@
+/**
+ * tests for Keyboard.ycp autoyast functions
+ * Author:	jsuchome@suse.cz
+ * $Id: ReadExport.ycp 57028 2009-04-29 10:58:09Z lslezak $
+ */
+{
+    // testedfiles: Keyboard.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "keyboard" : $[
+		"YAST_KEYBOARD"	: "english-us,pc104",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "dir"		: [],
+	    "yast2"		: $[
+		"english-us"	: [
+		    "English (US)",
+		    $[
+			"pc104": $[
+				"ncurses": "us.map.gz",
+			],
+		    ]
+		],
+	    ],
+	    "tmpdir"		: "/tmp",
+	],
+	"probe"	: $[
+	    "architecture"	: "i386"
+	],
+    ];
+
+    map E	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    import "Mode";
+
+    // let's simulate Mode::config
+    Mode::SetMode ("autoinst_config");
+
+    Testsuite::Init ([READ,$[],E], nil);
+
+    import "Keyboard";
+
+    Testsuite::Test (``(Keyboard::Restore ()), [READ,$[],E], nil);
+
+    Testsuite::Test (``(Keyboard::Read ()), [], nil);
+
+    Testsuite::Test (``(Keyboard::Export ()), [], nil);
+
+    Testsuite::Test (``(Keyboard::Summary ()), [], nil);
+
+    Testsuite::Test (``(Keyboard::Modified ()), [], nil);
+}

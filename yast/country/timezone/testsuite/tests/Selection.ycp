@@ -1,0 +1,65 @@
+/**
+ * tests for Timezone::Selection and Timezone::Set functions
+ * Author: jsuchome@suse.cz
+ * $Id: Selection.ycp 27936 2006-02-13 20:01:14Z olh $
+ */
+{
+
+    // testedfiles: Timezone.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    TESTSUITE_INIT([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    map R = $[
+	"target" : $[
+	    "yast2"		: [
+	    $[
+		"name"		: "Europe",
+		"entries"	: $[
+		    "Europe/Berlin" : "Germany",
+		    "Europe/Prague" : "Czech Republic",
+		]
+	    ],
+	    $[
+		"name"		: "USA",
+		"entries"	: $[
+		    "US/Mountain" : "Mountain",
+		]
+	    ]
+	    ]
+	],
+    ];
+
+    TEST (``(Timezone::Selection (1)), [R,$[],$[]], []);
+
+    integer sel	= (integer)
+	TEST (``(Timezone::Set ("Europe/Prague", false)), [R,$[],$[]], []);
+
+    TEST (``(Timezone::Selection (sel)), [R,$[],$[]], []);
+
+    sel	= (integer)
+	TEST (``(Timezone::Set ("US/Pacific", false)), [R,$[],$[]], []);
+
+    TEST (``(Timezone::Selection (sel)), [R,$[],$[]], []);
+}

@@ -1,0 +1,131 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:		language_proposal.ycp
+ *
+ * $Id: language_proposal.ycp 67757 2012-03-29 12:24:42Z jsuchome $
+ *
+ * Author:		Klaus Kaempf <kkaempf@suse.de>
+ *
+ * Purpose:		Proposal function dispatcher - language.
+ *
+ *			See also file proposal-API.txt for details.
+ */
+{
+    textdomain "country";
+
+    import "Language";
+    import "Wizard";
+    import "Encoding";
+
+    string func  = (string) WFM::Args(0);
+    map    param = (map) WFM::Args(1);
+    map    ret   = $[];
+
+    // Memorize current language to be able to detect a change.
+    //
+    string language_on_entry = Language::language;
+    y2milestone("language_on_entry - 1: %1", language_on_entry );
+
+    if ( func == "MakeProposal" )
+    {
+	boolean force_reset      = param["force_reset"     ]:false;
+	boolean language_changed = param["language_changed"]:false;
+
+	import "Installation";
+	import "Misc";
+	import "Mode";
+
+	if (Mode::update () &&
+	    (Language::languages == "" || Language::languages == language_on_entry) &&
+	    !force_reset && !Language::Modified ())
+	{
+	    Language::languages = Misc::CustomSysconfigRead ("INSTALLED_LANGUAGES", "",
+		Installation::destdir + "/etc/sysconfig/language");
+	    y2milestone ("languages got from target system: %1", Language::languages);
+	}
+
+	// Make proposal and fill return map
+	list<string> prop =
+	    Language::MakeProposal (force_reset, language_changed);
+
+	y2milestone ("language_on_entry:%1 lang:%2, languages: %3",
+	    language_on_entry, Language::language, Language::languages);
+
+	if (force_reset && language_on_entry != Language::language)
+	{
+	    // Set it in YaST2
+	    Language::WfmSetLanguage();
+	}
+
+	ret = $[
+	      "raw_proposal"    : prop,
+	      "language_changed": (language_on_entry != Language::language )
+	];
+    }
+    else if ( func == "AskUser" )
+    {
+
+	Wizard::OpenAcceptDialog();
+	map args = $[
+	    "enable_back"	: true,
+	    "enable_next"	: param["has_next"]:false,
+	];
+	symbol result	= (symbol)WFM::CallFunction ("select_language", [args]);
+
+	Wizard::CloseDialog();
+
+	if ( result == `back )
+	{
+	    y2milestone("back to language_on_entry: %1", language_on_entry );
+
+	    Language::Set( language_on_entry );
+	}
+
+	// Fill return map
+
+	ret =
+	    $[
+	      "workflow_sequence" : result,
+	      "language_changed": (language_on_entry != Language::language)
+	    ];
+
+	y2debug( "Returning from proposal_language::AskUser() with: %1", ret );
+
+    }
+    else if ( func == "Description" )
+    {
+	// Fill return map.
+	//
+	// Static values do just nicely here, no need to call a function.
+
+	ret =
+	    $[
+	      // label text
+	      "rich_text_title"	:	_("Language"),
+	      // menue label text
+	      "menu_title"	:	_("&Language"),
+	      "id"		:	"language_stuff"
+	    ];
+    }
+
+    return ret;
+}

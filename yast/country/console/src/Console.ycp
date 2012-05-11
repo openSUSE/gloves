@@ -1,0 +1,243 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:
+ *	Console.ycp
+ *
+ * Module:
+ *	Console
+ *
+ * Depends:
+ *	Language
+ *
+ * Summary:
+ *	provide console specific stuff (esp. font and encoding)
+ *<BR>
+ * sysconfig /etc/sysconfig/console:<BR>
+ *<UL>
+ *<LI>	CONSOLE_FONT		string	console font</LI>
+ *<LI>	CONSOLE_SCREENMAP	string	console screenmap</LI>
+ *<LI>	CONSOLE_UNICODEMAP	string	console unicode map</LI>
+ *<LI>	CONSOLE_MAGIC		string	console magic control sequence</LI>
+ *<LI>	CONSOLE_ENCODING	string	console encoding</LI>
+ *</UL>
+ *
+ * $Id: Console.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ *
+ * Author:
+ *	Klaus Kaempf <kkaempf@suse.de>
+ *
+ */
+
+{
+    module "Console";
+
+    import "Kernel";
+    import "Mode";
+    import "Language";
+    import "Linuxrc";
+    import "Encoding";
+    import "Stage";
+
+    // current base language, used in Check
+    string language	= "en_US";
+
+    string font		= "lat1-16.psfu";
+    string unicodeMap	= "";
+    string screenMap	= "none";
+    string magic	= "(B";
+
+    // non-empty if serial console (written /etc/inittab)
+    // -> S0:12345:respawn:/sbin/agetty -L 9600<n8> ttyS0
+    // something like "ttyS0,9600" from /etc/install.inf
+    string serial	= "";
+
+    /**
+     * activate a language specific console font
+     *
+     * @param	string	language	ISO code of language
+     * @return	string	encoding	encoding for console i/o
+     */
+
+    global define string SelectFont (string lang)
+    ``{
+
+	list consolefont = [];
+
+	map consolefonts = (map)WFM::Read (.local.yast2, "consolefonts.ycp");
+
+	string fqlanguage = Language::GetLocaleString(lang);
+	consolefont = consolefonts[fqlanguage]:[];
+
+	if( size(consolefont)==0 )
+	    {
+	    consolefont = consolefonts[lang]:[];
+	    }
+
+	if ((size (consolefont) == 0) && (size (lang) > 2))
+	{
+	    consolefont = consolefonts[substring(lang, 0, 2)]:[];
+	}
+
+	if (size (consolefont) > 0)
+	{
+	    language	= lang;
+
+	    font	= consolefont[0]:"";
+	    unicodeMap  = consolefont[1]:"";
+	    screenMap	= consolefont[2]:"";
+	    magic	= consolefont[3]:"";
+
+	    string currentLanguage = WFM::GetLanguage ();
+
+	    // Eventually must switch languages to get correct encoding
+	    if (currentLanguage != language)
+	    {
+		string currentEncoding = WFM::GetEncoding();	// save encoding
+
+		Encoding::console = WFM::SetLanguage (language);// switch lang, get proposed encoding
+
+		WFM::SetLanguage (currentLanguage, currentEncoding);// reset as it was before
+	    }
+
+	    if (Linuxrc::braille ())
+	    {
+		SCR::Execute (.target.bash, "/usr/bin/setfont");
+	    }
+	    else if (!Mode::commandline ())
+	    {
+		UI::SetConsoleFont (magic, font, screenMap, unicodeMap, language);	
+	    }
+	}
+
+	y2milestone ("Language %1 -> Console encoding %2", language,
+	    Encoding::console);
+	return Encoding::console;
+    };
+
+    /**
+     * save data to system (rc.config agent)
+     */
+
+    global define void Save ()
+    ``{
+	SCR::Write (.sysconfig.console.CONSOLE_FONT,	   font);
+	SCR::Write (.sysconfig.console.CONSOLE_SCREENMAP,  screenMap);
+	SCR::Write (.sysconfig.console.CONSOLE_UNICODEMAP, unicodeMap);
+	SCR::Write (.sysconfig.console.CONSOLE_MAGIC,	   magic);
+
+	SCR::Write (.sysconfig.console.CONSOLE_ENCODING, WFM::GetEncoding() );
+	SCR::Write (.sysconfig.console.CONSOLE_ENCODING.comment, "\n# Encoding used for output of non-ascii characters.\n#\n");
+	SCR::Write (.sysconfig.console, nil);
+
+	if (serial != "")
+	{
+		/*
+		 * during a fresh install, provide the autoconsole feature
+		 * it detects wether the kernel console is VGA/framebuffer or serial
+		 * it also starts agetty with the correct speed (#41623)
+		 * fresh install, all is easy: just add the getty to /dev/console
+		 * upgrade: disable old entries for serial console
+		 */
+		 SCR::Execute (.target.bash,"sed -i '/^\\(hvc\\|hvsi\\|S[0-9]\\)/s@^.*@#&@' /etc/inittab");
+
+		 // find out if the baud rate is not present on command line (bnc#602743)
+		 integer rate	= 42;
+		 foreach (string part, splitstring (Kernel::GetCmdLine (), "\t "), {
+		    if (substring (part, 0, 11) == "console=tty" && issubstring (part, ","))
+		    {
+			string srate = splitstring (part, ",")[1]:"42";
+			rate = tointeger (srate); // "bbbbpnf" -> bbbb, where 'b' is number and 'p' character
+		    }
+		 });
+		 if (rate == nil) rate = 42;
+		 SCR::Execute (.target.bash, sformat ("grep -E '^cons:' /etc/inittab || /bin/echo 'cons:12345:respawn:/sbin/smart_agetty -L %1 console' >> /etc/inittab", rate));
+		 SCR::Execute (.target.bash,"grep -Ew ^console /etc/securetty || /bin/echo console >> /etc/securetty");
+	}
+    }
+
+    /**
+     * restore data to system (rc.config agent)
+     * returns encoding
+     */
+    global define string Restore ()
+    ``{
+	font	   = (string)SCR::Read (.sysconfig.console.CONSOLE_FONT);
+	screenMap  = (string)SCR::Read (.sysconfig.console.CONSOLE_SCREENMAP);
+	unicodeMap = (string)SCR::Read (.sysconfig.console.CONSOLE_UNICODEMAP);
+	magic	   = (string)SCR::Read (.sysconfig.console.CONSOLE_MAGIC);
+	language   = (string)SCR::Read (.sysconfig.language.RC_LANG);
+	y2milestone( "encoding %1", Encoding::console );
+	return Encoding::console;
+    }
+
+    /**
+     * initialize console settings
+     */
+    global define void Init () {
+
+	if (Linuxrc::braille ())
+	{
+	    SCR::Execute (.target.bash, "/usr/bin/setfont");
+	}
+	else
+	{
+	    UI::SetConsoleFont (magic, font, screenMap, unicodeMap, language);
+	}
+    }
+
+    /**
+     * Check current configuration
+     * This function should be called to check consistency with
+     * other modules (mentioned as Depends in the header)
+     * @return	0	if no change
+     * 		1	change due to dependency with other module
+     *		2	inconsistency detected
+     *
+     */
+
+    global define boolean Check ()
+    ``{
+	return true;
+    }
+
+    /**
+     * constructor
+     * does nothing in initial mode
+     * restores console configuration from /etc/sysconfig
+     * in normal mode
+     */
+
+    global define void Console ()
+    ``{
+	if (Stage::initial ())
+	{
+	    serial = Linuxrc::InstallInf ("Console");
+	    if (serial == nil) serial = "";
+	}
+	else
+	{
+	    Restore ();
+	}
+
+	return;
+    }
+}

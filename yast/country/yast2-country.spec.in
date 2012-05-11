@@ -1,0 +1,86 @@
+@HEADER-COMMENT@
+
+@HEADER@
+Group:  System/YaST
+License:        GPL-2.0
+#policy files for YaPI dbus interface
+Source1:        org.opensuse.yast.modules.yapi.time.policy
+Source2:        org.opensuse.yast.modules.yapi.language.policy
+BuildRequires:	perl-XML-Writer update-desktop-files yast2-devtools yast2-testsuite yast2 yast2-perl-bindings
+BuildRequires:  polkit-devel
+Requires:	yast2-trans-stats yast2-perl-bindings timezone yast2-packager
+# XVersion.ycp
+# Wizard::SetDesktopTitleAndIcon
+Requires:	yast2 >= 2.21.22
+# Pkg::SetPackageLocale, Pkg::GetTextLocale
+Requires:       yast2-pkg-bindings >= 2.15.3
+# IconPath support for MultiSelectionBox
+Requires:	yast2-core >= 2.16.28
+# new API of ntp-client_proposal.ycp
+Conflicts:	yast2-ntp-client < 2.18.0
+
+Requires:	yast2-country-data
+
+# API for system access
+BuildRequires:  gloves-ycp-bindings gloves-country
+BuildRequires:  yast2-ruby-bindings >= 0.3.9
+
+Requires:	gloves-ycp-bindings gloves-country gloves-sysconfig
+Requires:       yast2-ruby-bindings >= 0.3.9
+
+Summary:	YaST2 - Country Settings (Language, Keyboard, and Timezone)
+
+%description
+Country specific data and configuration modules (language, keyboard,
+timezone) for yast2.
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+# Policies
+mkdir -p $RPM_BUILD_ROOT/usr/share/polkit-1/actions
+install -m 0644 %SOURCE1 $RPM_BUILD_ROOT/usr/share/polkit-1/actions/
+install -m 0644 %SOURCE2 $RPM_BUILD_ROOT/usr/share/polkit-1/actions/
+
+@CLEAN@
+
+# common
+%files
+%defattr(-,root,root)
+%doc @docdir@
+%doc COPYING
+@moduledir@/Console.y*
+@moduledir@/Keyboard.y*
+@moduledir@/Timezone.y*
+%dir @moduledir@/YaPI
+@moduledir@/YaPI/TIME.pm
+@moduledir@/YaPI/LANGUAGE.pm
+@clientdir@/*.ycp
+@ydatadir@/*.ycp
+@yncludedir@/keyboard/
+@yncludedir@/timezone/
+@scrconfdir@/*.scr
+@schemadir@/autoyast/rnc/*.rnc
+@desktopdir@/yast-language.desktop
+@desktopdir@/timezone.desktop
+@desktopdir@/keyboard.desktop
+%dir /usr/share/polkit-1
+%dir /usr/share/polkit-1/actions
+%attr(644,root,root) %config /usr/share/polkit-1/actions/org.opensuse.yast.modules.yapi.*.policy
+
+%package data
+Summary:	YaST2 - Data files for Country settings
+Group:          System/YaST
+
+%description data
+Data files for yast2-country together with the most often used API
+functions (Language module)
+
+%files data
+%defattr(-,root,root)
+%dir @ydatadir@/languages
+@ydatadir@/languages/*.ycp
+@moduledir@/Language.y*

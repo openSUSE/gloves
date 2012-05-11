@@ -1,0 +1,5 @@
+Read	.target.yast2 "timezone_raw.ycp" [$["entries":$["Europe/Prague":"Czech Republic"], "name":"Europe"]]
+Return	nil
+Return	$["hwclock":"UTC", "timezone":"Europe/Prague"]
+Return	<ul><li>Current Time Zone: Europe / Czech Republic</li><li>Hardware Clock Set To UTC</li></ul>
+Return	false

@@ -1,0 +1,7 @@
+Return	$["hwclock":"UTC", "timezone":""]
+Return	false
+Read	.target.yast2 "timezone_raw.ycp" nil
+Return	true
+Return	true
+Return	$["hwclock":"UTC", "timezone":"Europe/Berlin"]
+Return	<ul><li>Current Time Zone:  / Europe/Berlin</li><li>Hardware Clock Set To UTC</li></ul>

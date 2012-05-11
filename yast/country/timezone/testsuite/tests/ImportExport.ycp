@@ -1,0 +1,47 @@
+/**
+ * tests for Timezone.ycp autoyast functions
+ * Author:	jsuchome@suse.cz
+ * $Id: ImportExport.ycp 32769 2006-09-08 09:29:15Z jsuchome $
+ */
+{
+    // testedfiles: Timezone.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"target" : $[
+	    "size"		: 1,
+	    "dir"		: [],
+	    "yast2"		: $[],
+	],
+    ];
+
+    map E	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    import "Mode";
+    Mode::SetMode ("autoinst_config");
+
+    Testsuite::Init ([READ,$[],E], nil);
+
+    import "Timezone";
+
+    Testsuite::Test (``(Timezone::Export ()), [], nil);
+
+    Testsuite::Test (``(Timezone::Modified ()), [], nil);
+
+    map imported	= $[
+	"timezone"	: "Europe/Berlin"
+    ];
+
+    Testsuite::Test (``(Timezone::Import (imported)), [$[],$[],E], nil);
+
+    Testsuite::Test (``(Timezone::Modified ()), [], nil);
+
+    Testsuite::Test (``(Timezone::Export ()), [], nil);
+
+    Testsuite::Test (``(Timezone::Summary ()), [], nil);
+}

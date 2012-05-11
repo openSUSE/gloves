@@ -1,0 +1,9 @@
+Read	.target.size "/etc/sysconfig/language" 1
+Read	.target.dir "/usr/share/YaST2/data/languages" ["language_de_DE.ycp"]
+Read	.target.yast2 "languages/language_de_DE.ycp" $["de_DE":["Deutsch", "Deutsch", ".UTF-8", "@euro", "German"]]
+Return	en_US.UTF-8
+Execute	.target.bash_output "/usr/bin/locale -a" $[]
+Return	nil
+Return	de_DE.UTF-8
+Return	nil
+Return	de_DE@euro

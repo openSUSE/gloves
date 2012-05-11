@@ -1,0 +1,42 @@
+/**
+ * Maintainer:
+ *      Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id: languages.ycp 32769 2006-09-08 09:29:15Z jsuchome $
+ *
+ * This file is OBSOLETE, use language_LANGCODE.ycp files instead
+ */
+{
+    textdomain "languages_db";
+
+    return $[];
+
+/* --------------------------------------------
+/*          May be future expansion
+/* --------------------------------------------
+
+    "zh_HK"       : [
+		"繁體中文 (中國香港)",
+                "Traditional Chinese (China Hongkong)",
+		".UTF-8",
+		""
+    ],
+    "en_IE"	: [
+		"Irish",
+		"Irish",
+		".UTF-8",
+		"@euro"
+    ],
+    "id_ID"    : [ "Indonesia",]
+    "zh_CN"    : [ "中文 (Chinese)"]
+    "ar_EG"    : [ "ﻲﺑﺮﻋ"	]
+    "sr_YU"
+
+    // Incomplete, inactive translator.
+    "gl_ES"	: [ "Galego",
+		  "Galego",
+		  ".UTF-8",
+		  "@euro" ],
+*/
+
+}

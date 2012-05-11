@@ -1,0 +1,6 @@
+Read	.target.yast2 "timezone_raw.ycp" [$["entries":$["Europe/Berlin":"Germany", "Europe/Prague":"Czech Republic"], "name":"Europe"], $["entries":$["US/Mountain":"Mountain"], "name":"USA"]]
+Return	[`item (`id ("US/Mountain"), "Mountain", false)]
+Return	0
+Return	[`item (`id ("Europe/Prague"), "Czech Republic", false), `item (`id ("Europe/Berlin"), "Germany", false)]
+Return	2
+Return	[]

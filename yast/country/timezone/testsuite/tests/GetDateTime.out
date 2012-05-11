@@ -1,0 +1,9 @@
+Execute	.target.bash_output "TZ=Europe/Prague /bin/date \"+%c\" \"--date=now 0sec\"" $["stdout":"00:00:00 - 0001-01-01"]
+Return	00:00:00 - 0001-01-01
+Execute	.target.bash_output "TZ=Europe/Prague /bin/date \"+%Y-%m-%d - %H:%M:%S\" \"--date=now 0sec\"" $["stdout":"00:00:00 - 0001-01-01"]
+Return	00:00:00 - 0001-01-01
+Execute	.target.bash_output "/bin/date \"+%Y-%m-%d - %H:%M:%S\" \"--date=now 0sec\"" $["stdout":"00:00:00 - 0001-01-01"]
+Return	00:00:00 - 0001-01-01
+Execute	.target.bash_output "date +%z" $["stdout":"00:00:00 - 0001-01-01"]
+Execute	.target.bash_output "TZ=Europe/Prague /bin/date \"+%Y-%m-%d - %H:%M:%S\" \"--date=now 0sec\"" $["stdout":"00:00:00 - 0001-01-01"]
+Return	00:00:00 - 0001-01-01

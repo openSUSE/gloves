@@ -1,0 +1,16 @@
+/**
+ * File:
+ *   sysconfig_clock.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/sysconfig/clock
+ *   using the sysconfig-agent
+ * $$
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/clock</tt>
+ * in an easy manner.
+ */
+.sysconfig.clock
+
+`ag_ini(
+    `SysConfigFile("/etc/sysconfig/clock")
+)

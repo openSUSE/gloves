@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/yast/!svn/ver/67757/trunk/country/package
+END
+org.opensuse.yast.modules.yapi.time.policy
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/yast/!svn/ver/63527/trunk/country/package/org.opensuse.yast.modules.yapi.time.policy
+END
+yast2-country.changes
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/yast/!svn/ver/67757/trunk/country/package/yast2-country.changes
+END
+org.opensuse.yast.modules.yapi.language.policy
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/yast/!svn/ver/63527/trunk/country/package/org.opensuse.yast.modules.yapi.language.policy
+END

@@ -1,0 +1,50 @@
+/**
+ * tests for Timezone::GetTimezoneForLanguage
+ * Author: jsuchome@suse.cz
+ * $Id: GetTimezoneForLanguage.ycp 27936 2006-02-13 20:01:14Z olh $
+ */
+{
+
+    // testedfiles: Timezone.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    TESTSUITE_INIT([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    map R = $[
+	"target" : $[
+	    "yast2"		: $[
+		"en_US"		: "US/Mountain",
+		"cs_CZ"		: "Europe/Prague",
+	    ],
+	],
+    ];
+
+    TEST (``(Timezone::GetTimezoneForLanguage ("en_US", "US/Pacific")),
+	[R,$[],$[]], []);
+
+    TEST (``(Timezone::GetTimezoneForLanguage ("de_DE", "US/Pacific")),
+	[R,$[],$[]], []);
+
+
+}

@@ -1,0 +1,26 @@
+[Desktop Entry]
+Type=Application
+Categories=Settings;System;Qt;X-SuSE-YaST;X-SuSE-YaST-System;
+
+X-KDE-ModuleType=Library
+X-KDE-HasReadOnlyMode=true
+X-KDE-Library=yast2
+X-SuSE-YaST-Call=timezone
+
+X-SuSE-YaST-Group=System
+X-SuSE-YaST-Argument=
+X-SuSE-YaST-RootOnly=true
+X-SuSE-YaST-AutoInst=all
+X-SuSE-YaST-Geometry=
+X-SuSE-YaST-SortKey=
+X-SuSE-YaST-AutoInstResource=timezone
+X-SuSE-YaST-AutoInstClonable=true
+X-SuSE-YaST-AutoInstSchema=timezone.rnc
+X-SuSE-YaST-Keywords=time,timezone,clock
+
+Icon=yast-timezone
+Exec=xdg-su -c "/sbin/yast2 timezone"
+
+Name=Date and Time
+GenericName=Control time zone, date, and system time
+StartupNotify=true

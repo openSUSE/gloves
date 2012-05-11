@@ -1,0 +1,30 @@
+/**
+ * File:
+ *   sysconfig_lang.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/sysconfig/language
+ *   using the sysconfig-agent
+ * Access:
+ *   read/write
+ * Authors:
+ *   Unknown <yast2-hacker@suse.de>
+ * Example:
+ *   Dir(.sysconfig.language)
+ *   (["lang"])
+ **
+ *   Read(.sysconfig.language.LANG)
+ *   ("-t psaux")
+ **
+ *   Write(.sysconfig.language.LANG, "language")
+ *   (true)
+ *
+ * $Id: sysconfig_language.scr 59356 2009-11-05 17:51:36Z aschnell $
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/lang</tt>
+ * in an easy manner.
+ */
+.sysconfig.language
+
+`ag_ini(
+  `SysConfigFile("/etc/sysconfig/language")
+)
