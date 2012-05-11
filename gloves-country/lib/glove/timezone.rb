@@ -18,6 +18,7 @@
 
 $LOAD_PATH << File.dirname(__FILE__)
 
+require "rubygems"
 require 'config_agent/clock'
 
 # module for timezone configuration
