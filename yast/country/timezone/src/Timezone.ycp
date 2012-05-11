@@ -341,10 +341,10 @@ global define string UpdateTimezone (string tmz) {
    */
   global define void Read () {
 
-    hwclock		= Misc::SysconfigRead(.sysconfig.clock.HWCLOCK, hwclock);
-    timezone		= Misc::SysconfigRead (.sysconfig.clock.TIMEZONE, timezone);
-    default_timezone	=
-	Misc::SysconfigRead(.sysconfig.clock.DEFAULT_TIMEZONE, default_timezone);
+    map read    = (map) Glove::Timezone::read ($[]);
+    hwclock     = read["hwclock"]:hwclock;
+    timezone    = read["timezone"]:timezone;
+    default_timezone    = read["default_timezone"]:default_timezone;
 
     // get name for cloning purposes
     if (Mode::config ())
