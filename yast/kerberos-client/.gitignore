@@ -1,3 +1,4 @@
+autodocs-*
 Makefile
 Makefile.am
 Makefile.in
@@ -21,4 +22,5 @@ missing
 mkinstalldirs
 stamp-h*
 *.pot
+*.ami
 Makefile.am.common
