@@ -114,7 +114,7 @@ module Glove
 
     def self.read_sysconfig
       # read config files
-      ConfigAgent::Clock.new.read({})
+      return ConfigAgent::Clock.new.read({})
     end
 
     # read all the timezones splitted into regions defined by YaST, also read timezone labels
