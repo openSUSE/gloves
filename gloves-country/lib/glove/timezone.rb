@@ -20,6 +20,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 
 require "rubygems"
 require 'config_agent/clock'
+require 'config_agent/script_agent'
 
 # module for timezone configuration
 module Glove
@@ -77,6 +78,11 @@ module Glove
       ret		= {
 	"success"	=> true
       }
+      # read original sysconfig values
+      sysconfig_timezone        = read_sysconfig
+      return nil if sysconfig_timezone.nil?
+
+      # write sysconfig values (if provided)
       unless params.nil? && params.empty?
 	sysconfig_params = {}
 	params.each do |key, value|
@@ -88,22 +94,24 @@ module Glove
 
       timezone  = params["timezone"]
       hwclock   = params["hwclock"]
-      if config["apply"] && timezone
 
-        # read timezone/hwclock if it wasn't provided
-        if hwclock.nil? || timezone.nil?
-          sysconfig_timezone        = read_sysconfig
-          return nil if sysconfig_timezone.nil?
-          hwclock = sysconfig_timezone["HWCLOCK"] if hwclock.nil?
-          timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
-        end
+      # fill timezone/hwclock if it wasn't provided
+      if hwclock.nil? || timezone.nil?
+        hwclock = sysconfig_timezone["HWCLOCK"] if hwclock.nil?
+        timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
+      end
 
+      # apply the time zone changes to the system
+      if config["apply"]
 	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zic","-l",  timezone]
         # synchronize hw clock to system clock
 	ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock"," --hctosys", hwclock]
-        if hwclock == "--localtime"
+      end
+
+      # call mkinitrd if hwclock was changed or timezone was changed while localtime is in use
+      if (hwclock != sysconfig_timezone["HWCLOCK"] ||
+         (hwclock == "--localtime" && timezone != sysconfig_timezone["TIMEZONE"]))
           ConfigAgent::ScriptAgent.new.run ["/sbin/mkinitrd"]
-        end
       end
 
       return ret
