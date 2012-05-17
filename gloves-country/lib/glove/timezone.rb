@@ -83,7 +83,7 @@ module Glove
       return nil if sysconfig_timezone.nil?
 
       # write sysconfig values (if provided)
-      unless params.nil? && params.empty?
+      unless params.nil? && params.empty? && (!config["only_apply"])
 	sysconfig_params = {}
 	params.each do |key, value|
       	  new_key = @sysconfig2yast.invert[key]
@@ -102,7 +102,7 @@ module Glove
       end
 
       # apply the time zone changes to the system
-      if config["apply"]
+      if config["apply"] || config["only_apply"]
 	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zic","-l",  timezone]
         unless `uname -m`.start_with?("s390")
           # synchronize hw clock to system clock
