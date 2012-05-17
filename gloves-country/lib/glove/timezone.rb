@@ -104,8 +104,10 @@ module Glove
       # apply the time zone changes to the system
       if config["apply"]
 	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zic","-l",  timezone]
-        # synchronize hw clock to system clock
-	ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock"," --hctosys", hwclock]
+        unless `uname -m`.start_with?("s390")
+          # synchronize hw clock to system clock
+	  ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock"," --hctosys", hwclock]
+        end
       end
 
       # call mkinitrd if hwclock was changed or timezone was changed while localtime is in use
