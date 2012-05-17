@@ -222,6 +222,9 @@ define map<string, string> get_lang2tz () {
 
 global define list<map<string,any> > get_zonemap() {
 
+// FIXME using Gloves: (we'll lose translation!)
+// map glove_regions   = (map) Glove::Timezone::read ($[ "kind" : "regions" ]);
+//    y2security ("glove  : %1", glove_regions["Africa"]:nil);
     if (size(zonemap) == 0)
     {
 	list<map<string,any> > zmap = (list<map<string,any> >)
@@ -281,23 +284,13 @@ global define integer Set (string zone, boolean really) {
 	    SCR::Execute ( .target.bash, "/usr/bin/xset s reset");
 	    SCR::Execute ( .target.bash, "/usr/bin/xset s off");
 	}
-	string cmd = "/usr/sbin/zic -l " + timezone;
-	y2milestone( "Set cmd %1", cmd );
-	y2milestone( "Set ret %1", SCR::Execute( .target.bash_output, cmd ));
-	if (!Arch::s390 ())
-	{
-	    cmd = "/sbin/hwclock --hctosys " + hwclock;
-	    if (Stage::initial () && hwclock == "--localtime")
-	    {
-		if (!systz_called)
-		{
-		    cmd = "/sbin/hwclock --systz --localtime --noadjfile && touch /dev/shm/warpclock";
-		    systz_called	= true;
-		}
-	    }
-	    y2milestone( "Set cmd %1", cmd );
-	    y2milestone( "Set ret %1", SCR::Execute(.target.bash_output, cmd ));
-	}
+        map write   = $[
+          "hwclock"     : hwclock,
+          "timezone"    : timezone
+        ];
+        map ret     = (map) Glove::Timezone::modify ($["only_apply" : true ], write);
+        y2internal ("timezone applied: %1", ret);
+
 	if (Stage::firstboot() && !textmode)
 	{
 	    SCR::Execute (.target.bash, "/usr/bin/xset s on");
