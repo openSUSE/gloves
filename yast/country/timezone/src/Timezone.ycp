@@ -771,18 +771,28 @@ global define void Save() {
 	return;
     }
 
+    /*
     SCR::Write(.sysconfig.clock.TIMEZONE, timezone);
     SCR::Write(.sysconfig.clock.DEFAULT_TIMEZONE, default_timezone);
     SCR::Write(.sysconfig.clock.HWCLOCK, hwclock);
 
     SCR::Write(.sysconfig.clock, nil);	// flush
 
-    y2milestone( "Save Saved data for timezone: <%1>", timezone );
-
     if (call_mkinitrd && !Stage::initial ())
     {
 	CallMkinitrd ();
     }
+    */
+
+    map write   = $[
+      "hwclock"                 : hwclock,
+      "default_timezone"        : default_timezone,
+      "timezone"                : timezone
+    ];
+
+    map ret     = (map) Glove::Timezone::modify ($[], write);
+
+    y2milestone( "Saved data for timezone %1: %2", timezone, ret);
 
     return;
 }
