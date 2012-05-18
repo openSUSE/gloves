@@ -44,10 +44,8 @@ module Glove
 
       # get the list of available time zones
       if (params["kind"] == "timezones")
-        return {} unless File.exists? ZONETAB
-	timezones = `grep -v "#" #{ZONETAB} | cut -f 3 | sort`.split("\n")
       	return {
-	    "timezones"	=> timezones
+	    "timezones"	=> read_timezones
 	}
       # return the hash mapping regions to time zones
       elsif (params["kind"] == "regions")
@@ -127,14 +125,20 @@ module Glove
       return ConfigAgent::Clock.new.read({})
     end
 
-    # read all the timezones splitted into regions defined by YaST, also read timezone labels
+    # Read all the timezones splitted into regions also read timezone labels
     # return hash scructure of kind { region => { timezone => label } }
+    # Regions are defined in YaST data file; if not present, take reasons from zone.tab
     def self.read_timezones_with_regions
       full      = {}
       region    = ""
       unless File.exists? YAST_TIMEZONES
-        @error  = "File #{YAST_TIMEZONES} does not exist"
-        return nil
+        # use regions from time zonne names (defined in ZONETAB)
+        read_timezones.each do |timezone|
+          region,zone   = timezone.split("/")
+          full[region]  = {} unless full.has_key?(region)
+          full[region][timezone]    = zone
+        end
+        return full
       end
       input = `grep ":" #{YAST_TIMEZONES} | sed 's/^[[:space:]]*//'`
       input.split("\n").each do |line|
@@ -149,6 +153,11 @@ module Glove
         end
       end
       return full
+    end
+
+    def self.read_timezones
+      return [] unless File.exists? ZONETAB
+      return `grep -v "#" #{ZONETAB} | cut -f 3 | sort`.split("\n")
     end
 
   end
