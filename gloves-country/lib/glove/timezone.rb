@@ -60,12 +60,10 @@ module Glove
         end
       # return current time
       elsif (params["kind"] == "time")
-	time    = ConfigAgent::ScriptAgent.new.run ["/bin/date","+%Y-%m-%d - %H:%M:%S"]
-        return {
-            "time"      => time["stdout"] || ""
-        }
-        # TODO compute time when timezone was not saved to system yet
-        # See Timezone::GetDateTime (false, )
+        return current_time
+      # return default timezone for given language
+      elsif (params["kind"] == "language")
+        return timezone_for_language(params["language"] || "en_US")
       end
 
       sysconfig_timezone        = read_sysconfig
@@ -128,9 +126,30 @@ module Glove
 
   private
 
+    # read data from /etc/sysconfig/clock
     def self.read_sysconfig
-      # read config files
       return ConfigAgent::Clock.new.read({})
+    end
+
+    # return current system time
+    def self.current_time
+      time    = ConfigAgent::ScriptAgent.new.run ["/bin/date","+%Y-%m-%d - %H:%M:%S"]
+      return {
+        "time"      => time["stdout"] || ""
+      }
+      # TODO compute time when timezone was not saved to system yet
+      # See Timezone::GetDateTime (false, )
+    end
+
+    # return the default time zone for given language, language is locale form, like en_US, de_DE
+    # TODO ask Language Glove for data
+    def self.timezone_for_language(language)
+      # split("\n") is for multiple results for input like 'en'
+      line = `grep timezone /usr/share/YaST2/data/languages/*#{language}*.ycp 2>/dev/null`.chop.split("\n")
+      timezone  = line[0].gsub(/^[^"]*"[^"]+"[^"]*"([^"]+)".*$/,"\\1") if line.size > 0
+      return {
+        "timezone"      => timezone || ""
+      }
     end
 
     # Read all the timezones splitted into regions also read timezone labels
@@ -163,6 +182,7 @@ module Glove
       return full
     end
 
+    # read all available time zones; return list of strings
     def self.read_timezones
       return [] unless File.exists? ZONETAB
       return `grep -v "#" #{ZONETAB} | cut -f 3 | sort`.split("\n")

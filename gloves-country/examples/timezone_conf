@@ -22,10 +22,12 @@ require "glove/timezone"
 require "dbus_clients/backend_exception"
 begin
   args = {}
-  args = { "kind" => ARGV[0] } if (ARGV[0] == "timezones" || ARGV[0] == "regions" || ARGV[0] == "time")
+  args = { "kind" => ARGV[0] } if [ "timezones", "regions", "time", "language"].include? ARGV[0]
 
   if (ARGV[0] == "regions" && !ARGV[1].nil?)
     args["only"]        = ARGV[1]
+  elsif (ARGV[0] == "language" && !ARGV[1].nil?)
+    args["language"]    = ARGV[1]
   end
 
   if ARGV.empty? || !args.empty?
