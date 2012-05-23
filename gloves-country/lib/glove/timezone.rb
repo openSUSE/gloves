@@ -58,6 +58,14 @@ module Glove
         else
           return full_timezones
         end
+      # return current time
+      elsif (params["kind"] == "time")
+	time    = ConfigAgent::ScriptAgent.new.run ["/bin/date","+%Y-%m-%d - %H:%M:%S"]
+        return {
+            "time"      => time["stdout"] || ""
+        }
+        # TODO compute time when timezone was not saved to system yet
+        # See Timezone::GetDateTime (false, )
       end
 
       sysconfig_timezone        = read_sysconfig
