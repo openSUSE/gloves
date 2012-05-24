@@ -82,9 +82,25 @@ module Glove
       ret		= {
 	"success"	=> true
       }
+
       # read original sysconfig values
       sysconfig_timezone        = read_sysconfig
       return nil if sysconfig_timezone.nil?
+
+      timezone  = params["timezone"]
+      hwclock   = params["hwclock"]
+
+      # fill timezone/hwclock if it wasn't provided
+      if hwclock.nil? || timezone.nil?
+        hwclock = sysconfig_timezone["HWCLOCK"] if hwclock.nil?
+        timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
+      end
+
+      # only set time
+      if (config["time"])
+        set_time(timezone,hwclock,params)
+        return ret
+      end
 
       # write sysconfig values (if provided)
       unless params.nil? && params.empty? && (!config["only_apply"])
@@ -94,15 +110,6 @@ module Glove
       	  sysconfig_params[new_key] = value unless new_key.nil?
 	end
         ret	= ConfigAgent::Clock.new.write(sysconfig_params)
-      end
-
-      timezone  = params["timezone"]
-      hwclock   = params["hwclock"]
-
-      # fill timezone/hwclock if it wasn't provided
-      if hwclock.nil? || timezone.nil?
-        hwclock = sysconfig_timezone["HWCLOCK"] if hwclock.nil?
-        timezone= sysconfig_timezone["TIMEZONE"] if timezone.nil?
       end
 
       # apply the time zone changes to the system
@@ -188,5 +195,30 @@ module Glove
       return `grep -v "#" #{ZONETAB} | cut -f 3 | sort`.split("\n")
     end
 
+    def self.utc_only?
+      machine = `uname -m`.chop
+      return machine.start_with?("sparc")
+      # TODO how to do checks that are in YCP?
+      # Arch::board_iseries () || Arch::board_chrp () || Arch::board_prep 
+    end
+
+    # adapt current time
+    def self.set_time(timezone,hwclock,p)
+        return if `uname -m`.start_with?("s390")
+
+        args    = ["/sbin/hwclock", "--set", hwclock,
+          "--date=\"#{p['month']}/#{p['day']}/#{p['year']} #{p['hour']}:#{p['minute']}:#{p['second']}\""]
+
+#        if (hwclock != "--localtime" && timezone)
+#            # FIXME env variable, how to pass it?
+#            args        = ["TZ=#{timezone}"] + args
+#        end
+
+        # set the HW clock
+	ConfigAgent::ScriptAgent.new.run args
+        # synchronize to system clock
+	ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock", "--hctosys", hwclock]
+
+    end
   end
 end
