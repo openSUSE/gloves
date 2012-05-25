@@ -20,6 +20,7 @@ $LOAD_PATH << File.dirname(__FILE__)
 
 require "rubygems"
 require 'config_agent/passwd'
+require 'config_agent/chpasswd'
 require 'config_agent/script_agent'
 
 # module for users configuration
@@ -50,12 +51,15 @@ module Glove
     	"success"	=> true
       }
 
-      unless params.has_key? "username"
+      username  = params["username"]
+      if username.nil?
         @error  = "Username not provided"
         return nil
       end
 
-      ConfigAgent::ScriptAgent.new.run ["/usr/sbin/useradd", params["username"] || ""]
+      ConfigAgent::ScriptAgent.new.run ["/usr/sbin/useradd", username]
+
+      ret = ConfigAgent::Chpasswd.new.execute({ "user" => username, "pw" => params["password"]})
 
       return ret
 
