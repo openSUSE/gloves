@@ -25,7 +25,10 @@ module ConfigAgent
     def execute(params)
       ret = {}
 
-      config = params["config_file"] || [params] #allow one hash with user+pass or array of values
+      # allow one hash with user+pass or array of values:
+      # if "config_file" is present, it has to be list of hashes of type
+      # [ { "user" => "user1", "pw" => "p1" }, { "user" => "user2", "pw" => "p2" }]
+      config = params["config_file"] || [params]
       correct_data = config.all? {|i| !(i["user"]).empty? && !(i["pw"]).empty? }
       return ret unless correct_data #TODO exception
 
