@@ -24,5 +24,6 @@ SYSTOHC=yes
 # # Command:		/sbin/refresh_initrd
 # Timezone (e.g. CET or Asia/Tokyo). The value should correspond
 # to the contents of the /etc/localtime file and is for internal
-# this manually by calling zic -l.
+# YaST use; changing this setting will not make SuSEconfig update
 # the /etc/localtime file, YaST does that or you will need to do
+# this manually by calling zic -l.
