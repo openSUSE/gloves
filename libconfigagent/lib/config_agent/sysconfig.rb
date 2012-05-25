@@ -67,7 +67,7 @@ module ConfigAgent
 
           params.each do |key, value|
               next if key.start_with? "_"   # skip internal keys
-              aug.set("/files#{@file_path}/#{key}", pack( value))
+              aug.set("/files#{@file_path}/#{key}", key.start_with? "#comment" ? value : pack( value))
           end
 
           unless aug.save

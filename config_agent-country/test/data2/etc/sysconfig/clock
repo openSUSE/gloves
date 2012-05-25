@@ -7,14 +7,22 @@ SYSTOHC=yes
 # # Type:		string(-u,--utc,--localtime)
 # # ServiceRestart:	boot.clock
 # # Command:		/sbin/refresh_initrd
-# Set to -u if your system clock is set to UTC, and to --localtime
-# # ServiceRestart:	boot.clock
+# Set to "-u" if your system clock is set to UTC, and to "--localtime"
+# if your clock runs that way.
 # # Description: Write back system time to the hardware clock
 # # Type:		yesno
 # # Default:		yes
-# much more inaccurate than system clock.  Set to no if
+# Is set to "yes" write back the system time to the hardware
 # clock at reboot or shutdown. Usefull if hardware clock is
+# much more inaccurate than system clock.  Set to "no" if
+# system time does it wrong due e.g. missed timer interrupts.
+# If set to "no" the hardware clock adjust feature is also
+# skipped because it is rather useless without writing back
+# the system time to the hardware clock.
 # # Type:		string(Europe/Berlin,Europe/London,Europe/Paris)
-# this manually by calling zic -l.
-# If set to no the hardware clock adjust feature is also
+# # ServiceRestart:	boot.clock
+# # Command:		/sbin/refresh_initrd
+# Timezone (e.g. CET or Asia/Tokyo). The value should correspond
 # to the contents of the /etc/localtime file and is for internal
+# this manually by calling zic -l.
+# the /etc/localtime file, YaST does that or you will need to do
