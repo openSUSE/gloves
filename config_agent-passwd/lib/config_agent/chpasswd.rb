@@ -35,9 +35,9 @@ module ConfigAgent
       f = Tempfile.new('pwchange','/root')
       begin
         config.each { |i| f.puts("#{i["user"]}:#{i["pw"]}") }
+        f.close
         ret = run(["/usr/sbin/chpasswd"]+(params["exec_args"]||[])+[f.path])
       ensure
-        f.close
         f.unlink
       end
 
