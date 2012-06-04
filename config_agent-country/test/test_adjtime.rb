@@ -29,6 +29,12 @@ class TestAdjtime < Test::Unit::TestCase
     @data2_dir = File.join(File.dirname(__FILE__),"data2")
   end
 
+  def test_no_file
+    file = ConfigAgent::Adjtime.new
+    adjtime = file.read "_aug_internal" => Augeas::open(@data_dir + "/tmp", File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
+    assert_equal Hash.new, adjtime
+  end
+
   def test_reading
     file = ConfigAgent::Adjtime.new
     adjtime = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
