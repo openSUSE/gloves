@@ -56,7 +56,7 @@ module ConfigAgent
     end
 
     def write(params)
-      aug		= params["_aug_internal"] || Augeas::open(nil, "/tmp/lens", Augeas::NO_MODL_AUTOLOAD)
+      aug		= params["_aug_internal"] || Augeas::open(nil, "/usr/share/augeas/lenses/", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Ssh.lns", :incl => "/etc/ssh/ssh_config")
       aug.load
 
