@@ -50,6 +50,8 @@ import "ProductFeatures";
 import "SlideShow";
 import "Stage";
 
+// ruby API
+import "Glove::Language";
 
 /**
  * currently selected language
@@ -502,7 +504,8 @@ global define void SetDefault() {
  */
 global define string ReadSysconfigLanguage () {
 
-    string local_lang = Misc::SysconfigRead (.sysconfig.language.RC_LANG, language);
+    map read    = (map) Glove::Language::read ($[]);
+    string local_lang = read["language"]:language;
 
     integer pos = findfirstof (local_lang, ".@");
 
@@ -520,18 +523,20 @@ global define string ReadSysconfigLanguage () {
  */
 global define void ReadSysconfigValues () {
 
-    rootlang = Misc::SysconfigRead (.sysconfig.language.ROOT_USES_LANG, rootlang);
+    map read    = (map) Glove::Language::read ($[]);
+    rootlang    = read["rootlang"]:rootlang;
+    languages   = read["languages"]:languages;
+
     // during live installation, we have sysconfig.language.RC_LANG available
     if (!Stage::initial () || Mode::live_installation ())
     {
-	string val = toupper (Misc::SysconfigRead (.sysconfig.language.RC_LANG, ""));
+	string val = toupper (read["language"]:language);
 	use_utf8 = search (val, ".UTF-8") != nil;
     }
     else
     {
 	use_utf8 = true;
     }
-    languages = Misc::SysconfigRead (.sysconfig.language.INSTALLED_LANGUAGES, "");
 }
 
 /**
@@ -887,27 +892,30 @@ global define void Save() {
 
     string loc = GetLocaleString (language);
 
-    SCR::Write (.sysconfig.language.RC_LANG, loc);
+    map write   = $[
+      "rootlang"        : rootlang,
+      "languages"       : languages,
+      "language"        : loc
+    ];
 
     if (find (loc, "zh_HK") == 0)
     {
-	SCR::Write(.sysconfig.language.RC_LC_MESSAGES,"zh_TW"+substring(loc,5));
+        write["RC_LC_MESSAGES"] = "zh_TW"+substring(loc,5);
     }
     else
     {
 	// FIXME ugly hack: see bug #47711
-	string lc_mess = (string)SCR::Read(.sysconfig.language.RC_LC_MESSAGES);
+        map read        = (map) Glove::Language::read ($[]);
+	string lc_mess  = read["RC_LC_MESSAGES"]:"";
 	if (find (lc_mess, "zh_TW") == 0)
 	{
-	    SCR::Write (.sysconfig.language.RC_LC_MESSAGES, "");
+            write["RC_LC_MESSAGES"] = "";
 	}
     }
 
-    SCR::Write (.sysconfig.language.ROOT_USES_LANG, rootlang);
-    SCR::Write (.sysconfig.language.INSTALLED_LANGUAGES, languages);
-    SCR::Write (.sysconfig.language, nil);
+    map ret     = (map) Glove::Language::modify ($[], write);
 
-    y2milestone ("Saved data for language: <%1>", loc);
+    y2milestone ("Saved data for language '%1': %2", loc, ret);
 }
 
 boolean reset_recommended = true;
