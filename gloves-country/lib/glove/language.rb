@@ -32,7 +32,8 @@ module Glove
     @sysconfig2yast	= {
       "RC_LANG"		=> "language",
       "ROOT_USES_LANG"	=> "rootlang",
-      "INSTALLED_LANGUAGES"	=> "languages"
+      "INSTALLED_LANGUAGES"	=> "languages",
+      "RC_LC_MESSAGES"  => "RC_LC_MESSAGES"
     }
 
     # Read all settings relevant for language configuration (key:value map).
