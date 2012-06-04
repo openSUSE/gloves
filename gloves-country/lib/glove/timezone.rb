@@ -19,6 +19,7 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require "rubygems"
+require 'config_agent/adjtime'
 require 'config_agent/clock'
 require 'config_agent/script_agent'
 
@@ -109,6 +110,15 @@ module Glove
       	  new_key = @sysconfig2yast.invert[key]
       	  sysconfig_params[new_key] = value unless new_key.nil?
 	end
+
+        if sysconfig_params.has_key? "HWCLOCK"
+          adjtime_f = ConfigAgent::Adjtime.new
+          adjtime = adjtime_f.read({})
+          adjtime = { "1" => "0.0 0 0.0", "2" => "0" } if adjtime.empty?
+          adjtime["3"]    = sysconfig_params.delete "HWCLOCK"
+          adjtime_f.write(adjtime)
+        end
+
         ret	= ConfigAgent::Clock.new.write(sysconfig_params)
       end
 
@@ -133,9 +143,15 @@ module Glove
 
   private
 
-    # read data from /etc/sysconfig/clock
+    # read data from /etc/sysconfig/clock and /etc/adjtime
     def self.read_sysconfig
-      return ConfigAgent::Clock.new.read({})
+      read = ConfigAgent::Clock.new.read({})
+
+      adjtime = ConfigAgent::Adjtime.new.read({})
+      if (adjtime.has_key? "3")
+        read["HWCLOCK"]  = (adjtime["3"] == "LOCAL") ? "--localtime" : "-u"
+      end
+      return read
     end
 
     # return current system time
