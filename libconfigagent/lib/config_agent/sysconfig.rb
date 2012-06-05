@@ -28,56 +28,15 @@ module ConfigAgent
       def initialize path,params={}
         raise ArgumentError,"Path argument must be absolut path" unless path.start_with? '/'
         @file_path = path
+        @orig_values = {};
       end
 
       def read(params)
-          ret = {}
-
-          aug = load_augeas(params)
-
-          unless aug.get("/augeas/files#{@file_path}/error").nil?
-            #FIXME report it. TODO have universal wrapper for this (augeas serializer)
-              aug.close
-              return ret
-          end
-
-          aug.match("/files#{@file_path}/*").each do |key_path|
-              key = key_path.split("/").last
-  # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
-  # TODO: configurable option?
-  #      next if key.start_with? "#comment"
-
-              # remove quotes from value (Shellvars.lns keeps quoting), unescape values
-              #do not unpack comments
-              value = aug.get(key_path)
-              ret[key] = key.start_with?("#comment") ? value : unpack(value)
-          end
-
-          aug.close
-
-          return ret
+        return prepare_read( raw_read( params));
       end
 
       def write(params)
-          ret = {
-            "success" => true
-          }
-
-          aug = load_augeas(params)
-
-          params.each do |key, value|
-              next if key.start_with? "_"   # skip internal keys
-              aug.set("/files#{@file_path}/#{key}", ( key.start_with? "#comment") ? value : pack( value))
-          end
-
-          unless aug.save
-              ret["success"] = false
-              ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
-          end
-
-          aug.close
-          
-          return ret
+        return raw_write( prepare_write( params));
       end
 
   private
@@ -162,5 +121,88 @@ module ConfigAgent
         return result
       end
 
+      # returns content of underlying file as it get it.
+      def raw_read(params)
+          ret = {}
+
+          aug = load_augeas(params)
+
+          unless aug.get("/augeas/files#{@file_path}/error").nil?
+            #FIXME report it. TODO have universal wrapper for this (augeas serializer)
+              aug.close
+              return ret
+          end
+
+          aug.match("/files#{@file_path}/*").each do |key_path|
+              key = key_path.split("/").last
+  # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
+  # TODO: configurable option?
+  #      next if key.start_with? "#comment"
+
+              ret[ key] = aug.get(key_path)
+          end
+
+          aug.close
+
+          return ret
+      end
+
+      # writes values as it gets them
+      def raw_write(params)
+          ret = {
+            "success" => true
+          }
+
+          aug = load_augeas(params)
+
+          values.each do |key, value|
+              aug.set("/files#{@file_path}/#{key}", value)
+          end
+
+          unless aug.save
+              ret["success"] = false
+              ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
+          end
+
+          aug.close
+          
+          return ret
+      end
+
+      # parse values loaded from the underlying file. It removes quoting and so on.
+      def prepare_read( values)
+          ret = {}
+
+          values.each do |key, value|
+              @orig_values[ key] = value;
+              
+              # remove quotes from value (Shellvars.lns keeps quoting), unescape values
+              #do not unpack comments
+              ret[key] = key.start_with?("#comment") ? value : unpack(value)
+          end
+
+          return ret
+      end
+      
+      # see prepare_read. Prepare given values into a raw state ready for writing.
+      def prepare_write( values)
+          ret = {}
+
+          values.each do |key, value|
+              next if key.start_with? "_"                   # skip internal keys
+
+              if ( unpack( @orig_values[ key]) == value)
+                ret[ key] = @orig_values[ key]
+              elsif ( key.start_with? "#comment")
+                ret[ key] = value;
+              else
+                ret[ key] = pack( value);
+              end
+          end
+
+          return ret
+      end
+
+  
   end
 end

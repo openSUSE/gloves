@@ -41,7 +41,14 @@ TEST_QUOTING_MAP = {
   "string with \\\"" => "\"string with \\\"\""
 }
 
-  def test_unquoting
+TEST_STABILITY_IN_FILE = "input"
+
+  def setup
+    file_path = File.expand_path( __FILE__)
+    @data = File.join( file_path[0, file_path.rindex( "/")], "data/")
+  end
+
+  def test_quoting
     agent = ConfigAgent::Sysconfig.new "/dummy"
     TEST_UNQUOTING_MAP.each do |test,result|
       assert_equal result,agent.send(:unpack,test)
@@ -49,6 +56,13 @@ TEST_QUOTING_MAP = {
     TEST_QUOTING_MAP.each do |test,result|
       assert_equal result,agent.send(:pack,test)
     end
+  end
+
+  def test_stability
+    agent= ConfigAgent::Sysconfig.new( @data + TEST_STABILITY_IN_FILE)
+    params = agent.read({})
+
+    assert_equal agent.send( :raw_read, {}), agent.send( :prepare_write, params)
   end
 
 end
