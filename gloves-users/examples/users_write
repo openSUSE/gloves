@@ -25,7 +25,7 @@ begin
 
   unless ARGV[0].nil?
     if ARGV[0] == "add" && !ARGV[1].nil?
-      args = { "username" => ARGV[1] }
+      args = { "username" => ARGV[1], "password" => ARGV[2] || "q" }
     end
   end
 

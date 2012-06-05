@@ -18,8 +18,10 @@
 
 $LOAD_PATH << File.dirname(__FILE__)
 
+require "rubygems"
 require 'config_agent/passwd'
-require 'config_agent/useradd'
+require 'config_agent/chpasswd'
+require 'config_agent/script_agent'
 
 # module for users configuration
 module Glove
@@ -34,7 +36,7 @@ module Glove
       ret       = {}
 
       begin
-        ret     = ConfigAgent::Passwd.read(params)
+        ret     = ConfigAgent::Passwd.new.read(params)
       rescue DbusClients::InsufficientPermission => e
         @error	= "User has no permission for action '#{e.permission}'."
         return nil
@@ -49,12 +51,15 @@ module Glove
     	"success"	=> true
       }
 
-      unless params.has_key? "username"
+      username  = params["username"]
+      if username.nil?
         @error  = "Username not provided"
         return nil
       end
 
-      ConfigAgent::Useradd.execute({ "exec_args" => [ params["username"] ]})
+      ConfigAgent::ScriptAgent.new.run ["/usr/sbin/useradd", username]
+
+      ret = ConfigAgent::Chpasswd.new.execute({ "user" => username, "pw" => params["password"]})
 
       return ret
 
