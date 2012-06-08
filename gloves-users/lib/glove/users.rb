@@ -57,9 +57,25 @@ module Glove
         return nil
       end
 
-      ConfigAgent::ScriptAgent.new.run ["/usr/sbin/useradd", username]
+      useradd = ["/usr/sbin/useradd", username]
 
-      ret = ConfigAgent::Chpasswd.new.execute({ "user" => username, "pw" => params["password"]})
+      useradd = useradd + [ "-c", params["comment"] ]   if params["comment"]
+      useradd = useradd + [ "-d", params["home"] ]      if params["home"]
+      useradd = useradd + [ "-m" ]                      if params["create_home"]
+      useradd = useradd + [ "-u", params["uid"].to_s ]  if params["uid"]
+      useradd = useradd + [ "-g", params["gid"].to_s ]  if params["gid"]
+      useradd = useradd + [ "-s", params["shell"] ]     if params["shell"]
+      useradd = useradd + [ "--system" ]                if params["system"]
+
+      ret = ConfigAgent::ScriptAgent.new.run useradd
+
+      if ret["exit"] == 0 && params["password"]
+        ret = ConfigAgent::Chpasswd.new.execute({ "user" => username, "pw" => params["password"]})
+      end
+
+      if ret["exit"] == 0
+        ret = ConfigAgent::ScriptAgent.new.run ["/usr/sbin/useradd.local", username]
+      end
 
       return ret
 
