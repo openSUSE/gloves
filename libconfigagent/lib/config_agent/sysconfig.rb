@@ -155,7 +155,7 @@ module ConfigAgent
 
           aug = load_augeas(params)
 
-          values.each do |key, value|
+          params.each do |key, value|
               aug.set("/files#{@file_path}/#{key}", value)
           end
 
@@ -191,7 +191,7 @@ module ConfigAgent
           values.each do |key, value|
               next if key.start_with? "_"                   # skip internal keys
 
-              if ( unpack( @orig_values[ key]) == value)
+              if ( @orig_values[key] && unpack( @orig_values[ key]) == value)
                 ret[ key] = @orig_values[ key]
               elsif ( key.start_with? "#comment")
                 ret[ key] = value;
