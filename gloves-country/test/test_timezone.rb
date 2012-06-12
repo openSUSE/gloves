@@ -27,9 +27,14 @@ class TestTimezone < Test::Unit::TestCase
   def setup
     sysconfig_data = {
       "TIMEZONE" => "Europe/Prague",
-      "HWCLOCK" => "--localtime"
     }
-    ConfigAgent::Clock.stubs(:read).returns sysconfig_data
+    adjtime_data = {
+      "1"       => 0,
+      "2"       => 0,
+      "3"       => "LOCAL"
+    }
+    ConfigAgent::Clock.any_instance.stubs(:read).returns sysconfig_data
+    ConfigAgent::Adjtime.any_instance.stubs(:read).returns adjtime_data
   end
 
   def test_read_sysconfig

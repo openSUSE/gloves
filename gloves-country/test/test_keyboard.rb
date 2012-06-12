@@ -29,7 +29,7 @@ class TestKeyboard < Test::Unit::TestCase
       "KEYTABLE" => "us.map.gz",
       "YAST_KEYBOARD" => "english-us,pc104"
     }
-    ConfigAgent::Keyboard.stubs(:read).returns sysconfig_data
+    ConfigAgent::Keyboard.any_instance.stubs(:read).returns sysconfig_data
   end
 
   def test_read_sysconfig
