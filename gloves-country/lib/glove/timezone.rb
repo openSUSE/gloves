@@ -115,7 +115,7 @@ module Glove
           adjtime_f = ConfigAgent::Adjtime.new
           adjtime = adjtime_f.read({})
           adjtime = { "1" => "0.0 0 0.0", "2" => "0" } if adjtime.empty?
-          adjtime["3"]    = sysconfig_params.delete "HWCLOCK"
+          adjtime["3"]    = (sysconfig_params.delete("HWCLOCK") == "--localtime") ? "LOCAL" : "UTC"
           adjtime_f.write(adjtime)
         end
 
