@@ -70,3 +70,4 @@ KBD_CAPSLOCK=no
 # A typical setting for sb. with a character set, where a matching
 # compose table is missing (but with a PC keyboard), would be
 # COMPOSETABLE="winkeys shiftctrl"
+# The YaST-internal identifier of the attached keyboard.

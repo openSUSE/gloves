@@ -29,13 +29,17 @@ module ConfigAgent
         raise ArgumentError,"Path argument must be absolut path" unless path.start_with? '/'
         @file_path = path
         @orig_values = {};
+
+        @aug_tree = nil;
       end
 
       def read(params)
+        @aug_tree = load_augeas( params);
         return prepare_read( raw_read( params));
       end
 
       def write(params)
+        @aug_tree = load_augeas( params);
         return raw_write( prepare_write( params));
       end
 
@@ -125,7 +129,7 @@ module ConfigAgent
       def raw_read(params)
           ret = {}
 
-          aug = load_augeas(params)
+          aug = @aug_tree
 
           unless aug.get("/augeas/files#{@file_path}/error").nil?
             #FIXME report it. TODO have universal wrapper for this (augeas serializer)
@@ -153,9 +157,9 @@ module ConfigAgent
             "success" => true
           }
 
-          aug = load_augeas(params)
+          aug = @aug_tree
 
-          values.each do |key, value|
+          params.each do |key, value|
               aug.set("/files#{@file_path}/#{key}", value)
           end
 
@@ -188,10 +192,12 @@ module ConfigAgent
       def prepare_write( values)
           ret = {}
 
+          return {} if values.nil?
+
           values.each do |key, value|
               next if key.start_with? "_"                   # skip internal keys
 
-              if ( unpack( @orig_values[ key]) == value)
+              if ( !@orig_values[ key].nil? && unpack( @orig_values[ key]) == value)
                 ret[ key] = @orig_values[ key]
               elsif ( key.start_with? "#comment")
                 ret[ key] = value;
