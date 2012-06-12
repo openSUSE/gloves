@@ -29,7 +29,7 @@ class TestLanguage < Test::Unit::TestCase
       "RC_LANG" => "cs_CZ.UTF-8",
       "INSTALLED_LANGUAGES" => "cs_CZ,de_DE,en_US"
     }
-    ConfigAgent::Language.stubs(:read).returns sysconfig_data
+    ConfigAgent::Language.any_instance.stubs(:read).returns sysconfig_data
   end
 
   def test_read_sysconfig

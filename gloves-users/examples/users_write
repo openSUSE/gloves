@@ -25,7 +25,14 @@ begin
 
   unless ARGV[0].nil?
     if ARGV[0] == "add" && !ARGV[1].nil?
-      args = { "username" => ARGV[1], "password" => ARGV[2] || "q" }
+      args = {
+          "username"    => ARGV[1],
+          "password"    => ARGV[2] || "q",
+          "uid"         => ARGV[3], # with nil, free UID should be used
+          "comment"     => ARGV[4],
+          "shell"       => "/bin/csh",
+          "gid"         => "users"
+      }
     end
   end
 
