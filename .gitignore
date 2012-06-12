@@ -4,3 +4,4 @@
 *.o
 *.log
 Makefile
+config_agent-country/test/data[12]
