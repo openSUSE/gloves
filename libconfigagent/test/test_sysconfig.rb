@@ -62,7 +62,7 @@ TEST_STABILITY_IN_FILE = "input"
     agent= ConfigAgent::Sysconfig.new( @data + TEST_STABILITY_IN_FILE)
     params = agent.read({})
 
-    assert_equal agent.send( :raw_read, {}), agent.send( :prepare_write, params)
+    assert_equal agent.send( :raw_read), agent.send( :prepare_write, params)
   end
 
   def test_new_value_write

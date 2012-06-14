@@ -46,13 +46,17 @@ module ConfigAgent
             end
 
             @aug_tree = load_augeas( @aug_tree)
-            ret = prepare_read( raw_read( params));
+            ret = prepare_read( raw_read);
         end
 
         def write(params)
+            values = params;
+
             if( params[ "_aug_internal"])
                 @aug_tree.close
                 @aug_tree = params[ "_aug_internal"]
+
+                values.delete( "_aug_internal");
             end
 
             @aug_tree = load_augeas( @aug_tree)
@@ -152,7 +156,7 @@ module ConfigAgent
         end
 
         # returns content of underlying file as it get it.
-        def raw_read(params)
+        def raw_read
             ret = {}
 
             unless @aug_tree.get("/augeas/files#{@file_path}/error").nil?
@@ -183,7 +187,7 @@ module ConfigAgent
                 @aug_tree.set("/files#{@file_path}/#{key}", value)
             end
 
-            unless aug.save
+            unless @aug_tree.save
                 ret["success"] = false
                 ret["message"] = @aug_tree.get("/augeas/files#{@file_path}/error/message")
             end
@@ -213,8 +217,6 @@ module ConfigAgent
             return {} if values.nil?
 
             values.each do |key, value|
-                next if key.start_with? "_"                   # skip internal keys
-
                 if ( !@orig_values[ key].nil? && unpack( @orig_values[ key]) == value)
                     ret[ key] = @orig_values[ key]
                 elsif ( key.start_with? "#comment")
