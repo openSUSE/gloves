@@ -26,7 +26,7 @@ INPUT_METHOD=''
 # as long as $LC_ALL is not set, which overrides all $LC_-variables.
 # Root uses this variable only if ROOT_USES_LANG is set to "yes".
 #
-RC_LANG=en_US.UTF-8
+RC_LANG="en_US.UTF-8"
 
 ## Type:	string
 ## Default:	""
@@ -102,7 +102,7 @@ RC_LC_PAPER=''
 # which are defined here.
 # Value "ctype" means that root uses just LC_CTYPE. 
 #
-ROOT_USES_LANG=ctype
+ROOT_USES_LANG="ctype"
 
 ## Type:        yesno
 ## Default:     no
@@ -110,11 +110,11 @@ ROOT_USES_LANG=ctype
 # Workaround for missing forward of LANG and LC variables
 # of e.g. ssh login connections.
 #
-AUTO_DETECT_UTF8=no
+AUTO_DETECT_UTF8="no"
 
 ## Type:        string
 ## Default:     ""
 #
 # List of installed language supports, use by YaST2
 #
-INSTALLED_LANGUAGES=cs_CZ,en_US
+INSTALLED_LANGUAGES="cs_CZ,en_US"
