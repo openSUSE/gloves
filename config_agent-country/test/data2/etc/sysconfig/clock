@@ -1,7 +1,7 @@
-DEFAULT_TIMEZONE=US/Eastern
-TIMEZONE=US/Eastern
-HWCLOCK=--localtime
-SYSTOHC=yes
+DEFAULT_TIMEZONE="US/Eastern"
+TIMEZONE="US/Eastern"
+HWCLOCK="--localtime"
+SYSTOHC="yes"
 # # Path:		System/Environment/Clock
 # # Description:		Information about your timezone and time
 # # Type:		string(-u,--utc,--localtime)

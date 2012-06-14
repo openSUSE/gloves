@@ -24,29 +24,49 @@ module ConfigAgent
   class Sysconfig <  ConfigAgent::FileAgent
 
       SYSCONFIG_LENS = "Shellvars.lns"
+      DEFAULT_QUOTE  = '"'
 
       def initialize path,params={}
         raise ArgumentError,"Path argument must be absolut path" unless path.start_with? '/'
         @file_path = path
         @orig_values = {};
 
-        @aug_tree = nil;
+	@aug_tree = open_augeas
+      end
+
+      def ConfigAgent.finalize( id)
+        @aug_tree.close if @aug_tree
       end
 
       def read(params)
-        @aug_tree = load_augeas( params);
-        return prepare_read( raw_read( params));
+	if( params[ "_aug_internal"])
+          @aug_tree.close
+	  @aug_tree = params[ "_aug_internal"]
+	end
+
+        @aug_tree = load_augeas( @aug_tree)
+        ret = prepare_read( raw_read( params));
       end
 
       def write(params)
-        @aug_tree = load_augeas( params);
+	if( params[ "_aug_internal"])
+          @aug_tree.close
+	  @aug_tree = params[ "_aug_internal"]
+	end
+
+        @aug_tree = load_augeas( @aug_tree)
         return raw_write( prepare_write( params));
       end
 
   private
 
-      def load_augeas(params)
-          aug = params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
+      def open_augeas()
+        return Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD);
+      end
+      
+      def load_augeas( aug)
+	  raise ArgumentError, "An error in arguments, cannot create augeas tree." if @aug_tree.nil?
+
           aug.transform(:lens => SYSCONFIG_LENS, :incl => @file_path)
           aug.load
 
@@ -129,24 +149,19 @@ module ConfigAgent
       def raw_read(params)
           ret = {}
 
-          aug = @aug_tree
-
-          unless aug.get("/augeas/files#{@file_path}/error").nil?
+          unless @aug_tree.get("/augeas/files#{@file_path}/error").nil?
             #FIXME report it. TODO have universal wrapper for this (augeas serializer)
-              aug.close
               return ret
           end
 
-          aug.match("/files#{@file_path}/*").each do |key_path|
+          @aug_tree.match("/files#{@file_path}/*").each do |key_path|
               key = key_path.split("/").last
   # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
   # TODO: configurable option?
   #      next if key.start_with? "#comment"
 
-              ret[ key] = aug.get(key_path)
+              ret[ key] = @aug_tree.get(key_path)
           end
-
-          aug.close
 
           return ret
       end
@@ -203,6 +218,10 @@ module ConfigAgent
                 ret[ key] = value;
               else
                 ret[ key] = pack( value);
+
+	        if !( ret[ key] =~ /^["'].*["']$/)
+                  ret[ key] = DEFAULT_QUOTE + ret[ key] + DEFAULT_QUOTE;
+		end 
               end
           end
 
