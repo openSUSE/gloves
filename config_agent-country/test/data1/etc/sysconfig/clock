@@ -1,2 +1,2 @@
-TIMEZONE=US/Eastern
-HWCLOCK=-u
+TIMEZONE="US/Eastern"
+HWCLOCK="-u"
