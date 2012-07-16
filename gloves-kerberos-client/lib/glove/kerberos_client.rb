@@ -24,6 +24,8 @@ require 'config_agent/krb5_conf'
 require 'config_agent/ssh_config'
 require 'config_agent/script_agent'
 
+require "dbus_clients/backend_exception"
+
 require 'socket'
 
 # module for kerberos-client configuration
