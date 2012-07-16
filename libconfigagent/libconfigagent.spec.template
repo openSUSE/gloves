@@ -70,17 +70,17 @@ rm -rf $RPM_BUILD_ROOT
 %files 
 %defattr(-,root,root)
 %doc COPYING COPYING.LESSER
-%{rb_vendorlib}/config_agent_service
-%dir %{_datadir}/config_agents
-%dir %{_datadir}/config_agents/bin
+%{rb_vendorlib}/config_agent
 %dir /var/log/config_agents
-%{_datadir}/config_agents/bin/config_agent.rb
 
 
 
 %files devel
 %defattr(-,root,root)
-/usr/lib/config-agent-generator
+%dir /usr/lib/config-agent-generator
+/usr/lib/config-agent-generator/COPYING*
+/usr/lib/config-agent-generator/agent-generator
+/usr/lib/config-agent-generator/*.erb
 /usr/bin/config-agent-generator
 
 #---------------------------------------------------------------
