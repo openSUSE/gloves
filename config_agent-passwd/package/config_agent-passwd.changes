@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 16 14:56:12 CEST 2012 - jsuchome@suse.cz
+
+- agent for chpasswd
+- convert agents to new infrastructure (jreidinger) 
+- 0.2.0
+
+-------------------------------------------------------------------
 Thu Dec 15 17:09:05 CET 2011 - jsuchome@suse.cz
 
 - implemented reading from /etc/passwd
