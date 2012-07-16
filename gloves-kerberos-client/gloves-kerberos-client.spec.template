@@ -18,7 +18,7 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Library for high level access to kerberos client configuration
 Source:         %{name}-%{version}.tar.bz2
-Requires:  config_agent-kerberos
+Requires:       config_agent-kerberos libconfigagent
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
