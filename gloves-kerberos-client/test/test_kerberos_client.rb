@@ -40,14 +40,14 @@ class TestKerberosClient < Test::Unit::TestCase
       "admin_server"=>"kdc.example.cz",
       "ticket_lifetime"=>"1d"
     }
-    ConfigAgent::Krb5Conf.stubs(:read).returns krb5_conf_data
+    ConfigAgent::Krb5Conf.any_instance.stubs(:read).returns krb5_conf_data
     sss_pam_module_out = {
       "stderr" => "",
       "stdout" => "",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--sss"] ).returns(sss_pam_module_out)
-    ConfigAgent::SshConfig.stubs(:read).returns({"Host" => []})
+    ConfigAgent::ScriptAgent.any_instance.stubs(:run).with(["/usr/sbin/pam-config","-q", "--sss"]).returns(sss_pam_module_out)
+    ConfigAgent::SshConfig.any_instance.stubs(:read).returns({"Host" => []})
   end
 
   def test_read_common
@@ -56,8 +56,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "auth:\naccount: ignore_unknown_principals\npassword:\nsession:\n",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
-
+    ConfigAgent::ScriptAgent.any_instance.stubs(:run).with(["/usr/sbin/pam-config","-q", "--krb5"]).returns(krb5_pam_module_out)
     ret = Glove::KerberosClient.read({})
     assert_equal "300",ret["kerberos_client"]["clockskew"]
     assert_equal true,ret["kerberos_client"]["ignore_unknown"]
@@ -73,7 +72,7 @@ class TestKerberosClient < Test::Unit::TestCase
       "stdout" => "",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
+    ConfigAgent::ScriptAgent.any_instance.stubs(:run).with(["/usr/sbin/pam-config","-q", "--krb5"]).returns(krb5_pam_module_out)
 
     ret = Glove::KerberosClient.read({})
     assert_equal false,ret["pam_login"]["use_kerberos"]
@@ -81,14 +80,14 @@ class TestKerberosClient < Test::Unit::TestCase
   end
 
   # pam_krb configured, ignore_unknown is false
-  def test_read_withou_ignore_unknown
+  def test_read_without_ignore_unknown
 
     krb5_pam_module_out = {
       "stderr" => "",
       "stdout" => "auth:\naccount:\npassword:\nsession:\n",
       "exitstatus" => 0
     }
-    ConfigAgent::PamConfig.stubs(:execute).with("exec_args" => ["-q", "--krb5"] ).returns(krb5_pam_module_out)
+    ConfigAgent::ScriptAgent.any_instance.stubs(:run).with(["/usr/sbin/pam-config","-q", "--krb5"]).returns(krb5_pam_module_out)
 
     ret = Glove::KerberosClient.read({})
     assert_equal true,ret["pam_login"]["use_kerberos"]
