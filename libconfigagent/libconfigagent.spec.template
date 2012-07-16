@@ -10,7 +10,6 @@
 
 
 Name:           libconfigagent
-Requires:       rubygem-ruby-dbus
 License:        LGPL-2.1 OR LGPL-3
 Group:          System/Libraries
 URL:            https://github.com/yast/yast--
@@ -25,7 +24,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby
 BuildRequires:  rubygem-packaging_rake_tasks
 Requires:       augeas-lenses
-Recommends:     rubygem-ruby-dbus
 
 # This is for Hudson (build service) to setup the build env correctly
 %if 0
@@ -72,15 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %files 
 %defattr(-,root,root)
 %doc COPYING COPYING.LESSER
-%{rb_vendorlib}/dbus_clients
 %{rb_vendorlib}/config_agent_service
-/etc/dbus-1/system.d/org.opensuse.config_agent.conf
-%dir /etc/dbus-1
-%dir /etc/dbus-1/system.d
 %dir %{_datadir}/config_agents
 %dir %{_datadir}/config_agents/bin
-%dir %{_datadir}/dbus-1
-%dir %{_datadir}/dbus-1/system-services
 %dir /var/log/config_agents
 %{_datadir}/config_agents/bin/config_agent.rb
 
