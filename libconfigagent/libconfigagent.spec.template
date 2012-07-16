@@ -83,7 +83,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/dbus-1/system-services
 %dir /var/log/config_agents
 %{_datadir}/config_agents/bin/config_agent.rb
-%{_datadir}/dbus-1/system-services/org.opensuse.config_agent.service
 
 
 
