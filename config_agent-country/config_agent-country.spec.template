@@ -10,13 +10,13 @@
 
 
 Name:           config_agent-country
-License:	      LGPL-2.1 OR LGPL-3
+License:        LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    on
 Version:        VERSION_TEMPLATE
 Release:        0
-Summary:        Set of dbus services for basic access to country config
+Summary:        Set of services for basic access to country config
 Source:         %{name}-%{version}.tar.bz2
 Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent >= 0.2.0
@@ -61,12 +61,9 @@ rm -rf $RPM_BUILD_ROOT
 #---------------------------------------------------------------
 %files 
 %defattr(-,root,root)
-%dir /usr/share/polkit-1
-%dir /usr/share/polkit-1/actions
 %doc COPYING COPYING.LESSER
 %{rb_vendorlib}/config_agent
 /usr/share/config_agents
-/usr/share/polkit-1/actions/org.opensuse.config_agent*
 %dir /usr/share/augeas
 %dir /usr/share/augeas/lenses
 /usr/share/augeas/lenses/sysconfig.aug

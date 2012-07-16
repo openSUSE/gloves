@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 16 14:10:32 CEST 2012 - jsuchome@suse.cz
+
+- remove dbus and polkit references
+- 0.2.1 
+
+-------------------------------------------------------------------
 Mon Jul 16 13:40:12 CEST 2012 - jsuchome@suse.cz
 
 - agent for /etc/adjtime
