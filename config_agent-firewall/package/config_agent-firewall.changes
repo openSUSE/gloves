@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 16 13:59:13 CEST 2012 - jsuchome@suse.cz
+
+- convert to new config agent structure (jreidinger)
+- 0.2.0 
+
+-------------------------------------------------------------------
 Tue Dec 13 10:43:58 UTC 2011 - locilka@suse.com
 
 - Initial version
