@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Mon Jul 16 11:54:29 CEST 2012 - jsuchome@suse.cz
+
+- read RC_LC_MESSAGES
+- read HW clock from /etc/adjtime 
+- adapted for new config agents
+- require rubygems in gloves
+- do not depend on YaST data file
+- 0.3.0
+
+-------------------------------------------------------------------
 Thu Apr  5 14:07:52 CEST 2012 - jsuchome@suse.cz
 
 - renamed to gloves-country
