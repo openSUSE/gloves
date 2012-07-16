@@ -70,6 +70,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/augeas
 %dir /usr/share/augeas/lenses
 /usr/share/augeas/lenses/sysconfig.aug
+/usr/share/augeas/lenses/adjtime.aug
 
 
 #---------------------------------------------------------------
