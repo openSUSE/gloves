@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Mon Jul 16 15:06:40 CEST 2012 - jsuchome@suse.cz
+Mon Jul 16 15:25:49 CEST 2012 - jsuchome@suse.cz
 
+- adapted agent calls and testsuite to new infrastructure
 - removed config-agent-pam
 - 0.3.0 
 
