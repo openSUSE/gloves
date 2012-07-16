@@ -65,6 +65,14 @@ TEST_STABILITY_IN_FILE = "input"
     assert_equal agent.send( :raw_read, {}), agent.send( :prepare_write, params)
   end
 
+  def test_new_value_write
+    agent = ConfigAgent::Sysconfig.new( "/dummy")
+    q = ConfigAgent::Sysconfig::DEFAULT_QUOTE
+    params = { "KEY" => "VALUE" }
+    expected = { "KEY" => q + "VALUE" + q }
+
+    assert_equal expected, agent.send( :prepare_write, params)
+  end
 end
 
 Test::Unit::UI::Console::TestRunner.run(TestSysconfig)
