@@ -18,7 +18,7 @@ Version:        VERSION_TEMPLATE
 Release:        0
 Summary:        Library for high level access to users configuration
 Source:         %{name}-%{version}.tar.bz2
-Requires:  config_agent-passwd
+Requires:       config_agent-passwd
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  ruby

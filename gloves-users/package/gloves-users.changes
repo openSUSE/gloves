@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Jul 16 15:54:38 CEST 2012 - jsuchome@suse.cz
+
+- more options for adding user
+- use Chpasswd to set password
+- agent for useradd removed, using generic script agent 
+- 0.2.0
+
+-------------------------------------------------------------------
 Thu Apr  5 10:42:52 CEST 2012 - jsuchome@suse.cz
 
 - renamed to gloves-users
