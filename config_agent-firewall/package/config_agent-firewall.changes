@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Mon Jul 16 13:59:13 CEST 2012 - jsuchome@suse.cz
+Mon Jul 16 14:29:45 CEST 2012 - jsuchome@suse.cz
 
+- removed polkit references
 - convert to new config agent structure (jreidinger)
 - 0.2.0 
 
