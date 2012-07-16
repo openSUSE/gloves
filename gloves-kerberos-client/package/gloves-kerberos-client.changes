@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 16 15:06:40 CEST 2012 - jsuchome@suse.cz
+
+- removed config-agent-pam
+- 0.3.0 
+
+-------------------------------------------------------------------
 Thu Apr  5 13:47:47 CEST 2012 - jsuchome@suse.cz
 
 - renamed to gloves-kerberos-client
