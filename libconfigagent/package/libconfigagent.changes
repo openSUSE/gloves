@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 17 15:20:43 CEST 2012 - jsuchome@suse.cz
+
+- require rubygem-open4
+- 0.3.1 
+
+-------------------------------------------------------------------
 Mon Jul 16 13:33:24 CEST 2012 - jreidinger@suse.com
 
 - added sysconfig agent
