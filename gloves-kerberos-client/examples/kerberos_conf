@@ -19,7 +19,6 @@
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
 require "glove/kerberos_client"
-require "dbus_clients/backend_exception"
 begin
   if ARGV.empty?
     krb = Glove::KerberosClient::read({})
@@ -32,7 +31,7 @@ begin
     puts Glove::KerberosClient::modify({}, {"kerberos_client"=>{"default_realm"=>ARGV[0]}})
 #    puts Glove::KerberosClient::modify({}, {"kerberos_client"=>{"default_realm"=>ARGV[0], "ssh_support" => true}})
   end
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
+rescue Exception => e
+  puts e.inspect
   raise
 end

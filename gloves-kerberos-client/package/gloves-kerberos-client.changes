@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 17 16:06:39 CEST 2012 - jsuchome@suse.cz
+
+- do not require obsolete backend_exception
+- 0.3.1 
+
+-------------------------------------------------------------------
 Mon Jul 16 15:25:49 CEST 2012 - jsuchome@suse.cz
 
 - adapted agent calls and testsuite to new infrastructure
