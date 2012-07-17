@@ -14,11 +14,12 @@ License:	LGPL-2.1 OR LGPL-3
 Group:          System/Management
 URL:            https://github.com/yast/yast--
 Autoreqprov:    1
-Version:        0.2.1
+Version:        0.3.0
 Release:        0
 Summary:        YCP bindings to YLib
 
 
+BuildRequires:  ruby
 Requires:       gloves-global
 BuildRequires:	yast2 gloves-global
 
