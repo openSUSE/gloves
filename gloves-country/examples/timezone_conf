@@ -19,7 +19,6 @@
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
 require "glove/timezone"
-require "dbus_clients/backend_exception"
 begin
   args = {}
   args = { "kind" => ARGV[0] } if [ "timezones", "regions", "time", "language"].include? ARGV[0]
@@ -42,7 +41,7 @@ begin
     puts Glove::Timezone::modify({}, {"timezone"=>ARGV[0]}).inspect
   end
 
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
+rescue Exception => e
+  puts e.inspect
   raise
 end

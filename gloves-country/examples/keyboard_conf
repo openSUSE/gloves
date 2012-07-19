@@ -19,7 +19,6 @@
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
 require "glove/keyboard"
-require "dbus_clients/backend_exception"
 begin
   args = {}
 
@@ -33,7 +32,7 @@ begin
   else
     puts Glove::Keyboard::modify({}, {"keymap"=>ARGV[0]})
   end
-rescue DbusClients::BackendException => e
-  puts e.backend_backtrace
+rescue Exception => e
+  puts e.inspect
   raise
 end

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 19 10:34:13 CEST 2012 - jsuchome@suse.cz
+
+- remove dbus_clients/backend_exception dependency 
+
+-------------------------------------------------------------------
 Mon Jul 16 11:54:29 CEST 2012 - jsuchome@suse.cz
 
 - read RC_LC_MESSAGES
