@@ -16,62 +16,32 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent/file_agent' # Gloves only
-require 'augeas'
+require 'config_agent/augeas_wrapper'
 require 'shellwords'
 
 module ConfigAgent
-  class Sysconfig <  ConfigAgent::FileAgent
+  class Sysconfig <  AugeasWrapper
 
       SYSCONFIG_LENS = "Shellvars.lns"
       DEFAULT_QUOTE  = '"'
 
-      def initialize path,params={}
-        raise ArgumentError,"Path argument must be absolut path" unless path.start_with? '/'
-        @file_path = path
+      def initialize( params = {})
+        params[ :lens] = SYSCONFIG_LENS
+
+        super( params);
+
         @orig_values = {};
-
-	@aug_tree = open_augeas
-      end
-
-      def ConfigAgent.finalize( id)
-        @aug_tree.close if @aug_tree
       end
 
       def read(params)
-	if( params[ "_aug_internal"])
-          @aug_tree.close
-	  @aug_tree = params[ "_aug_internal"]
-	end
-
-        @aug_tree = load_augeas( @aug_tree)
-        ret = prepare_read( raw_read( params));
+        ret = prepare_read( serialize( params));
       end
 
       def write(params)
-	if( params[ "_aug_internal"])
-          @aug_tree.close
-	  @aug_tree = params[ "_aug_internal"]
-	end
-
-        @aug_tree = load_augeas( @aug_tree)
-        return raw_write( prepare_write( params));
+        return deserialize( prepare_write( params));
       end
 
   private
-
-      def open_augeas()
-        return Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD);
-      end
-      
-      def load_augeas( aug)
-	  raise ArgumentError, "An error in arguments, cannot create augeas tree." if @aug_tree.nil?
-
-          aug.transform(:lens => SYSCONFIG_LENS, :incl => @file_path)
-          aug.load
-
-          return aug
-      end
 
        # to get correct value it is needed to unescape too
        # @example
@@ -143,49 +113,6 @@ module ConfigAgent
           result = Shellwords.escape( string)
         end        
         return result
-      end
-
-      # returns content of underlying file as it get it.
-      def raw_read(params)
-          ret = {}
-
-          unless @aug_tree.get("/augeas/files#{@file_path}/error").nil?
-            #FIXME report it. TODO have universal wrapper for this (augeas serializer)
-              return ret
-          end
-
-          @aug_tree.match("/files#{@file_path}/*").each do |key_path|
-              key = key_path.split("/").last
-  # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
-  # TODO: configurable option?
-  #      next if key.start_with? "#comment"
-
-              ret[ key] = @aug_tree.get(key_path)
-          end
-
-          return ret
-      end
-
-      # writes values as it gets them
-      def raw_write(params)
-          ret = {
-            "success" => true
-          }
-
-          aug = @aug_tree
-
-          params.each do |key, value|
-              aug.set("/files#{@file_path}/#{key}", value)
-          end
-
-          unless aug.save
-              ret["success"] = false
-              ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
-          end
-
-          aug.close
-          
-          return ret
       end
 
       # parse values loaded from the underlying file. It removes quoting and so on.

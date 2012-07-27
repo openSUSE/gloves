@@ -49,7 +49,7 @@ TEST_STABILITY_IN_FILE = "input"
   end
 
   def test_quoting
-    agent = ConfigAgent::Sysconfig.new "/dummy"
+    agent = ConfigAgent::Sysconfig.new( { :path => "/dummy" })
     TEST_UNQUOTING_MAP.each do |test,result|
       assert_equal result,agent.send(:unpack,test)
     end
@@ -59,14 +59,14 @@ TEST_STABILITY_IN_FILE = "input"
   end
 
   def test_stability
-    agent= ConfigAgent::Sysconfig.new( @data + TEST_STABILITY_IN_FILE)
+    agent= ConfigAgent::Sysconfig.new( { :path => @data + TEST_STABILITY_IN_FILE })
     params = agent.read({})
 
-    assert_equal agent.send( :raw_read, {}), agent.send( :prepare_write, params)
+    assert_equal agent.send( :serialize, {}), agent.send( :prepare_write, params)
   end
 
   def test_new_value_write
-    agent = ConfigAgent::Sysconfig.new( "/dummy")
+    agent = ConfigAgent::Sysconfig.new( { :path => "/dummy" })
     q = ConfigAgent::Sysconfig::DEFAULT_QUOTE
     params = { "KEY" => "VALUE" }
     expected = { "KEY" => q + "VALUE" + q }
