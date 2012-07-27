@@ -30,8 +30,8 @@ class TestClock < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Clock.new
-    sysconfig_clock = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Clock.new( { :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    sysconfig_clock = file.read({})
     assert_equal "Europe/Prague", sysconfig_clock["TIMEZONE"]
     assert_equal "--localtime", sysconfig_clock["HWCLOCK"]
     assert_equal "yes", sysconfig_clock["SYSTOHC"]
@@ -39,25 +39,23 @@ class TestClock < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Clock.new
+    file = ConfigAgent::Clock.new( { :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
     params	= {
-	"_aug_internal"		=> Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
 	"TIMEZONE"		=> "US/Eastern",
 	"HWCLOCK"		=> "-u"
     }
     ret = file.write params
-    assert_equal true, ret["success"]
     assert_equal nil, ret["message"]
+    assert_equal true, ret["success"]
   end
 
   # diff data/etc/sysconfig/clock data2/etc/sysconfig/clock -> change value of TIMEZONE
   def test_overwrite
-    file = ConfigAgent::Clock.new
-    params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Clock.new( { :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    params = file.read({})
     assert_equal "Europe/Prague", params["TIMEZONE"]
 
-    file2 = ConfigAgent::Clock.new
-    params["_aug_internal"]	= Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file2 = ConfigAgent::Clock.new( { :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
     params["TIMEZONE"]		= "US/Eastern"
 
     ret = file2.write params

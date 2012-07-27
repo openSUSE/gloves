@@ -48,7 +48,7 @@ module ConfigAgent
 
     # loads data from the augeas tree and stores them in a hash
     def serialize( params)
-      raise ArgumentError "_aug_internal not supported" if params.has_key?( "_aug_internal")
+      raise ArgumentError, "_aug_internal not supported" if params.has_key?( "_aug_internal")
 
       ret = {}
 
@@ -72,7 +72,7 @@ module ConfigAgent
 
     # loads data from given hash and stores them in the augeas tree
     def deserialize( params)
-      raise ArgumentError "_aug_internal not supported" if params.has_key?( "_aug_internal")
+      raise ArgumentError, "_aug_internal not supported" if params.has_key?( "_aug_internal")
 
       ret = {
         "success" => true
