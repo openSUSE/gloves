@@ -42,6 +42,7 @@ TEST_QUOTING_MAP = {
 }
 
 TEST_STABILITY_IN_FILE = "input"
+TEST_WORKING_DIR = "/tmp/"
 
   def setup
     file_path = File.expand_path( __FILE__)
@@ -59,10 +60,24 @@ TEST_STABILITY_IN_FILE = "input"
   end
 
   def test_stability
-    agent= ConfigAgent::Sysconfig.new( { :path => @data + TEST_STABILITY_IN_FILE })
-    params = agent.read({})
+    # prepare test input
+    test_file  = TEST_WORKING_DIR + TEST_STABILITY_IN_FILE
+    orig_file = @data + TEST_STABILITY_IN_FILE
 
-    assert_equal agent.send( :serialize, {}), agent.send( :prepare_write, params)
+    res = system( "cp #{orig_file} #{test_file}")
+
+    assert( res)
+
+    # perform the test
+    agent = ConfigAgent::Sysconfig.new( { :path => test_file })
+
+    agent.write( agent.read({}))
+    res = system( "diff #{test_file} #{orig_file}")
+
+    assert( res)
+
+    # cleanup
+    system( "rm #{test_file}")
   end
 
   def test_new_value_write
