@@ -31,15 +31,16 @@ module ConfigAgent
     # * root_dir - which dir should be used as filesystem root
     #
     def initialize( params)
-        @lens      = params[ :lens]
-        @file_path = params[ :path]
-        @incl_path = params[ :include]
-        @root_dir  = params[ :root_dir]
 
-        raise ArgumentError,"Path argument must be absolut path" unless @file_path.start_with? '/'
-        # TODO: add other checks here
+      @lens      = params[ :lens]
+      @file_path = params[ :path]
+      @incl_path = params[ :include]
+      @root_dir  = params[ :root_dir]
 
-	@aug_tree = open_augeas
+      raise ArgumentError,"Path argument must be absolut path" unless @file_path.start_with? '/'
+      # TODO: add other checks here
+
+      @aug_tree = open_augeas
     end
 
     def AugeasWrapper.finalize( id)
@@ -59,7 +60,7 @@ module ConfigAgent
 
       aug.match("/files#{@file_path}/*").each do |key_path|
         key = key_path.split("/").last
-  
+
         # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
         # TODO: configurable option?
         #      next if key.start_with? "#comment"
@@ -85,8 +86,8 @@ module ConfigAgent
       end
 
       unless aug.save
-          ret["success"] = false
-          ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
+        ret["success"] = false
+        ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
       end
 
       return ret
