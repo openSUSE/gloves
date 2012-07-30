@@ -30,7 +30,7 @@ class TestKeyboard < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Keyboard.new( { :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     sysconfig_keyboard = file.read ({})
     assert_equal "english-us,pc104", sysconfig_keyboard["YAST_KEYBOARD"]
     assert_equal "us.map.gz", sysconfig_keyboard["KEYTABLE"]
@@ -40,7 +40,7 @@ class TestKeyboard < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Keyboard.new( { :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file = ConfigAgent::Keyboard.new( :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params        = {
         "YAST_KEYBOARD"		=> "english-uk,pc104",
         "KEYTABLE"		=> "uk.map.gz"
@@ -52,12 +52,12 @@ class TestKeyboard < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/keyboard data2/etc/sysconfig/keyboard -> change value of RC_LANG
   def test_overwrite
-    file = ConfigAgent::Keyboard.new( { :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params = file.read({})
     assert_equal "english-us,pc104", params["YAST_KEYBOARD"]
     assert_equal "us.map.gz", params["KEYTABLE"]
 
-    file2 = ConfigAgent::Keyboard.new( { :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file2 = ConfigAgent::Keyboard.new( :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params["YAST_KEYBOARD"]        = "english-uk,pc104"
     params["KEYTABLE"]        	= "uk.map.gz"
 

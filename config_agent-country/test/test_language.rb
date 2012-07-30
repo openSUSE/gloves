@@ -30,7 +30,7 @@ class TestLanguage < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Language.new( { :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file = ConfigAgent::Language.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     sysconfig_language = file.read({})
     assert_equal "cs_CZ.UTF-8", sysconfig_language["RC_LANG"]
     assert_equal "", sysconfig_language["INSTALLED_LANGUAGES"]
@@ -38,7 +38,7 @@ class TestLanguage < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Language.new( { :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file = ConfigAgent::Language.new( :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params        = {
         "ROOT_USES_LANG"	=> "yes",
         "RC_LANG"		=> "en_US.UTF-8"
@@ -50,12 +50,12 @@ class TestLanguage < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/language data2/etc/sysconfig/language -> change value of RC_LANG
   def test_overwrite
-    file = ConfigAgent::Language.new( { :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file = ConfigAgent::Language.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params = file.read({})
     assert_equal "cs_CZ.UTF-8", params["RC_LANG"]
     assert_equal "", params["INSTALLED_LANGUAGES"]
 
-    file2 = ConfigAgent::Language.new( { :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") })
+    file2 = ConfigAgent::Language.new( :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params["RC_LANG"]        	= "en_US.UTF-8"
     params["INSTALLED_LANGUAGES"]        = "cs_CZ,en_US"
 
