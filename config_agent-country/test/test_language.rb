@@ -30,34 +30,32 @@ class TestLanguage < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Language.new
-    sysconfig_language = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Language.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    sysconfig_language = file.read({})
     assert_equal "cs_CZ.UTF-8", sysconfig_language["RC_LANG"]
     assert_equal "", sysconfig_language["INSTALLED_LANGUAGES"]
   end
 
   # write new file
   def test_write
-    file = ConfigAgent::Language.new
+    file = ConfigAgent::Language.new( :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params        = {
-        "_aug_internal"		=> Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
         "ROOT_USES_LANG"	=> "yes",
         "RC_LANG"		=> "en_US.UTF-8"
     }
     ret = file.write params
-    assert_equal true, ret["success"]
     assert_equal nil, ret["message"]
+    assert_equal true, ret["success"]
   end
 
   # diff data/etc/sysconfig/language data2/etc/sysconfig/language -> change value of RC_LANG
   def test_overwrite
-    file = ConfigAgent::Language.new
-    params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Language.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    params = file.read({})
     assert_equal "cs_CZ.UTF-8", params["RC_LANG"]
     assert_equal "", params["INSTALLED_LANGUAGES"]
 
-    file2 = ConfigAgent::Language.new
-    params["_aug_internal"]        = Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file2 = ConfigAgent::Language.new( :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params["RC_LANG"]        	= "en_US.UTF-8"
     params["INSTALLED_LANGUAGES"]        = "cs_CZ,en_US"
 

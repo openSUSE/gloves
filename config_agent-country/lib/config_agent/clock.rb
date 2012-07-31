@@ -21,7 +21,8 @@ require 'config_agent/sysconfig'
 module ConfigAgent
   class Clock < ConfigAgent::Sysconfig
     def initialize params={}
-      super "/etc/sysconfig/clock",params
+      params[ :path] = "/etc/sysconfig/clock"
+      super( params)
     end
   end
 end
