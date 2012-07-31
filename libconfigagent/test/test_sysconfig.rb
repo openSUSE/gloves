@@ -42,6 +42,7 @@ TEST_QUOTING_MAP = {
 }
 
 TEST_STABILITY_IN_FILE = "input"
+TEST_WORKING_DIR = "/tmp/"
 
   def setup
     file_path = File.expand_path( __FILE__)
@@ -49,7 +50,7 @@ TEST_STABILITY_IN_FILE = "input"
   end
 
   def test_quoting
-    agent = ConfigAgent::Sysconfig.new "/dummy"
+    agent = ConfigAgent::Sysconfig.new( { :path => "/dummy" })
     TEST_UNQUOTING_MAP.each do |test,result|
       assert_equal result,agent.send(:unpack,test)
     end
@@ -59,14 +60,26 @@ TEST_STABILITY_IN_FILE = "input"
   end
 
   def test_stability
-    agent= ConfigAgent::Sysconfig.new( @data + TEST_STABILITY_IN_FILE)
-    params = agent.read({})
+    # prepare test input
+    test_file  = TEST_WORKING_DIR + TEST_STABILITY_IN_FILE
+    orig_file = @data + TEST_STABILITY_IN_FILE
 
-    assert_equal agent.send( :raw_read, {}), agent.send( :prepare_write, params)
+    FileUtils.cp( orig_file, test_file)
+
+    # perform the test
+    agent = ConfigAgent::Sysconfig.new( { :path => test_file })
+
+    agent.write( agent.read({}))
+    res = FileUtils.compare_file( test_file, orig_file)
+
+    assert( res)
+
+    # cleanup
+    FileUtils.rm( test_file)
   end
 
   def test_new_value_write
-    agent = ConfigAgent::Sysconfig.new( "/dummy")
+    agent = ConfigAgent::Sysconfig.new( { :path => "/dummy" })
     q = ConfigAgent::Sysconfig::DEFAULT_QUOTE
     params = { "KEY" => "VALUE" }
     expected = { "KEY" => q + "VALUE" + q }

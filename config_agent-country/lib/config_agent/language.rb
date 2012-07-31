@@ -21,7 +21,8 @@ require 'config_agent/sysconfig'
 module ConfigAgent
   class Language < ConfigAgent::Sysconfig
     def initialize params={}
-      super "/etc/sysconfig/language",params
+      params[ :path] = "/etc/sysconfig/language" 
+      super( params )
     end
   end
 end

@@ -30,8 +30,8 @@ class TestKeyboard < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Keyboard.new
-    sysconfig_keyboard = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    sysconfig_keyboard = file.read ({})
     assert_equal "english-us,pc104", sysconfig_keyboard["YAST_KEYBOARD"]
     assert_equal "us.map.gz", sysconfig_keyboard["KEYTABLE"]
     assert_equal "bios", sysconfig_keyboard["KBD_NUMLOCK"]
@@ -40,26 +40,24 @@ class TestKeyboard < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Keyboard.new
+    file = ConfigAgent::Keyboard.new( :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params        = {
-        "_aug_internal"		=> Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
         "YAST_KEYBOARD"		=> "english-uk,pc104",
         "KEYTABLE"		=> "uk.map.gz"
     }
     ret = file.write params
-    assert_equal true, ret["success"]
     assert_equal nil, ret["message"]
+    assert_equal true, ret["success"]
   end
 
   # diff data/etc/sysconfig/keyboard data2/etc/sysconfig/keyboard -> change value of RC_LANG
   def test_overwrite
-    file = ConfigAgent::Keyboard.new
-    params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    params = file.read({})
     assert_equal "english-us,pc104", params["YAST_KEYBOARD"]
     assert_equal "us.map.gz", params["KEYTABLE"]
 
-    file2 = ConfigAgent::Keyboard.new
-    params["_aug_internal"]        = Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file2 = ConfigAgent::Keyboard.new( :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params["YAST_KEYBOARD"]        = "english-uk,pc104"
     params["KEYTABLE"]        	= "uk.map.gz"
 

@@ -21,7 +21,8 @@ require 'config_agent/sysconfig'
 module ConfigAgent
   class Keyboard < ConfigAgent::Sysconfig
     def initialize params={}
-      super "/etc/sysconfig/keyboard",params
+      params[ :path] = "/etc/sysconfig/keyboard" 
+      super( params )
     end
   end
 end
