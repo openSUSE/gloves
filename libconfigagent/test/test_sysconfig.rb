@@ -64,20 +64,18 @@ TEST_WORKING_DIR = "/tmp/"
     test_file  = TEST_WORKING_DIR + TEST_STABILITY_IN_FILE
     orig_file = @data + TEST_STABILITY_IN_FILE
 
-    res = system( "cp #{orig_file} #{test_file}")
-
-    assert( res)
+    FileUtils.cp( orig_file, test_file)
 
     # perform the test
     agent = ConfigAgent::Sysconfig.new( { :path => test_file })
 
     agent.write( agent.read({}))
-    res = system( "diff #{test_file} #{orig_file}")
+    res = FileUtils.compare_file( test_file, orig_file)
 
     assert( res)
 
     # cleanup
-    system( "rm #{test_file}")
+    FileUtils.rm( test_file)
   end
 
   def test_new_value_write
