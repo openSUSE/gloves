@@ -17,7 +17,7 @@ Various written documenation is located at doc directory.
 install rubygem dependencies from the OpenSUSE build system's Ruby Extensions repository
 
     sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
-    sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
+    sudo zypper in rubygem-ruby-augeas augeas-lenses rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
 
     sudo rake install
     cd yast++lib-kerberos-client
