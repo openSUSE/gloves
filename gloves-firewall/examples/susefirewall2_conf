@@ -28,11 +28,7 @@ begin
     puts susefirewall2.inspect
 
     if susefirewall2.nil?
-<<<<<<< HEAD:yast++lib-firewall/examples/susefirewall2_conf
-      error = YLib::Susefirewall2::last_error
-=======
       error = Glove::Susefirewall2::last_error
->>>>>>> upstream/master:gloves-firewall/examples/susefirewall2_conf
       puts "returned error: #{error}" if error
     end
   else
