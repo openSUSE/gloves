@@ -1,0 +1,5 @@
+Read	.target.size "/etc/sysconfig/language" 1
+Read	.target.dir "/usr/share/YaST2/data/languages" ["language_de_DE.ycp"]
+Read	.target.yast2 "languages/language_de_DE.ycp" $["de_DE":["Deutsch", "Deutsch", ".UTF-8", "@euro", "German"]]
+Return	["Primary Language: English (US)", "Additional Languages: German"]
+Return	["Primary Language: English (US)"]

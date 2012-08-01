@@ -1,0 +1,112 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:		keyboard_proposal.ycp
+ *
+ * $Id: keyboard_proposal.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ *
+ * Author:              Klaus Kaempf <kkaempf@suse.de>
+ *
+ * Purpose:		Proposal function dispatcher - keyboard.
+ *
+ *			See also file proposal-API.txt for details.
+ */
+{
+    textdomain "country";
+
+    import "Arch";
+    import "Keyboard";
+    import "Wizard";
+
+    include "keyboard/dialogs.ycp";
+
+    string func  = (string)WFM::Args(0);
+    map    param = (map)WFM::Args(1);
+    map    ret   = $[];
+
+    if ( func == "MakeProposal" )
+    {
+	boolean force_reset      = param["force_reset"     ]:false;
+	boolean language_changed = param["language_changed"]:false;
+
+	// call some function that makes a proposal here:
+	//
+	// DummyMod::MakeProposal( force_reset );
+
+	// Fill return map
+
+	ret =
+	    $[
+	      "raw_proposal"    : [ Keyboard::MakeProposal( force_reset, language_changed ) ],
+	      "language_changed": false
+	    ];
+    }
+    else if ( func == "AskUser" )
+    {
+	if (Arch::s390 ())
+	{
+	    ret = $[
+		"workflow_sequence" : `next,
+		"language_changed"  : false
+	    ];
+	    return ret;
+	}
+
+	if (!Keyboard::CalledRestore())
+	{
+	    Keyboard::Restore();
+	}
+
+	Keyboard::Read (); // save the inital values
+
+	map argmap = $[
+	    "enable_back"	: true,
+	    "enable_next"	: param["has_next"]:false
+	];
+
+	Wizard::OpenAcceptDialog();
+	symbol result = KeyboardDialog (argmap);
+	Wizard::CloseDialog ();
+
+	// Fill return map
+	ret = $[
+		"workflow_sequence" : result,
+		"language_changed"  : false
+	       ];
+    }
+    else if ( func == "Description" )
+    {
+	// Fill return map.
+	//
+	// Static values do just nicely here, no need to call a function.
+
+	ret =
+	    $[
+	      // summary item
+	      "rich_text_title"	:	_("Keyboard Layout"),
+	      // menue label text
+	      "menu_title"	:	_("&Keyboard Layout"),
+	      "id"		:	"keyboard_stuff"
+	    ];
+    }
+
+    return ret;
+}

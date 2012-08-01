@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr  5 14:26:25 CEST 2012 - jsuchome@suse.cz
+
+- yast++ packages renamed to gloves
+- 3.0.2 
+
+-------------------------------------------------------------------
 Tue Feb 14 14:48:01 CET 2012 - jsuchome@suse.cz
 
 - require yast++lib-kerberos-client

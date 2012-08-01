@@ -1,0 +1,9 @@
+Read	.target.yast2 "keyboard_raw.ycp" $[]
+Read	.target.yast2 "lang2keyboard.ycp" $["cs_CZ":"czech", "de_CH":"german-ch", "en_US":"english-us"]
+Return	english-us
+Read	.target.yast2 "lang2keyboard.ycp" $["cs_CZ":"czech", "de_CH":"german-ch", "en_US":"english-us"]
+Return	czech
+Read	.target.yast2 "lang2keyboard.ycp" $["cs_CZ":"czech", "de_CH":"german-ch", "en_US":"english-us"]
+Return	german-ch
+Read	.target.yast2 "lang2keyboard.ycp" $["cs_CZ":"czech", "de_CH":"german-ch", "en_US":"english-us"]
+Return	en_US

@@ -1,5 +1,0 @@
-# DBus service activation config
-[D-BUS Service]
-Name=org.opensuse.config_agent.file.etc_sysconfig_windowmanager
-Exec=/usr/share/config_agents/bin/file_services/windowmanager_service.rb
-User=root

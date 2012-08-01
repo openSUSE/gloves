@@ -1,0 +1,8 @@
+Read	.target.size "/etc/sysconfig/language" 1
+Read	.target.dir "/usr/share/YaST2/data/languages" []
+Write	.sysconfig.language.RC_LANG "en_US.UTF-8" true
+Read	.sysconfig.language.RC_LC_MESSAGES ""
+Write	.sysconfig.language.ROOT_USES_LANG "ctype" true
+Write	.sysconfig.language.INSTALLED_LANGUAGES "en_US" true
+Write	.sysconfig.language nil true
+Return	nil

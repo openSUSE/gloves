@@ -1,0 +1,3 @@
+Read	.target.yast2 "lang2tz.ycp" $["cs_CZ":"Europe/Prague", "en_US":"US/Mountain"]
+Return	US/Mountain
+Return	US/Pacific

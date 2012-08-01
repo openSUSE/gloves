@@ -1,0 +1,72 @@
+/**
+ * File:	lang2tz.ycp
+ *
+ * Authors:	Thomas Roelz <tom@suse.de> (original authors unknown)
+ *
+ * Maintainer:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ *
+ * Summary:  map language code to default timezone
+ *
+ * $Id: lang2tz.ycp 43812 2008-01-22 12:20:52Z jsuchome $
+*
+ * This map does not need to contain the entries for languages directly
+ * supported by YaST - for such languages the default time zone mappings are
+ * present in their language_LANGCODE.ycp description files. See language/data.
+ *
+ * *****************************************************************
+ * In case of changes please keep the following files in sync:
+ * lang2tz.ycp, timezone_raw.ycp
+ * *****************************************************************
+ */
+
+$[
+  "ar_eg"		: "Africa/Cairo",
+
+  "br_FR"		: "Europe/Paris",
+
+  "de"			: "Europe/Berlin",
+  "de_AT"		: "Europe/Vienna",
+  "de_CH"		: "Europe/Zurich",
+  "de_LU"		: "Europe/Luxembourg",
+  "de_BE"		: "Europe/Brussels",
+
+  "en"			: "US/Eastern",
+  "en_AU"		: "Australia/Sydney",
+  "en_CA"		: "Canada/Eastern",
+  "en_IE"		: "Europe/Belfast",
+  "en_NZ"		: "Pacific/Auckland",
+  "en_IN"		: "Asia/Calcutta",
+
+  "es_AR"		: "America/Buenos_Aires",
+  "es_CL"		: "Chile/Continental",
+  "es_CO"		: "America/Bogota",
+  "es_MX"		: "Mexico/General",
+  "es_PE"		: "America/Lima",
+  "es_PY"		: "America/Asuncion",
+  "es_UY"		: "America/Montevideo",
+  "es_VE"		: "America/Caracas",
+
+  "fr"			: "Europe/Paris",
+  "fr_BE"		: "Europe/Brussels",
+  "fr_CA"		: "Canada/Eastern",
+  "fr_CH"		: "Europe/Zurich",
+  "fr_LU"		: "Europe/Luxembourg",
+
+  "it_CH"		: "Europe/Zurich",
+
+  "km"			: "Asia/Phnom_Penh",
+
+  "nl_BE"		: "Europe/Brussels",
+
+  "no_NO"		: "Europe/Oslo",
+
+  "ru"			: "Europe/Moscow",
+  "ru_RU.KOI8-R"	: "Europe/Moscow",
+  "ru_UA"		: "Europe/Kiev",
+
+  "sr_YU"		: "Europe/Belgrade",
+
+  "zh_CN"		: "Asia/Shanghai",
+  "zh_TW"		: "Asia/Taipei",
+]

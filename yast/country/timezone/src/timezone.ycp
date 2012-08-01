@@ -1,0 +1,210 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+/*
+ *
+ * Module:             timezone.ycp
+ *
+ * Author:             Klaus Kaempf (kkaempf@suse.de)
+ *
+ * Submodules:
+ *
+ *
+ * Purpose:	configure timezone in running system
+ *
+ * Modify:
+ *
+ *
+ * $Id: timezone.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ */
+
+{
+textdomain "country";
+
+import "CommandLine";
+import "Timezone";
+import "Wizard";
+
+include "timezone/dialogs.ycp";
+
+
+/**
+ * read timezone settings (store initial values)
+ */
+define boolean TimezoneRead () {
+
+    Timezone::PushVal ();
+    return true;
+}
+
+/**
+ * write timezone settings
+ */
+define boolean TimezoneWrite () {
+
+    if (Timezone::Modified ())
+    {
+	y2milestone ("User selected new timezone/clock setting: <%1> <%2>",
+	    Timezone::timezone, Timezone::hwclock);
+
+	Timezone::Save ();
+	WFM::CallFunction( "inst_suseconfig", [ false, false ] );
+    }
+    else
+    {
+	y2milestone( "Timezone not changed --> doing nothing" );
+    }
+    return true;
+}
+
+
+/**
+ * the timezone configuration sequence
+ */
+define any TimezoneSequence () {
+
+    // create the wizard dialog
+    Wizard::OpenOKDialog();
+
+    any result = TimezoneDialog ($[]);
+
+    if ( result == `next )
+    {
+	TimezoneWrite ();
+    }
+    else	// `cancel or `back
+    {
+	y2milestone( "User cancelled --> no change" );
+    }
+    Wizard::CloseDialog ();
+    return result;
+}
+
+/**
+ * Handler for timezone summary
+ */
+define boolean TimezoneSummaryHandler (map options) {
+
+    // summary label
+    CommandLine::Print(sformat (_("Current Time Zone:\t%1"),Timezone::timezone));
+
+    if (!Timezone::utc_only())
+    {
+	// summary label
+	CommandLine::Print (sformat (_("Hardware Clock Set To:\t%1"),
+		// summary text (Clock setting)
+	    Timezone::hwclock == "-u" ? _("UTC") :
+		// summary text (Clock setting)
+		_("Local time"))
+	);
+
+    }
+    // summary label
+    CommandLine::Print (sformat (_("Current Time and Date:\t%1"),
+	Timezone::GetDateTime(true, true)));
+    return false;
+}
+
+/**
+ * Handler for listing timezone layouts
+ */
+define boolean TimezoneListHandler (map options) {
+
+    foreach (map<string,any> zone, Timezone::get_zonemap (), {
+	CommandLine::Print ("");
+	// summary label
+	CommandLine::Print (sformat ("Region: %1", zone["name"]:""));
+	foreach (string code, string name, zone["entries"]:$[], {
+	    CommandLine::Print (sformat ("%1 (%2)", code, name));
+	});
+    });
+    return false;
+}
+
+
+/**
+ * Handler for changing timezone settings
+ */
+define boolean TimezoneSetHandler (map options) {
+
+    string timezone	= options["timezone"]:"";
+    string hwclock	= options["hwclock"]:"";
+
+    if (timezone != "")
+    {
+	Timezone::Set (timezone, true);
+    }
+    if (hwclock != "" && !Timezone::utc_only ())
+    {
+	Timezone::hwclock	= tolower (hwclock) == "utc" ? "-u" : "--localtime";
+    }
+    return (Timezone::Modified ());
+}
+
+
+/* -- the command line description map -------------------------------------- */
+map cmdline = $[
+    "id"		: "timezone",
+    // translators: command line help text for timezone module
+    "help"		: _("Time zone configuration"),
+    "guihandler"	: TimezoneSequence,
+    "initialize"	: TimezoneRead,
+    "finish"		: TimezoneWrite,
+    "actions"		: $[
+	"summary" :$[
+	    "handler"	: TimezoneSummaryHandler,
+	    // command line help text for 'summary' action
+	    "help"	: _("Time zone configuration summary"),
+	],
+	"set" :$[
+	    "handler"	: TimezoneSetHandler,
+	    // command line help text for 'set' action
+	    "help"	: _("Set new values for time zone configuration"),
+	],
+	"list": $[
+	    "handler"	: TimezoneListHandler,
+	    // command line help text for 'list' action
+	    "help"	: _("List all available time zones")
+	],
+    ],
+    "options"		: $[
+	"timezone"		: $[
+	    // command line help text for 'set timezone' option
+	    "help"	: _("New time zone"),
+	    "type"	: "string"
+	],
+	"hwclock"		: $[
+	    // command line help text for 'set hwclock' option
+	    "help"	: _("New value for hardware clock"),
+	    "type"	: "enum",
+	    "typespec"	: [ "local", "utc", "UTC" ],
+	],
+    ],
+    "mappings"		: $[
+	"summary"	: [],
+	"set"		: [ "timezone", "hwclock" ],
+	"list"		: [],
+    ]
+];
+
+CommandLine::Run (cmdline);
+return true;
+
+
+}

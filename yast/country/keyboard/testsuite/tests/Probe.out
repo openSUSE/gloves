@@ -1,0 +1,4 @@
+Read	.probe.keyboard nil
+Read	.target.yast2 "lang2keyboard.ycp" $["czech-qwerty":["Czech (qwerty)", $["pc104":$["compose":"latin2", "ncurses":"cz-lat2-us.map.gz"]]], "danish":["Danish", $["pc104":$["ncurses":"dk-latin1.map.gz"]]]]
+Read	.target.yast2 "keyboard_raw.ycp" $["czech-qwerty":["Czech (qwerty)", $["pc104":$["compose":"latin2", "ncurses":"cz-lat2-us.map.gz"]]], "danish":["Danish", $["pc104":$["ncurses":"dk-latin1.map.gz"]]]]
+Read	.target.yast2 "keyboard_raw.ycp" $["czech-qwerty":["Czech (qwerty)", $["pc104":$["compose":"latin2", "ncurses":"cz-lat2-us.map.gz"]]], "danish":["Danish", $["pc104":$["ncurses":"dk-latin1.map.gz"]]]]

@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+#--
+# Gloves Timezone Library
+#
+# Copyright (C) 2011 Novell, Inc.
+#   This library is free software; you can redistribute it and/or modify
+# it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
+# License as published by the Free Software Foundation.
+#
+#   This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+#   You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+#++
+
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
+require "glove/timezone"
+begin
+  args = {}
+  args = { "kind" => ARGV[0] } if [ "timezones", "regions", "time", "language"].include? ARGV[0]
+
+  if (ARGV[0] == "regions" && !ARGV[1].nil?)
+    args["only"]        = ARGV[1]
+  elsif (ARGV[0] == "language" && !ARGV[1].nil?)
+    args["language"]    = ARGV[1]
+  end
+
+  if ARGV.empty? || !args.empty?
+    ret = Glove::Timezone::read(args)
+    if ret.nil?
+      error	= Glove::Timezone::last_error
+      puts "returned error: #{error}" if error
+    else
+      puts ret.inspect
+    end
+  else
+    puts Glove::Timezone::modify({}, {"timezone"=>ARGV[0]}).inspect
+  end
+
+rescue Exception => e
+  puts e.inspect
+  raise
+end

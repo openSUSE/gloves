@@ -1,0 +1,305 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ *
+ * Module:		yast2-country
+ *
+ * Authors:		Klaus Kaempf (kkaempf@suse.de)
+ *			Jiri Suchomel (jsuchome@suse.cz)
+ *
+ * Purpose:		client for language configuration in running system
+ *
+ * $Id: language.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ */
+
+{
+
+textdomain "country";
+
+import "CommandLine";
+import "Console";
+import "Keyboard";
+import "Language";
+import "Mode";
+import "Popup";
+import "Progress";
+import "Service";
+import "Wizard";
+
+// if packages should be installed after language change
+boolean no_packages	= false;
+
+
+/**
+ * read language settings
+ */
+define boolean LanguageRead () {
+
+    return Language::Read (false);
+}
+
+/**
+ * write language settings
+ */
+define boolean LanguageWrite () {
+
+    y2milestone ("Language changed --> saving");
+
+    integer steps	= 3;
+
+    // progress title
+    Progress::New (_("Saving Language Configuration"), " ", steps, [
+	// progress stage
+	_("Save language and console settings"),
+	// progress stage
+	_("Install and uninstall affected packages"),
+	// progress stage
+	_("Update translations in boot loader menu"),
+	], [
+	// progress step
+	_("Saving language and console settings..."),
+	// progress step
+	_("Installing and uninstalling affected packages..."),
+	// progress step
+	_("Updating translations in boot loader menu..."),
+	// last progress step
+	_("Starting SuSEconfig...")
+	], ""
+    );
+
+    Progress::NextStage ();
+
+    Language::Save ();
+    Console::Save ();
+
+    Progress::NextStage ();
+
+    boolean enough_space	= true;
+    boolean solved = true;
+    if (Language::PackagesModified () && !no_packages)
+    {
+	if (Mode::commandline ())
+	{
+	    // if not commandline, packages were already initialized in
+	    // select_language
+	    solved = Language::PackagesInit (
+		splitstring (Language::languages, ","));
+	    enough_space = Language::EnoughSpace();
+
+	    y2milestone("Packages solved: %1, enough space; %2", solved, enough_space);
+	}
+	if (enough_space && solved)
+	{
+	    Language::PackagesCommit ();
+	}
+    }
+
+    Progress::NextStage ();
+
+    // switch the UI to new language (after packages installation), so
+    // the texts in GfxMenu can be translated (bnc#446982)
+    Language::WfmSetLanguage ();
+
+    WFM::CallFunction ("bootloader_proposal", [ "UpdateGfxMenu" ]);
+
+    if (Keyboard::Modified ())
+    {
+	// restart kbd now (after console settings is written) bnc#429515
+	Service::Restart ("kbd");
+    }
+    Progress::NextStage ();
+
+    WFM::CallFunction ("inst_suseconfig", [ false, false ]);
+
+    return true;
+}
+
+/**
+ * the language configuration sequence
+ */
+define any LanguageSequence () {
+
+    LanguageRead ();
+
+    Keyboard::Read ();
+
+    Console::Init ();
+
+    Wizard::CreateDialog();
+
+    // set the language according to Language.ycp initialization
+    Language::WfmSetLanguage ();
+    Wizard::OpenOKDialog();
+
+    // Params are:				`back `next  set_default
+    map args = $[];
+    args["enable_back"] = true;
+    args["enable_next"] = true;
+
+    any result = WFM::CallFunction ("select_language", [args]);
+
+    Wizard::CloseDialog();
+
+    y2debug ("result '%1'", result);
+
+    if (result == `cancel || result == `back)
+    {
+	// Back to original values...
+	y2milestone ("canceled -> restoring: %1", Language::language_on_entry);
+	Language::Set (Language::language_on_entry);
+    }
+    else
+    {
+	if (Language::Modified ())
+	{
+	    // help for write dialog
+	    Wizard::RestoreHelp (_("<p><b>Saving Configuration</b><br>Please wait...</p>"));
+	    Console::SelectFont (Language::language);
+	    LanguageWrite ();
+	}
+	else
+	{
+	    y2milestone( "Language not changed --> doing nothing" );
+	}
+    }
+    UI::CloseDialog();
+    return result;
+}
+
+/**
+ * Handler for language summary
+ */
+define boolean LanguageSummaryHandler (map options) {
+
+    map<string,list> selection	= Language::Selection();
+    // summary label
+    CommandLine::Print (sformat (_("Current Language: %1 (%2)"),
+	Language::language, selection[Language::language,1]:""));
+
+    string languages	= Language::languages;
+    if (languages != "")
+    {
+	list<string> langs	= filter (string lang_code,
+	    splitstring (languages, ","), ``(lang_code != Language::language));
+	if (size (langs) > 0)
+	{
+	    CommandLine::Print (sformat (_("Additional Languages: %1"),
+		mergestring (langs,",")));
+	}
+    }
+    return false;
+}
+
+/**
+ * Handler for listing available languages
+ */
+define boolean LanguageListHandler (map options) {
+
+    foreach (string lang_code, list lang_info, Language::Selection(), {
+	CommandLine::Print (sformat ("%1 (%2)", lang_code, lang_info[1]:""));
+    });
+    return false;
+}
+
+
+/**
+ * Handler for changing language settings
+ */
+define boolean LanguageSetHandler (map options) {
+
+    string language	= options["lang"]:Language::language;
+    string languages	= options["languages"]:"";
+
+    if (!haskey(Language::Selection(), language))
+    {
+	// error message (%1 is given layout); do not translate 'list'
+	CommandLine::Print (sformat (_("%1 is not a valid language. Use the list command to see possible values."), language));
+	return false;
+    }
+    list<string> llanguages       = splitstring (languages, ",");
+    if (!contains (llanguages, language))
+	llanguages       = add (llanguages, language);
+
+    Language::languages	= mergestring (llanguages, ",");
+
+    if (language != Language::language)
+    {
+	Language::Set (language);
+	Console::SelectFont (language);
+    }
+    no_packages		= haskey (options, "no_packages");
+
+    return (Language::Modified ());
+}
+
+
+/* -- the command line description map -------------------------------------- */
+map cmdline = $[
+    "id"		: "language",
+    // translators: command line help text for language module
+    "help"		: _("Language configuration"),
+    "guihandler"	: LanguageSequence,
+    "initialize"	: LanguageRead,
+    "finish"		: LanguageWrite,
+    "actions"		: $[
+	"summary" :$[
+	    "handler"	: LanguageSummaryHandler,
+	    // command line help text for 'summary' action
+	    "help"	: _("Language configuration summary"),
+	],
+	"set" :$[
+	    "handler"	: LanguageSetHandler,
+	    // command line help text for 'set' action
+	    "help"	: _("Set new values for language"),
+	],
+	"list": $[
+	    "handler"	: LanguageListHandler,
+	    // command line help text for 'list' action
+	    "help"	: _("List all available languages.")
+	],
+    ],
+    "options"		: $[
+	"lang"		: $[
+	    // command line help text for 'set lang' option
+	    "help"	: _("New language value"),
+	    "type"	: "string"
+	],
+	"languages"	: $[
+	    // command line help text for 'set languages' option
+	    "help"	: _("List of secondary languages (separated by commas)"),
+	    "type"	: "string"
+	],
+	"no_packages"	: $[
+	    // command line help text for 'set no_packages' option
+	    "help"	: _("Do not install language specific packages"),
+	],
+    ],
+    "mappings"		: $[
+	"summary"	: [],
+	"set"		: [ "lang", "languages", "no_packages" ],
+	"list"		: [],
+    ]
+];
+
+CommandLine::Run (cmdline);
+return true;
+
+}

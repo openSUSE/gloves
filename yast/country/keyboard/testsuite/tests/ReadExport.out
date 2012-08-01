@@ -1,0 +1,6 @@
+Read	.target.yast2 "keyboard_raw.ycp" $["english-us":["English (US)", $["pc104":$["ncurses":"us.map.gz"]]]]
+Return	true
+Return	true
+Return	$["keymap":"english-us"]
+Return	<ul><li>Current Keyboard Layout: English (US)</li></ul>
+Return	false

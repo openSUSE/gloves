@@ -1,0 +1,679 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+
+/**
+ * File:
+ *	select_language.ycp
+ *
+ * Module:
+ *	yast2-country
+ *
+ * Authors:
+ *	Klaus   Kämpf <kkaempf@suse.de>
+ *	Michael Hager <mike@suse.de>
+ *	Stefan  Hundhammer <sh@suse.de>
+ *	Thomas Roelz <tom@suse.de>
+ *	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * Summary:
+ *	This client shows main dialog for choosing the language.
+ *
+ * $Id: select_language.ycp 67757 2012-03-29 12:24:42Z jsuchome $
+ *
+ */
+{
+    textdomain "country";
+
+    import "Console";
+    import "GetInstArgs";
+    import "Keyboard";
+    import "Label";
+    import "Language";
+    import "Mode";
+    import "PackageSlideShow";
+    import "Popup";
+    import "ProductFeatures";
+    import "Report";
+    import "SlideShow";
+    import "Stage";
+    import "Timezone";
+    import "Wizard";
+    import "PackagesUI";
+
+    string language		= Language::language;
+
+    /**
+     * Popup for setting expert language values
+     */
+    define symbol LanguageExpertDialog() {
+
+    // help text for langauge expert screen
+    string help_text = _("<p>
+Here, fine-tune settings for the language handling.
+These settings are written into the file <tt>/etc/sysconfig/language</tt>.
+If unsure, use the default values already selected.
+</p>
+");
+
+    // help text for langauge expert screen
+    help_text = help_text + _("<p>
+<b>Locale Settings for User root</b>
+determines how the locale variables (LC_*) are set for the root user.</p>") +
+
+    // help text for langauge expert screen
+    _("<p><b>ctype Only</b>: root has the same LC_CTYPE as a normal user. Other values
+are unset.<br>
+<b>Yes</b>: root has the same locale settings as normal user.<br>
+<b>No</b>: root has all locale variables unset.
+</p>
+") +
+
+    // help text for langauge expert screen
+    _("<p>Use <b>Detailed Locale Setting</b> to set a locale for the primary language that is not offered in the list in the main dialog. Translation may not be available for the selected locale.</p>");
+
+    map val		= Language::GetExpertValues();
+    map val_on_entry	= val;
+    y2debug ("expert values %1", val);
+
+    // get the list of locales for our language
+    string lang		= substring (language, 0, 2);
+    list locales_list	= [];
+
+    foreach (string code, integer i, Language::GetLocales (), {
+	if (substring (code, 0, 2) == lang)
+	{
+	    locales_list = add (locales_list, code);
+	}
+    });
+    if (!contains (locales_list, language))
+	locales_list	= add (locales_list, language);
+
+    UI::OpenDialog (`opt (`decorated), `HBox(
+	`HWeight (40, `RichText (help_text)),
+	`HStretch (),
+	`HSpacing (),
+	`HWeight (60, `VBox (
+	    `HSpacing (45),
+	    // heading text
+	    `Heading( _("Language Details") ),
+	    `VSpacing(`opt(`vstretch), 2),
+	    `Left (
+		// combo box label
+		`ComboBox(`id(`rootlang), _("Locale Settings for User &root"),
+		    [
+			// do not translate "ctype"
+			`item( `id("ctype"), _("ctype Only")),
+			`item( `id("yes"), _("Yes")),
+			`item( `id("no"), _("No"))
+		    ]
+	    )),
+	    `VSpacing (`opt(`vstretch), 1),
+	    `Left (
+		// checkbox label
+		`CheckBox (`id(`use_utf8), _("Use &UTF-8 Encoding"),
+			val["use_utf8"]:true)
+	    ),
+	    `VSpacing (),
+	    `Left (
+	    // combo box label
+	        `ComboBox (`id(`locales), _("&Detailed Locale Setting"),
+		    locales_list)
+	    ),
+	    `VSpacing (`opt(`vstretch), 7),
+	    `ButtonBox (
+		`PushButton(`id(`ok), `opt(`default), Label::OKButton()),
+		`PushButton(`id(`cancel),`opt (`key_F9), Label::CancelButton())
+	    ),
+	    `VSpacing (0.5)
+	))
+    ));
+
+    UI::ChangeWidget (`id(`rootlang), `Value, val["rootlang"]:"ctype");
+    UI::ChangeWidget (`id(`locales), `Value, language);
+
+    symbol ret		= `none;
+    symbol retval	= `expert;
+    repeat
+    {
+	ret = (symbol)UI::UserInput();
+	if( ret == `ok )
+	{
+	    val = $[];
+	    val["rootlang"]	= UI::QueryWidget( `id(`rootlang), `Value );
+	    val["use_utf8"]	= UI::QueryWidget( `id(`use_utf8), `Value );
+	    if (val != val_on_entry)
+	    {
+		y2milestone ("expert settings changed to %1", val );
+		Language::SetExpertValues (val);
+		Language::ExpertSettingsChanged = true;
+	    }
+	    if (language != (string)UI::QueryWidget( `id(`locales), `Value))
+	    {
+	        language	= (string)UI::QueryWidget(`id(`locales),`Value);
+		retval		= `changed_locale;
+	    }
+	}
+    } until ( ret == `cancel || ret == `ok );
+    UI::CloseDialog();
+    return retval;
+    };
+
+    /**
+     * helper function for updating the "adapt terms" to current language
+     */
+    define void update_adapt_term () {
+
+	string kb = Keyboard::GetKeyboardForLanguage (language, "english-us");
+	string tz = Timezone::GetTimezoneForLanguage (language, "US/Mountain");
+	string kbd_name	= Keyboard::Selection ()[kb]:"";
+	string tmz_name	= Timezone::GetTimezoneCountry (tz);
+
+	UI::ReplaceWidget (`id(`rpadapt), `VBox (
+	    `Left (`CheckBox (`id (`adapt_kbd),
+		// check box label (%1 is keyboard layout name)
+		sformat(_("Adapt &Keyboard Layout to %1"),kbd_name))),
+	    `Left (`CheckBox (`id (`adapt_tmz),
+		// check box label (%1 is country name)
+		sformat (_("Adapt &Time Zone to %1"), tmz_name)))
+	));
+	UI::ChangeWidget(`id(`adapt_kbd),`Enabled, kb != Keyboard::current_kbd);
+	UI::ChangeWidget(`id(`adapt_tmz),`Enabled, tz != Timezone::timezone);
+    }
+
+    // ------------------------------------- main part of the client -----------
+
+    map argmap = GetInstArgs::argmap();
+
+    // Check if the current call should be treated as the first run (3rd param).
+    // In this case if the user exits with next the the current setting
+    // will be made the default that is restored with "Reset to defaults".
+    //
+    boolean set_default = argmap["first_run"]:"no" == "yes";
+    y2milestone("set_default: %1", set_default );
+
+    string preselected = Language::preselected;
+
+    if (preselected != "en_US" && set_default)
+    {
+	if (ProductFeatures::GetBooleanFeature ("globals", "skip_language_dialog"))
+	{
+	    y2milestone("Skipping language dialog, Language changed to %1",preselected);
+	    Language::CheckLanguagesSupport (preselected);
+	    Language::selection_skipped	= true;
+	    return `auto;
+	}
+    }
+
+
+    // when the possibility for selecting more languages should be shown
+    // (this includes differet UI layout)
+    boolean more_languages	= true;
+
+    list<string>languages	= splitstring (Language::languages, ",");
+
+    // filter the primary language from the list of secondary ones:
+    languages	= filter (string l, languages, ``(l != language));
+
+
+    // Build the contents of the dialog.
+
+    // build up language selection box
+    // with the default selection according to Language::language
+
+    // set up selection list with default item
+
+    boolean show_expert = true;
+
+   /* ----------------------------------------------------------------------
+    * Build dialog
+    * ----------------------------------------------------------------------*/
+    // heading text
+    string heading_text = _("Languages");
+
+    if (set_default && !Mode::repair ())
+    {
+	// heading text
+	heading_text = _("Language");
+    }
+    if (Mode::repair ())
+    {
+	// heading text
+	heading_text = _("Welcome to System Repair");
+    }
+
+    if (set_default)
+    {
+	show_expert	= false;
+	more_languages	= false;
+    }
+
+    term languagesel = `Empty ();
+    if (Stage::initial ()) // this is actually not reached now...
+	languagesel	= `SelectionBox (`id(`language), `opt(`notify), "",
+	    Language::GetLanguageItems (`first_screen));
+
+    if (Stage::firstboot ())
+	languagesel = `SelectionBox (`id(`language), `opt(`notify), "",
+	    Language::GetLanguageItems (`primary));
+
+    term contents = `VBox (`VSpacing (), `HBox (
+	`HWeight (1, `HSpacing ()),
+	`HWeight (3, languagesel),
+	`HWeight (1, `HSpacing ())
+   ), `VSpacing ());
+
+    term expert = `HStretch();
+    if (show_expert)
+    {
+	expert = `VBox (
+	    `Label (""),
+	    // button label
+	    `PushButton (`id(`expert), _("&Details"))
+	);
+    }
+
+    list<term> primary_items	= [];
+    list<term> secondary_items	= [];
+
+    // if checkboxes for adapting keyboard and timezone should be shown
+    boolean adapt_term = more_languages && !Mode::config ();
+    if (more_languages)
+    {
+	term languages_term = `MultiSelectionBox (`id(`languages),
+	    // multiselection box label
+	    _("&Secondary Languages")
+	);
+	primary_items	= Language::GetLanguageItems (`primary);
+	secondary_items	= Language::GetLanguageItems (`secondary);
+
+	term primary_term = `HBox (
+	    `Left (
+		`ComboBox (`id(`language), `opt (`notify),
+		// combo box label
+		_("Primary &Language"), primary_items)
+	    ),
+	    `Right (expert)
+	);
+
+	if (adapt_term)
+	{
+	    // frame label
+	    primary_term = `Frame (_("Primary Language Settings"), `HBox (
+		`HSpacing (0.5),
+		`VBox (
+		    primary_term,
+		    `VSpacing (0.5),
+		    `ReplacePoint (`id(`rpadapt), `VBox ()),
+		    `VSpacing (0.5)
+		),
+		`HSpacing (0.5))
+	    );
+	}
+
+	contents = `VBox (
+	    `VSpacing (),
+	    `HBox (
+		`HSpacing (2),
+		`VBox (
+		    primary_term,
+		    `VSpacing (),
+		    `ReplacePoint (`id(`rplangs), languages_term),
+		    `VSpacing (0.5)
+		),
+		`HSpacing (2)
+	    ),
+	    `VSpacing()
+	);
+    }
+
+    string help_text		= "";
+    // help text (language dependent packages) - at the end of help
+    string packages_help	= _("<p>
+Additional packages with support for the selected primary and secondary languages will be installed. Packages no longer needed will be removed.
+</p>");
+
+    if (Stage::initial ())
+    {
+	// help text for initial (first time) language screen
+	help_text = _("<p>
+Choose the <b>Language</b> to use during installation and for
+the installed system.
+</p>
+");
+
+	// help text, continued
+	help_text = help_text + _("<p>
+Click <b>Next</b> to proceed to the next dialog.
+</p>
+");
+
+	// help text, continued
+	help_text = help_text + _("<p>
+Nothing will happen to your computer until you confirm
+all your settings in the last installation dialog.
+</p>
+");
+	if (set_default)
+	{
+	    // help text, continued
+	    help_text = help_text + _("<p>
+You can select <b>Abort</b> at any time to abort the
+installation process.
+</p>
+");
+	}
+    }
+    else
+    {
+	// different help text when called after installation
+	// in an installed system
+	help_text = _("<p>
+Choose the new <b>Language</b> for your system.
+</p>\n");
+    }
+
+    if (more_languages)
+    {
+	// help text when "multiple languages" are suported 1/2
+	help_text = _("<p>
+Choose the new <b>Primary Language</b> for your system.
+</p>\n");
+
+	if (adapt_term)
+	{
+	    // help text for 'adapt keyboard checkbox'
+	    help_text	= help_text + _("<p>
+Check <b>Adapt Keyboard Layout</b> to change the keyboard layout to the primary language.
+Check <b>Adapt Time Zone</b> to change the current time zone according to the primary language. If the keyboard layout or time zone is already adapted to the default language setting, the respective option is disabled.
+</p>
+");
+	}
+
+	// help text when "multiple languages" are suported 2/2
+	help_text	= help_text + _("<p>
+<b>Secondary Languages</b><br>
+In the selection box, specify additional languages to use on your system.
+</p>
+");
+
+	help_text       = help_text + packages_help;
+    }
+
+    // Screen title for the first interactive dialog
+
+    Wizard::SetContents (heading_text, contents, help_text,
+	argmap["enable_back"]:true , argmap["enable_next"]:true);
+
+    Wizard::SetDesktopTitleAndIcon("yast-language");
+
+    if (more_languages)
+    {
+	if (!Stage::initial () && !Stage::firstboot ())
+	{
+	    UI::ChangeWidget( `language, `IconPath, "/usr/share/locale/l10n/" );
+	    UI::ChangeWidget( `languages, `IconPath, "/usr/share/locale/l10n/");
+	}
+	UI::ChangeWidget( `language, `Items, primary_items );
+	UI::ChangeWidget( `languages, `Items, secondary_items );
+    }
+
+    // No .desktop files in inst-sys - use icon explicitly
+    if (Stage::initial () || Stage::firstboot ())
+	Wizard::SetTitleIcon ("yast-language");
+
+    if (adapt_term)
+	update_adapt_term ();
+
+    // Get the user input.
+    //
+    any ret = nil;
+
+    UI::SetFocus(`id(`language));
+
+    // adapt keyboard for language?
+    boolean kbd_adapt = (set_default && !Mode::config ());
+    // adapt timezone for language?
+    boolean tmz_adapt = (set_default && !Mode::config ());
+
+
+    repeat
+    {
+	ret = Wizard::UserInput();
+	y2debug ("UserInput() returned %1", ret);
+
+	if (ret == `ok)
+	    ret = `next;
+
+	if (ret == `abort && Popup::ConfirmAbort (`painless))
+	{
+	    Wizard::RestoreNextButton();
+	    return `abort;
+	}
+
+	if (ret==`expert)
+	{
+	    ret	= LanguageExpertDialog();
+	}
+
+	if (ret == `help)
+	{
+	    Wizard::ShowHelp( help_text );
+	}
+
+	if (ret == `changed_locale)
+	{
+	    boolean primary_included	= false;
+	    if (nil == find (term i, primary_items,``(i[0,0]:nil == language)))
+	    {
+		primary_items = add (primary_items,
+		    `item (`id (language), language, true));
+		UI::ChangeWidget (`id(`language), `Items, primary_items);
+	    };
+	    if (Mode::config ())
+	    {
+		Language::Set (language);
+	    }
+	}
+
+	if (ret == `next ||
+	   ((ret == `language || ret == `changed_locale) && ! Mode::config ()))
+	{
+	    // Get the selected language.
+	    //
+	    if (ret != `changed_locale)
+	    {
+		language = more_languages ?
+		    (string) UI::QueryWidget(`id(`language), `Value) :
+		    (string) UI::QueryWidget(`id(`language), `CurrentItem);
+	    }
+
+	    if (ret != `changed_locale && adapt_term)
+	    {
+		kbd_adapt = (boolean) UI::QueryWidget (`id(`adapt_kbd), `Value);
+		tmz_adapt = (boolean) UI::QueryWidget (`id(`adapt_tmz), `Value);
+	    }
+
+	    if (ret == `next && !Language::CheckIncompleteTranslation(language))
+	    {
+		ret = `not_next;
+		continue;
+	    }
+	    if (ret == `next && Stage::initial ())
+	    {
+		Language::CheckLanguagesSupport (language);
+	    }
+	    if (language != Language::language)
+	    {
+		y2milestone ("Language changed from %1 to %2", Language::language, language);
+		if (more_languages)
+		{
+		    list<string> selected_languages = (list<string>)
+			UI::QueryWidget (`id(`languages),`SelectedItems);
+
+		    if (ret != `next)
+		    {
+			Language::languages =
+			    mergestring (selected_languages, ",");
+		    }
+		}
+
+
+		if (set_default)
+		{
+		    Timezone::ResetZonemap ();
+		}
+
+		// Set it in the Language module.
+		//
+		Language::Set (language);
+		if (adapt_term)
+		    update_adapt_term ();
+	    }
+
+	    if (Stage::initial () || Stage::firstboot ())
+	    {
+		if ((set_default && ret == `language || (!set_default && ret == `next)) &&
+		    Language::SwitchToEnglishIfNeeded (true))
+		{
+		    y2debug ("UI switched to en_US");
+		}
+		else if (ret == `next || (set_default && ret == `language))
+		{
+		    Console::SelectFont (language);
+		    // no yast translation for nn_NO, use nb_NO as a backup
+		    if (language == "nn_NO")
+		    {
+			y2milestone ("Nynorsk not translated, using Bokmål");
+			Language::WfmSetGivenLanguage ("nb_NO");
+		    }
+		    else
+			Language::WfmSetLanguage ();
+		}
+	    }
+
+	    if (ret == `language && set_default)
+	    {
+		// Display newly translated dialog.
+		Wizard::SetFocusToNextButton();
+		return `again;
+	    }
+
+	    if (ret == `next)
+	    {
+		// Language has been set already.
+		// On first run store users decision as default.
+		//
+		if (set_default)
+		{
+		    y2milestone("Resetting to default language");
+		    Language::SetDefault();
+		}
+
+		if (tmz_adapt)
+		{
+		    Timezone::SetTimezoneForLanguage (language);
+		}
+		else
+		{
+		    Timezone::user_decision = true;
+		}
+
+		if (kbd_adapt)
+		{
+		    Keyboard::SetKeyboardForLanguage (language);
+		    if (set_default)
+		    {
+			Keyboard::SetKeyboardDefault();
+		    }
+		}
+		else
+		{
+		    Keyboard::user_decision = true;
+		}
+
+		if (!Stage::initial () && !Mode::update ())
+		{
+		    // save settings (rest is saved in LanguageWrite)
+		    if (kbd_adapt)
+			Keyboard::Save ();
+		    if (tmz_adapt)
+			Timezone::Save ();
+		}
+		y2milestone ("Language: '%1', system encoding '%2'", language,
+		             WFM::GetEncoding());
+
+		if (more_languages || Stage::firstboot ())
+		{
+		    list<string> selected_languages =
+			Stage::firstboot () ? [ language ] : (list<string>)
+			UI::QueryWidget (`id(`languages),`SelectedItems);
+
+		    if (!contains (selected_languages, language))
+		    {
+			selected_languages = add (selected_languages, language);
+		    }
+		    y2milestone ("selected languages: %1", selected_languages);
+
+		    Language::languages = mergestring (selected_languages, ",");
+
+		    // now adapt language seletions
+		    if (Stage::initial () || Mode::update ())
+		    {
+			Pkg::SetAdditionalLocales (selected_languages);
+		    }
+		    else if (Language::PackagesModified () && !Mode::config ())
+		    {
+			if (!Language::PackagesInit(selected_languages))
+			{
+			    // error message - package solver failed
+			    Report::Error (_("There are unresolved package dependencies."));
+
+			    // run the package selector
+
+			    // disable repomanagement during installation
+			    boolean repomgmt = !Mode::installation();
+			    // start the package selector
+			    PackagesUI::RunPackageSelector($[ "enable_repo_mgr" : repomgmt, "mode" : `summaryMode ]);
+
+			    ret = `not_next;
+			    continue;
+			}
+			if (!Language::EnoughSpace())
+			{
+			    // error message
+			    Report::Error (_("There is not enough space to install all additional packages.
+Remove some languages from the selection."));
+			    ret = `not_next;
+			    continue;
+			}
+			if (Stage::firstboot ())// install language packages now
+			{
+			    Language::PackagesCommit ();
+			}
+		    }
+		}
+	    }
+	}
+    }
+    until (ret == `next || ret == `back);
+
+    return (symbol) ret;
+}

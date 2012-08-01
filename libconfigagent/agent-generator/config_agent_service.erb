@@ -16,9 +16,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent_service/<%= type.to_s.downcase %>_service'
+require 'config_agent/<%= type.to_s.downcase %>_service'
 
-class <%= agent_class %> < ConfigAgentService::<%= type.to_s.capitalize %>Service
+class <%= agent_class %> < ConfigAgent::<%= type.to_s.capitalize %>Service
 <% if type == :file %>
   def read(params)
     #TODO add your code here

@@ -1,0 +1,40 @@
+/**
+ * tests for Language.ycp functions
+ * Maintainer:	jsuchome@suse.cz
+ * $Id: Language.ycp 22461 2005-03-11 15:09:25Z jsuchome $
+ */
+{
+
+// testedfiles: Language.ycp
+
+include "testsuite.ycp";
+
+map READ = $[
+    "sysconfig" : $[
+	"language" : $[
+	    "DEFAULT_LANGUAGE"	: "en_US",
+	 ],
+    ],
+    "target" : $[
+	"bash_output"	: $[],
+        "size"		: 1,
+	"yast2"		: $[],
+    ],
+];
+
+TESTSUITE_INIT([READ,$[],READ], nil);
+import "Pkg";
+import "Language";
+
+DUMP("GetLanguageCountry");
+Language::language = "de_AT@UTF-8";
+TEST(``(Language::GetLanguageCountry()), [], nil);
+Language::language = "de_AT";
+TEST(``(Language::GetLanguageCountry()), [], nil);
+Language::language = "de";
+TEST(``(Language::GetLanguageCountry()), [], nil);
+
+Language::language = ""; // use default language
+
+TEST(``(Language::GetLanguageCountry()), [], nil);
+}

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 16 14:44:28 CEST 2012 - jsuchome@suse.cz
+
+- convert agent to new infrastructure (jreidinger) 
+- remove polkit dependencies
+- 0.3.0
+
+-------------------------------------------------------------------
 Wed Dec 14 13:41:01 CET 2011 - jsuchome@suse.cz
 
 - return correct error message

@@ -1,0 +1,705 @@
+/**
+ * File:
+ *   keyboard_raw.ycp
+ *
+ * Authors:
+ *   Thomas Roelz <tom@suse.de>
+ *   (original authors unknown; now maintained by tom)
+ *
+ *
+ * Summary:
+ *   The untranslated keyboard database.
+ *
+ * $Id: keyboard_raw.ycp 65281 2011-08-08 13:07:02Z jsuchome $
+ *
+ * *****************************************************************
+ * In case of changes please keep the following three files in sync:
+ * lang2keyboard.ycp, xkblayout2keyboard.ycp, keyboard_raw.ycp
+ * *****************************************************************
+ *
+ *  description of i.g.$[ "pc104": $[	 "ncurses": "us.map.gz" ]
+ *
+ * Added "compose" tag for COMPOSETABLE flag in rc.config
+ * non-latin1 keyboards need this, see bug #7023
+ *
+ */
+{
+textdomain "country";
+
+// map <string, list>
+
+return ($[
+  "english-us":
+    [
+	// keyboard layout
+	_("English (US)"),
+	$[
+	    "pc104"	: $[ "ncurses": "us.map.gz" ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	 ]
+    ],
+  "english-uk":
+    [
+	// keyboard layout
+	_("English (UK)"),
+	$[
+	    "pc104"	: $[ "ncurses": "uk.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-uk.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-uk.map.gz"],
+	    "type5_euro": $[ "ncurses": "sunt5-uk.map.gz"],
+	]
+    ],
+  "german":
+    [
+	// keyboard layout
+	_("German"),
+	$[
+	    "pc104"	: $[ "ncurses": "de-latin1-nodeadkeys.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-de-latin1-nodeadkeys.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-de-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-de-latin1.map.gz" ],
+	]
+    ],
+  "german-deadkey":
+    [
+	// keyboard layout
+	_("German (with deadkeys)"),
+	$[
+	    "pc104"	: $[ "ncurses": "de-latin1.map.gz" ],
+	    "macintosh" : $[ "ncurses": "mac-de-latin1.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-de-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-de-latin1.map.gz" ],
+	]
+    ],
+  "german-ch":
+    [
+	// keyboard layout
+	_("German (Switzerland)"),
+	$[
+	    "pc104"	: $[ "ncurses": "sg-latin1.map.gz" ],
+	    "macintosh" : $[ "ncurses": "mac-de_CH.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-de-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-de-latin1.map.gz" ],
+	]
+    ],
+  "french":
+    [
+	// keyboard layout
+	_("French"),
+	$[
+	    "pc104"	: $[ "ncurses": "fr-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-fr-latin1.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-fr-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-fr-latin1.map.gz" ],
+	]
+    ],
+  "french-ch":
+    [
+	// keyboard layout
+	_("French (Switzerland)"),
+	$[
+	    "pc104"	: $[ "ncurses": "fr_CH-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-fr_CH-latin1.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-fr-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-fr-latin1.map.gz" ],
+	]
+    ],
+  "french-ca":
+    [
+	// keyboard layout
+	_("French (Canada)"),
+	$[
+	    "pc104"	: $[ "ncurses": "cf.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-fr-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-fr-latin1.map.gz" ],
+	]
+    ],
+
+  "cn-latin1":
+    [
+	// keyboard layout
+	_("Canadian (Multilingual)"),
+	$[
+	    "pc104"	: $[ "ncurses": "cn-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	    "pc104"	: $[ "ncurses": "cn-latin1.map.gz" ],
+	]
+    ],
+
+  "spanish":
+    [
+	// keyboard layout
+	_("Spanish"),
+	$[
+	    "pc104"	: $[ "ncurses": "es.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-es.map.gz"],
+	    "type4"	: $[ "ncurses": "sunt4-es.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-es.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-es.map.gz" ],
+	]
+    ],
+  "spanish-lat":
+    [
+	// keyboard layout
+	_("Spanish (Latin America)"),
+	$[
+	    "pc104"	: $[ "ncurses": "la-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunt4-es.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-es.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-es.map.gz"],
+	]
+    ],
+  "spanish-lat-cp850":
+    [
+	// keyboard layout
+	_("Spanish (CP 850)"),
+	$[
+	    "pc104"	: $[ "ncurses": "es-cp850.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunt4-es.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-es.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-es.map.gz" ],
+	]
+    ],
+  "italian":
+    [
+	// keyboard layout
+	_("Italian"),
+	$[
+	    "pc104"	: $[ "ncurses": "it.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-it.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "portugese":
+    [
+	// keyboard layout
+	_("Portuguese"),
+	$[
+	    "pc104"	: $[ "ncurses": "pt-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-pt-latin1.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "portugese-br":
+    [
+	// keyboard layout
+	_("Portuguese (Brazil)"),
+	$[
+	    "pc104"	: $[ "ncurses": "br-abnt2.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-br-abnt2.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "portugese-br-usa":
+    [
+	// keyboard layout
+	_("Portuguese (Brazil -- US accents)"),
+	$[
+	    "pc104"	: $[ "ncurses": "us-acentos.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "sparc64"	: $[ "type4": $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  ],
+    "greek": [
+	// keyboard layout
+	_("Greek"),
+	$[
+	    "pc104"	: $[ "ncurses": "gr.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-gr.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "dutch":
+    [
+	// keyboard layout
+	_("Dutch"),
+	$[
+	    "pc104"	: $[ "ncurses": "nl.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "danish":
+    [
+	// keyboard layout
+	_("Danish"),
+	$[
+	    "pc104"	: $[ "ncurses": "dk-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-dk-latin1.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "norwegian":
+    [
+	// keyboard layout
+	_("Norwegian"),
+	$[
+	    "pc104"	: $[ "ncurses": "no-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-no-latin1.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunt4-no-latin1.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "swedish":
+    [
+	// keyboard layout
+	_("Swedish"),
+	$[
+	    "pc104"	: $[ "ncurses": "sv-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-se.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-se-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-se-latin.map.gz" ],
+	]
+    ],
+  "finnish":
+    [
+	// keyboard layout
+	_("Finnish"),
+	$[
+	    "pc104"	: $[ "ncurses": "fi-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-fi-latin1.map.gz"],
+	    "type4"	: $[ "ncurses": "sunt4-fi-latin1.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-fi-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-fi-latin.map.gz" ],
+	]
+    ],
+  "czech":
+    [
+	// keyboard layout
+	_("Czech"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "cz-us-qwertz.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-cz-us-qwertz.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-cz-us.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-cz-us.map.gz" ],
+	]
+    ],
+  "czech-qwerty":
+    [
+	// keyboard layout
+	_("Czech (qwerty)"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "cz-lat2-us.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "slovak":
+    [
+	// keyboard layout
+	_("Slovak"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "sk-qwertz.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "slovak-qwerty":
+    [
+	// keyboard layout
+	_("Slovak (qwerty)"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "sk-qwerty.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "slovene":
+    [
+	// keyboard layout
+	_("Slovene"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "slovene.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "hungarian":
+    [
+	// keyboard layout
+	_("Hungarian"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "hu.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-hu.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "polish":
+    [
+	// keyboard layout
+	_("Polish"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "Pl02.map.gz",
+		    "compose" : "latin2"
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sun-pl.map.gz"],
+	    "type5"	: $[ "ncurses": "sun-pl.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sun-pl.map.gz" ],
+	]
+    ],
+  "russian":
+    [
+	// keyboard layout
+	_("Russian"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "ruwin_alt-UTF-8.map.gz",
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-ru.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-ru.map.gz" ],
+	]
+    ],
+  "serbian":
+    [
+	// keyboard layout
+	_("Serbian"),
+	$[
+	    "pc104"	: $[ "ncurses": "sr-cy.map.gz"],
+	    "macintosh"	: $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz"],
+	 ]
+    ],
+  "estonian":
+    [
+	// keyboard layout
+	_("Estonian"),
+	$[
+	    "pc104"	: $[ "ncurses": "et.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-ru.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-ru.map.gz" ],
+	]
+    ],
+  "lithuanian":
+    [
+	// keyboard layout
+	_("Lithuanian"),
+	$[
+	    "pc104"	: $[ "ncurses": "lt.baltic.map.gz"],
+	    "macintosh"	: $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz"],
+	 ]
+    ],
+  "turkish":
+    [
+	// keyboard layout
+	_("Turkish"),
+	$[
+	    "pc104"	: $[ "ncurses": "trq.map.gz" ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	 ]
+    ],
+    "croatian": [
+	// keyboard layout
+	_("Croatian"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "croat.map.gz",
+		    "compose"	: "latin2"
+	    ],
+	    "macintosh" : $[
+		    "ncurses"   : "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+  "japanese":
+    [
+	// keyboard layout
+	_("Japanese"),
+	$[
+	    "pc104"	: $[ "ncurses": "jp106.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-jp106.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	]
+    ],
+  "belgian":
+    [
+	// keyboard layout
+	_("Belgian"),
+	$[
+	    "pc104"	: $[ "ncurses": "be-latin1.map.gz"],
+	    "macintosh" : $[ "ncurses": "mac-be.map.gz" ],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunt5-be-latin1.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-be-latin1.map.gz"],
+	]
+    ],
+  "dvorak":
+    [
+	// keyboard layout
+	_("Dvorak"),
+	$[
+	    "pc104"	: $[ "ncurses": "dvorak.map.gz" ],
+	    "macintosh" : $[ "ncurses": "mac-dvorak.map.gz" ],
+	    "type4"	: $[ "ncurses": "sundvorak.map.gz" ],
+	    "type5"	: $[ "ncurses": "sundvorak.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sundvorak.map.gz" ],
+	 ]
+    ],
+  "icelandic":
+    [
+	// keyboard layout
+	_("Icelandic"),
+	$[
+	    "pc104"	: $[ "ncurses": "is-latin1.map.gz" ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5"	: $[ "ncurses": "sunkeymap.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunkeymap.map.gz" ],
+	 ]
+    ],
+
+    "ukrainian": [
+	// keyboard layout
+	_("Ukrainian"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "ua.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+
+    "khmer": [
+	// keyboard layout
+	_("Khmer"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "khmer.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+
+    "korean": [
+	// keyboard layout
+	_("Korean"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "korean.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+
+    "arabic": [
+	// keyboard layout
+	_("Arabic"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "arabic.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+    "tajik": [
+	// keyboard layout
+	_("Tajik"),
+	$[
+	    "pc104"	: $[
+		    "ncurses": "tj_alt-UTF8.map.gz",
+	    ],
+	    "macintosh" : $[ "ncurses": "mac-us.map.gz"],
+	    "type4"	: $[ "ncurses": "sunkeymap.map.gz"],
+	    "type5"	: $[ "ncurses": "sunt5-ru.map.gz" ],
+	    "type5_euro": $[ "ncurses": "sunt5-ru.map.gz" ],
+	]
+    ],
+
+    "taiwanese": [
+	// keyboard layout
+	_("Traditional Chinese"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "taiwanese.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+
+    "chinese": [
+	// keyboard layout
+	_("Simplified Chinese"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "chinese.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+
+    "romanian": [
+	// keyboard layout
+	_("Romanian"),
+	$[
+	    "pc104"	: $[
+		    "ncurses"	: "ro.map.gz",
+	    ],
+	    "macintosh" : $[
+		    "ncurses"	: "mac-us.map.gz"
+	    ],
+	    "type4"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5"	: $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	    "type5_euro": $[
+		    "ncurses"	: "sunkeymap.map.gz"
+	    ],
+	 ]
+    ],
+]);
+
+}

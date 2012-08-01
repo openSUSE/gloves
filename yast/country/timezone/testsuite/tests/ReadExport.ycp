@@ -1,0 +1,55 @@
+/**
+ * tests for Timezone.ycp autoyast functions: preparation for cloning
+ * Author:	jsuchome@suse.cz
+ * $Id: ReadExport.ycp 57028 2009-04-29 10:58:09Z lslezak $
+ */
+{
+    // testedfiles: Timezone.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "dir"		: [],
+	    "yast2"		: $[],
+	],
+    ];
+
+    map E	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    import "Mode";
+
+    Mode::SetMode ("autoinst_config");
+
+    Testsuite::Init ([READ,$[],E], nil);
+
+    import "Timezone";
+
+    READ["target","yast2"]	= [
+	    $[
+		"name"		: "Europe",
+		"entries"	: $[
+		    "Europe/Prague" : "Czech Republic",
+		]
+	    ]
+    ];
+
+    Testsuite::Test (``(Timezone::Read ()), [READ,$[],E], nil);
+
+    Testsuite::Test (``(Timezone::Export ()), [], nil);
+
+    Testsuite::Test (``(Timezone::Summary ()), [], nil);
+
+    Testsuite::Test (``(Timezone::Modified ()), [], nil);
+}

@@ -1,4 +1,21 @@
 -------------------------------------------------------------------
+Tue Jul 17 15:20:43 CEST 2012 - jsuchome@suse.cz
+
+- require rubygem-open4
+- 0.3.1 
+
+-------------------------------------------------------------------
+Mon Jul 16 13:33:24 CEST 2012 - jreidinger@suse.com
+
+- added sysconfig agent
+- agent need not have dbus service
+- follow gems convention to have library code in lib directory
+- added documentation
+- change run command to allow only arrays
+- implement serialization of backend exception in chroot 
+- 0.3.0
+
+-------------------------------------------------------------------
 Wed Dec 14 13:38:54 UTC 2011 - jreidinger@suse.com
 
 - add timeout for dbus service 

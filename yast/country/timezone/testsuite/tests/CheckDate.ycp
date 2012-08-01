@@ -1,0 +1,53 @@
+/**
+ * tests for Timezone::GetDateTime
+ * Author: jsuchome@suse.cz
+ * $Id: CheckDate.ycp 27936 2006-02-13 20:01:14Z olh $
+ */
+{
+
+    // testedfiles: Timezone.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    Testsuite::Init([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    Testsuite::Test (``(Timezone::CheckDate ("1", "2", "2000")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckDate ("29", "2", "2000")), [], []);
+
+    // wrong dates:
+    Testsuite::Test (``(Timezone::CheckDate ("29", "2", "2001")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckDate ("33", "2", "2000")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckDate ("33", "13", "2000")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckDate ("1", "1", "2033")), [], []);
+
+    // wrong input
+    Testsuite::Test (``(Timezone::CheckDate ("", "2", "2000")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckDate ("1", "", "2000")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckDate ("1", "2", "blah")), [], []);
+}

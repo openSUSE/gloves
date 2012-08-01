@@ -16,11 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','services')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
-require "file/clock"
+require "config_agent/clock"
 
 class TestClock < Test::Unit::TestCase
   def setup
@@ -30,8 +30,8 @@ class TestClock < Test::Unit::TestCase
   end
 
   def test_reading
-    file = Clock.new
-    sysconfig_clock = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Clock.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    sysconfig_clock = file.read({})
     assert_equal "Europe/Prague", sysconfig_clock["TIMEZONE"]
     assert_equal "--localtime", sysconfig_clock["HWCLOCK"]
     assert_equal "yes", sysconfig_clock["SYSTOHC"]
@@ -39,25 +39,23 @@ class TestClock < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = Clock.new
+    file = ConfigAgent::Clock.new( :root_dir => @data1_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params	= {
-	"_aug_internal"		=> Augeas::open(@data1_dir,nil, Augeas::NO_MODL_AUTOLOAD),
 	"TIMEZONE"		=> "US/Eastern",
 	"HWCLOCK"		=> "-u"
     }
     ret = file.write params
-    assert_equal true, ret["success"]
     assert_equal nil, ret["message"]
+    assert_equal true, ret["success"]
   end
 
   # diff data/etc/sysconfig/clock data2/etc/sysconfig/clock -> change value of TIMEZONE
   def test_overwrite
-    file = Clock.new
-    params = file.read "_aug_internal" => Augeas::open(@data_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Clock.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    params = file.read({})
     assert_equal "Europe/Prague", params["TIMEZONE"]
 
-    file2 = Clock.new
-    params["_aug_internal"]	= Augeas::open(@data2_dir,nil, Augeas::NO_MODL_AUTOLOAD)
+    file2 = ConfigAgent::Clock.new( :root_dir => @data2_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
     params["TIMEZONE"]		= "US/Eastern"
 
     ret = file2.write params

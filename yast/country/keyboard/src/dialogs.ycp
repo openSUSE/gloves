@@ -1,0 +1,343 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:
+ *	keyboard/dialogs.ycp
+ *
+ * Authors:
+ *	Klaus   Kämpf <kkaempf@suse.de>
+ *	Michael Hager <mike@suse.de>
+ *	Stefan  Hundhammer <sh@suse.de>
+ *
+ * Summary:
+ *	Dialogs for keyboard configuration
+ *
+ * $Id: dialogs.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ */
+{
+    textdomain "country";
+
+  import "Keyboard";
+  import "Label";
+  import "Mode";
+  import "Popup";
+  import "Stage";
+  import "Wizard";
+
+  /**
+   * Dialog with expert keyboard configuration
+   */
+  define symbol KeyboardExpertDialog() {
+
+    symbol ret = `none;
+    // help text for keyboard expert screen
+    string help_text = _("<p>
+Here, fine tune various settings of the keyboard module.
+These settings are written into the file <tt>/etc/sysconfig/keyboard</tt>.
+If unsure, use the default values already selected.
+</p>")
+
+    // help text for keyboard expert screen cont.
+    + _("<p>Settings made here apply only to the console keyboard.  Configure the keyboard for the graphical user interface with another tool, such as SaX.</p>
+");
+
+    // general help trailer
+    help_text = help_text + _("<p>
+For <b>Devices for Lock</b>, enter a space-separated list of devices to which to apply the Scroll Lock, Num Lock, and Caps Lock settings.
+</p>");
+
+    // label text
+
+    UI::OpenDialog (`opt(`decorated),
+	`HBox (
+	    `HWeight(30, `RichText( help_text )),
+	    `HStretch(),
+	    `HSpacing(1),
+	    `HWeight(70,
+		`VBox (
+		    `HSpacing( 60 ),
+		    // heading text
+		    `Heading (_("Expert Keyboard Settings")),
+		    `VSpacing(`opt(`vstretch), 1),
+		    `Left (`InputField (`id(`rate), `opt (`hstretch),
+			// label text
+			_("Repeat &Rate"))
+		    ),
+		    `Left (
+			`InputField (`id(`delay), `opt (`hstretch),
+			// label text
+			_("De&lay before Repetition Starts"))
+		    ),
+		    `VSpacing (`opt(`vstretch), 1),
+		    `Frame (
+			// frame label
+			_("Start-Up States"),
+			`VBox(
+			    `Left (`ComboBox(
+				// combobox label
+				`id(`numlock), _("&Num Lock On"),
+				[
+				    // combobox item
+				    `item (`id("bios"), _("BIOS Settings")),
+				    // combobox item
+				    `item( `id("yes"), _("Yes")),
+				    // combobox item
+				    `item( `id("no"), _("No")),
+				    // combobox item
+				    `item( `id("untouched"), _("<Untouched>"))
+				]
+			    )),
+			    `VSpacing(`opt(`vstretch), 1),
+			    `Left (
+				// checkbox label
+				`CheckBox (`id(`capslock), _("Ca&ps Lock On"))
+			    ),
+			    `Left(
+				// checkbox label
+				`CheckBox( `id(`scrlock), _("&Scroll Lock On"))
+			    )
+			)
+		    ),
+		    `VSpacing(`opt(`vstretch), 1),
+		    `Left (
+			`InputField (`id(`tty), `opt (`hstretch),
+			    // textentry label
+			    _("&Devices for Lock")
+			)
+		    ),
+		    `VSpacing(`opt(`vstretch), 1),
+		    `Left (
+			// label text
+			`CheckBox (`id(`discaps), _("D&isable Caps Lock"))
+		    ),
+		    `VSpacing (1),
+		    `VStretch(),
+		    `ButtonBox (
+			`PushButton (`id(`ok),`opt(`default),Label::OKButton()),
+			`PushButton (`id(`cancel), Label::CancelButton())
+		    ),
+		    `VSpacing (0.5)
+		)
+	    )
+	)
+    );
+    map val = Keyboard::GetExpertValues();
+    map val_on_entry = val;
+    y2milestone( "map %1", val );
+    UI::ChangeWidget( `id(`rate), `Value, val["rate"]:"" );
+    UI::ChangeWidget( `id(`rate), `ValidChars, "0123456789." );
+    UI::ChangeWidget( `id(`delay), `Value, val["delay"]:"" );
+    UI::ChangeWidget( `id(`delay), `ValidChars, "0123456789" );
+    string tmp = val["numlock"]:"";
+    if( tmp == "" )
+	{
+	tmp = "untouched";
+	}
+    UI::ChangeWidget( `id(`numlock), `Value, tmp );
+    UI::ChangeWidget( `id(`capslock), `Value, val["capslock"]:false );
+    UI::ChangeWidget( `id(`scrlock), `Value, val["scrlock"]:false );
+    UI::ChangeWidget( `id(`tty), `Value, val["tty"]:"" );
+    UI::ChangeWidget( `id(`discaps), `Value, val["discaps"]:false );
+    repeat
+    {
+	ret = (symbol)UI::UserInput();
+	if( ret == `ok )
+	{
+	    val = $[];
+	    val["rate"] = UI::QueryWidget( `id(`rate), `Value );
+	    val["delay"] = UI::QueryWidget( `id(`delay), `Value );
+	    val["numlock"] = "";
+	    tmp = (string)UI::QueryWidget( `id(`numlock), `Value );
+	    y2milestone( "tmp %1", tmp );
+	    if( contains( ["bios", "yes", "no"], tmp ) )
+		{
+		val["numlock"] = tmp;
+		}
+	    val["capslock"] = UI::QueryWidget( `id(`capslock), `Value );
+	    val["scrlock"] = UI::QueryWidget( `id(`scrlock), `Value );
+	    val["tty"] = UI::QueryWidget( `id(`tty), `Value );
+	    val["discaps"] = UI::QueryWidget( `id(`discaps), `Value );
+	    y2milestone( "map ok %1", val );
+	    Keyboard::SetExpertValues( val );
+	}
+    } until ( ret == `cancel || ret == `ok );
+    UI::CloseDialog();
+  };
+
+  /**
+   * main dialog for choosing keyboard
+   * @param args: arguments forwarded from the initial client call
+   * (checking for "enable_back" and "enable_next" keys)
+   */
+  define symbol KeyboardDialog (map args) {
+
+    string keyboard = "";
+
+    term keyboardsel = `SelectionBox (`id (`keyboard), `opt(`notify),
+		// title for selection box 'keyboard layout'
+		_("&Keyboard Layout"),
+		Keyboard::GetKeyboardItems ());
+
+    // title for input field to test the keyboard setting
+    // (no more than about 25 characters!)
+    term test = `InputField (`opt (`hstretch), _("&Test"));
+    if (Mode::config ())
+	test = `Empty();
+
+    // Put test widget below selection list.
+    //
+    keyboardsel = `VBox(
+		keyboardsel,
+		test,
+		`VSpacing( 0.8 ),
+		// push button
+		`PushButton( `id(`expert), _("E&xpert Settings...") )
+	     );
+
+    /* ----------------------------------------------------------------------
+     * Build dialog
+     * ----------------------------------------------------------------------*/
+
+    term contents =
+	    `VBox(
+		`HBox(
+		    `HWeight ( 20, `HStretch() ),
+		    `HWeight ( 50, keyboardsel ),
+		    `HWeight ( 20, `HStretch() )
+		),
+		`VSpacing()
+	    );
+
+    // help text for keyboard screen (header)
+    string help_text = _("
+<p><big><b>Keyboard Configuration</b></big></p>");
+
+    if (Stage::initial () || Stage::firstboot ())
+    {
+
+	help_text	= help_text +
+	// help text for keyboard screen (installation)
+	_("<p>
+Choose the <b>Keyboard Layout</b> to use for
+installation and in the installed system.  
+Test the layout in <b>Test</b>.
+For advanced options, such as repeat rate and delay, select <b>Expert Settings</b>.
+</p>
+");
+	// general help trailer
+	help_text = help_text + _("<p>
+If unsure, use the default values already selected.
+</p>");
+    }
+    else
+	help_text	= help_text +
+	// help text for keyboard screen (installation)
+	_("<p>
+Choose the <b>Keyboard Layout</b> to use in the system.
+For advanced options, such as repeat rate and delay, select <b>Expert Settings</b>.</p>
+<p>Find more options as well as more layouts in the keyboard layout tool of your desktop environment.</p>
+");
+
+    // Screen title for keyboard screen
+    Wizard::SetContents ( _("System Keyboard Configuration"), contents, help_text,
+	args["enable_back"]:true, args["enable_next"]:true);
+
+    Wizard::SetDesktopTitleAndIcon("keyboard");
+    if (Stage::initial () || Stage::firstboot ())
+	Wizard::SetTitleIcon ("yast-keyboard");
+
+    // Initially set the current keyboard to establish a consistent state.
+    // Not on installed system, where it might clash with layout set different way
+    if (Mode::installation ())
+    {
+	Keyboard::Set (Keyboard::current_kbd);
+    }
+
+    UI::SetFocus( `id(`keyboard ));
+
+    any ret = nil;
+
+    repeat {
+
+	ret = Wizard::UserInput();
+
+	if (ret == `abort && Popup::ConfirmAbort(`painless) && !Mode::config ())
+	{
+	    return `abort;
+	}
+	if (ret == `ok)
+	    ret	= `next;
+
+	if( ret==`expert )
+	    {
+	    KeyboardExpertDialog();
+	    }
+
+	if( ret == `next || ret == `keyboard )
+	{
+	    // Get the selected keyboard.
+	    //
+	    keyboard = (string)UI::QueryWidget( `id( `keyboard ), `CurrentItem );
+
+	    y2milestone ("on entry %1 current %2 ret %3",
+		Keyboard::keyboard_on_entry, Keyboard::current_kbd, keyboard);
+
+	    // Set it in Keyboard module.
+	    if (Keyboard::current_kbd != keyboard)
+	    {
+		Keyboard::Set( keyboard );
+	    }
+
+	    if (ret == `next && !Mode::config ())
+	    {
+		// User wants to keep his changes.
+		// Set user_decision flag in keyboard module.
+		//
+		Keyboard::user_decision = true;
+
+		if (Keyboard::Modified ())
+		{
+		    // User has chosen a different keyboard from the database.
+		    // ==> clear unique_key in the keyboard module to achieve
+		    // configured = no and needed = no in Keyboard::Save() for
+		    // _ALL_ keyboards.
+		    //
+		    y2milestone("Clearing unique key <%1> due to manual selection",
+				Keyboard::unique_key );
+
+		    Keyboard::unique_key = "";
+		}
+	    }
+	}
+    } until ( ret == `next || ret == `back || ret == `cancel );
+
+    if (ret == `back || ret == `cancel)
+    {
+	y2milestone("`back or `cancel restoring: <%1>", Keyboard::keyboard_on_entry);
+
+	// Reset keyboard to initial state.
+	Keyboard::Set (Keyboard::keyboard_on_entry);
+    }
+
+    return (symbol)ret;
+  }
+
+}

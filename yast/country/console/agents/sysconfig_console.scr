@@ -1,0 +1,17 @@
+/**
+ * File:
+ *   sysconfig_console.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/sysconfig/console
+ *   using the sysconfig-agent
+ * 
+ * $Id: sysconfig_console.scr 59356 2009-11-05 17:51:36Z aschnell $
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/console</tt>
+ * in an easy manner.
+ */
+.sysconfig.console
+
+`ag_ini(
+  `SysConfigFile("/etc/sysconfig/console")
+)

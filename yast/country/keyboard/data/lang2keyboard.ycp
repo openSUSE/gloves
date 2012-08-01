@@ -1,0 +1,61 @@
+/**
+ * File:	keyboard_raw.ycp
+ *
+ * Authors:	Thomas Roelz <tom@suse.de> (original authors unknown)
+ *
+ * Maintainer:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * Summary:
+ * Maps language codes (locales) to YaST2-keyboard-codes.
+ *
+ * The YaST2-keyboard-codes are used for looking up a keyboard description in
+ * the YaST2-keyboard-database (see keyboard_raw.ycp).
+ *
+ * Do NOT use this map for looking up YaST2-keyboard-codes from xkblayout-codes.
+ * The xkblayout-codes may or may not resemble a locale code, therefore
+ * an extra conversion map is necessary (see xkblayout2keyboard.ycp).
+ *
+ * This map does not need to contain the entries for languages directly
+ * supported by YaST - for such languages the default keyboard mappings are
+ * present in their language_LANGCODE.ycp description files. See language/data.
+ *
+ * $Id: lang2keyboard.ycp 32769 2006-09-08 09:29:15Z jsuchome $
+ *
+ * *****************************************************************
+ * In case of changes please keep the following three files in sync:
+ * lang2keyboard.ycp, xkblayout2keyboard.ycp, keyboard_raw.ycp
+ * *****************************************************************
+ */
+
+      $[
+	"ar_eg"		: "english-us",
+
+	"be_BY"		: "belgian",
+	"br_FR"		: "french",
+
+	"de"		: "german",
+	"de_CH"		: "german-ch",
+
+	"en"		: "english-us",
+
+	"es"		: "spanish",
+
+	"fr"		: "french",
+	"fr_BE"		: "french",
+	"fr_CA"		: "cn-latin1",
+	"fr_CH"		: "french-ch",
+
+	"is_IS"         : "icelandic",
+
+	"it"		: "italian",
+
+	"no_NO"		: "norwegian",
+	"nn_NO"		: "norwegian",
+
+	"nl_BE"		: "english-us",
+
+	"ru"		: "russian",
+	"ru_RU.KOI8-R"	: "russian",
+
+	"sr_YU"		: "serbian",
+      ]

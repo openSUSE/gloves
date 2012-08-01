@@ -1,0 +1,954 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:
+ *	timezone/dialogs.ycp
+ *
+ * Authors:
+ *	Klaus   Kämpf <kkaempf@suse.de>
+ *	Michael Hager <mike@suse.de>
+ *	Stefan  Hundhammer <sh@suse.de>
+ *	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * Summary:
+ *	Dialogs for timeone and time configuration.
+ *
+ * $Id: dialogs.ycp 67757 2012-03-29 12:24:42Z jsuchome $
+ */
+{
+  textdomain "country";
+
+  import "Arch";
+  import "Directory";
+  import "GetInstArgs";
+  import "Label";
+  import "Language";
+  import "Mode";
+  import "NetworkService";
+  import "Package";
+  import "Popup";
+  import "ProductFeatures";
+  import "Service";
+  import "Stage";
+  import "Timezone";
+  import "Wizard";
+
+  symbol hwclock_s_initial = `none;
+
+  // if system clock is configured to sync with NTP
+  boolean ntp_used		= false;
+
+  // ntp server configured to sync with
+  string ntp_server		= "";
+
+  // if packages for NTP configuration are installed
+  boolean ntp_installed		= false;
+
+  // when checking for NTP status for first time, check the service status
+  boolean ntp_first_time	= true;
+
+  /**
+   * helper function for seting the time related stuff in module and possibly
+   * adapting current time according to it
+   */
+  define void SetTimezone (symbol hwclock, string timezone, boolean really,
+			   boolean changed_time)
+  {
+
+    y2milestone( "SetTimezone hw %1, tz %2 really %3 tchanged %4 initial:%5",
+                 hwclock, timezone, really, changed_time, hwclock_s_initial );
+
+    // simulate the time change
+    if (!really && hwclock != hwclock_s_initial)
+	Timezone::diff = (hwclock==`hwclock_utc)?1:-1;
+    else
+	Timezone::diff = 0;
+
+    y2milestone( "SetTimezone diff %1", Timezone::diff );
+
+    Timezone::hwclock = (hwclock == `hwclock_utc) ? "-u" : "--localtime";
+    Timezone::Set (timezone, really);
+
+    // Redisplay date/time.
+    //
+    UI::ChangeWidget(`id(`date), `Value, Timezone::GetDateTime (really, false));
+  };
+
+
+  // handles the complication that the package yast2-ntp-client may not be present
+  any ntp_call(string acall, map<string,any> args) {
+      if (!ntp_installed) {
+	  // replace "replace_point" by the widgets
+	  if (acall == "ui_init")
+	      return false;	// deselect the RB
+	  // the help text
+	  else if (acall == "ui_help_text")
+	      return ""; // or say "will install"? TODO recompute help text
+	  // save settings, return false if dialog should not exit
+	  else if (acall == "ui_try_save")
+	      return true;	// success, exit loop
+	  // Service::Enabled. FIXME too smart?
+	  else if (acall == "GetNTPEnabled")
+	      return false;
+
+	  // default: do nothing
+	  return nil;
+	  /*
+	    other API for completeness:
+	  // before UserInput
+	  else if (acall == "ui_enable_disable_widgets")
+	  else if (acall == "SetUseNTP")
+	  else if (acall == "Write")
+	  */
+      }
+
+      any ret = WFM::CallFunction ("ntp-client_proposal", [ acall, args ]);
+      return ret;
+  }
+
+  /**
+   * Dialog for setinge system date and time
+   * @return true if user changed the time (dialog accepted)
+   */
+  define boolean SetTimeDialog() {
+
+    string ntp_help_text = (string) ntp_call("ui_help_text", $[]);
+    // help text for set time dialog
+    string htext = _("<p>The current system time and date are displayed. If required, change them to the correct values manually or use Network Time Protocol (NTP).</p>") +
+	// help text, cont.
+	_("<p>Press <b>Accept</b> to save your changes.</p>") +
+
+	ntp_help_text;
+
+    boolean dt_widgets = false;
+
+    string hour		= "";
+    string minute	= "";
+    string second	= "";
+    string day		= "";
+    string month	= "";
+    string year		= "";
+
+    // check current time and show it in the time widgets
+    void show_current_time () {
+
+	map val = Timezone::GetDateTimeMap ();
+	hour	= val["hour"]:"";
+	minute	= val["minute"]:"";
+	second	= val["second"]:"";
+	day	= val["day"]:"";
+	month	= val["month"]:"";
+	year	= val["year"]:"";
+
+	if (dt_widgets)
+	{
+	    UI::ChangeWidget (`id (`date), `Value,
+		sformat ("%1-%2-%3", year, month, day));
+	    UI::ChangeWidget (`id (`time), `Value,
+		sformat ("%1:%2:%3", hour, minute, second)
+	    );
+	}
+	else
+	{
+	    UI::ChangeWidget (`id(`hour), `Value, hour);
+	    UI::ChangeWidget (`id(`minute), `Value, minute);
+	    UI::ChangeWidget (`id(`second), `Value, second);
+	    UI::ChangeWidget (`id(`day), `Value, day);
+	    UI::ChangeWidget (`id(`month), `Value, month);
+	    UI::ChangeWidget (`id(`year), `Value, year);
+	}
+    }
+
+    void enable_disable_time_widgets (boolean enable) {
+
+	UI::ChangeWidget (`id (`change_now), `Enabled, enable);
+
+	enable	= enable && (boolean) UI::QueryWidget (`id (`change_now), `Value);
+
+	if (dt_widgets)
+	{
+	    UI::ChangeWidget (`id (`date), `Enabled, enable);
+	    UI::ChangeWidget (`id (`time), `Enabled, enable);
+	}
+	else
+	{
+	    UI::ChangeWidget (`id(`hour), `Enabled, enable);
+	    UI::ChangeWidget (`id(`minute), `Enabled, enable);
+	    UI::ChangeWidget (`id(`second), `Enabled, enable);
+	    UI::ChangeWidget (`id(`day), `Enabled, enable);
+	    UI::ChangeWidget (`id(`month), `Enabled, enable);
+	    UI::ChangeWidget (`id(`year), `Enabled, enable);
+	}
+    }
+
+    term dateterm	= `VBox (
+	`HBox (
+	    `HSpacing(1),
+	    // label text, do not change "DD-MM-YYYY"
+	    `Left (`Label(_("Current Date in DD-MM-YYYY Format")))
+	),
+	`HBox (
+	    `HSpacing(10),
+	    `InputField( `id(`day), `opt(`shrinkable), ""),
+	    `HSpacing (),
+	    `InputField( `id(`month), `opt(`shrinkable), ""),
+	    `HSpacing (),
+	    `InputField( `id(`year), `opt(`shrinkable), ""),
+	    `HSpacing(30)
+	)
+    );
+    term timeterm	= `VBox (
+	`HBox (
+	    `HSpacing (1),
+	    // label text, do not change "HH:MM:SS"
+	    `Left (`Label (_("Current Time in HH:MM:SS Format")))
+	),
+	`HBox (
+	    `HSpacing(10),
+	    `InputField (`id(`hour), `opt(`shrinkable), ""),
+	    `HSpacing (),
+	    `InputField (`id(`minute), `opt(`shrinkable), ""),
+	    `HSpacing (),
+	    `InputField (`id(`second), `opt(`shrinkable), ""),
+	    `HSpacing(30)
+	)
+    );
+    if (UI::HasSpecialWidget (`Date) && UI::HasSpecialWidget (`Time))
+    {
+	dateterm	= `HBox (
+	    // label text
+	    `Date (`id(`date), _("Current Date"), "")
+	);
+	timeterm = `HBox (
+	    // label text
+	    `Time (`id(`time), _("Current Time"), "")
+	);
+	dt_widgets	= true;
+    }
+
+
+
+
+    term cont	= `HBox (
+	`HWeight (1, `VBox ()),
+	`HWeight (6, `RadioButtonGroup (`id (`rb), `VBox (
+	    // radio button label (= how to setup time)
+	    `Left (`RadioButton (`id (`manual), `opt (`notify), _("Manually"))),
+	    `VSpacing (0.5),
+	    `HBox (
+		`HSpacing (3),
+		`VBox (
+		    `Left (timeterm),
+		    `VSpacing(),
+		    `Left (dateterm),
+		    `VSpacing (),
+		    `HBox (`HSpacing (0.5), `Left (
+			// check box label
+			`CheckBox (`id (`change_now), `opt (`notify), _("Change the Time Now"), true))
+		    )
+		)
+	    ),
+	    `VSpacing (1),
+	    `Left (`RadioButton (`id (`ntp), `opt (`notify),
+		// radio button label
+		_("Synchronize with NTP Server"), false)
+	    ),
+	    `ReplacePoint(`id(`rp), `Empty())
+	))),
+	`HWeight (1, `VBox ())
+    );
+
+    Wizard::OpenAcceptDialog ();
+    // TODO replace help text after ntp_installed, is.
+    Wizard::SetContents (_("Change Date and Time"), cont, htext, true, true);
+
+    if( Mode::normal() )
+	Wizard::SetDesktopTitleAndIcon("timezone");
+
+    show_current_time ();
+
+    boolean ntp_rb = false;
+    ntp_rb = (boolean) ntp_call ("ui_init", $[
+				     "replace_point": `id (`rp),
+				     "country" : Language::GetLanguageCountry(),
+				     "first_time" : ntp_first_time ]);
+    ntp_first_time	= false;
+    UI::ChangeWidget(`id(`rb), `CurrentButton, (ntp_rb ? `ntp : `manual));
+
+    if (!dt_widgets)
+    {
+	foreach (symbol widget, [`hour, `minute, `second, `day, `month, `year],{
+	    UI::ChangeWidget (`id(widget), `ValidChars, "0123456789");
+	    UI::ChangeWidget (`id(widget), `InputMaxLength,
+		widget == `year ? 4 : 2);
+	});
+    }
+
+    any ret = nil;
+    repeat
+    {
+	ntp_call ("ui_enable_disable_widgets", $["enabled": ntp_rb]);
+	enable_disable_time_widgets (!ntp_rb);
+
+	ret = UI::UserInput();
+	y2debug ("UserInput ret:%1", ret );
+
+	symbol ntp_handled = (symbol) ntp_call ("ui_handle", $["ui": ret]);
+	if (ntp_handled != nil) {
+	    ret = ntp_handled;
+	}
+	if (ret == `redraw)
+	    show_current_time ();
+
+	if (ret == `ntp || ret == `manual)
+	{
+	    ntp_rb = (ret == `ntp);
+	    // need to install it first?
+	    if (ntp_rb && !Stage::initial () && !ntp_installed)
+	    {
+		ntp_installed	= Package::InstallAll (["yast2-ntp-client", "ntp"]);
+		// succeeded? create UI, otherwise revert the click
+		if (!ntp_installed)
+		{
+		    ntp_rb = false;
+		    UI::ChangeWidget (`id(`rb), `CurrentButton, `manual);
+		}
+		else
+		{
+		    // ignore retval, user clicked to use ntp
+		    ntp_call ("ui_init", $[
+				  "replace_point": `id (`rp),
+				  "country" : Language::GetLanguageCountry(),
+				  "first_time" : false ]);
+		}
+	    }
+	}
+
+	if (ret == `accept && ntp_rb)
+	{
+	    // before the sync, save the time zone (bnc#467318)
+	    Timezone::Set (Timezone::timezone, Stage::initial () && !Mode::live_installation ());
+	    // true: go on, exit; false: loop on
+	    boolean ntp_handled = (boolean) ntp_call ("ui_try_save", $[]);
+	    if (!ntp_handled)
+		ret = `retry;	// loop on
+	    else
+	    {
+		// `ntp_address is constructed by ntp-client_proposal.ycp... :-(
+		ntp_server      = (string) UI::QueryWidget(`id(`ntp_address), `Value);
+		// after sync, show real time in the widget
+		Timezone::diff	= 0;
+	    }
+	}
+	if (ret == `accept && !ntp_rb && UI::QueryWidget (`id (`change_now), `Value) == true)
+	{
+	    if (dt_widgets)
+	    {
+		list datel	= splitstring (
+		    (string) UI::QueryWidget (`id(`date), `Value), "-");
+		year	= datel[0]:"";
+		month	= datel[1]:"";
+		day	= datel[2]:"";
+		list timel	= splitstring (
+		    (string) UI::QueryWidget (`id(`time), `Value), ":");
+		hour	= timel[0]:"";
+		minute	= timel[1]:"";
+		second	= timel[2]:"";
+	    }
+	    else
+	    {
+		hour	= (string) UI::QueryWidget(`id(`hour), `Value );
+		minute	= (string) UI::QueryWidget(`id(`minute), `Value );
+		second	= (string) UI::QueryWidget(`id(`second), `Value );
+		day	= (string) UI::QueryWidget(`id(`day), `Value );
+		month	= (string) UI::QueryWidget(`id(`month), `Value );
+		year	= (string) UI::QueryWidget(`id(`year), `Value );
+	    }
+	    if (!Timezone::CheckTime (hour, minute, second))
+	    {
+		string tmp = sformat( "%1:%2:%3", hour, minute, second );
+		// popup text, %1 is entered value
+		tmp = sformat( _("Invalid time (HH:MM:SS) %1.
+Enter the correct time.
+"), tmp );
+		Popup::Error( tmp );
+		ret = `retry;
+	    }
+	    else if( !Timezone::CheckDate( day, month, year ))
+	    {
+		string tmp = sformat( "%1-%2-%3", day, month, year );
+		// popup text, %1 is entered value
+		tmp = sformat( _("Invalid date (DD-MM-YYYY) %1.
+Enter the correct date.
+"), tmp );
+		Popup::Error( tmp );
+		ret = `retry;
+	    }
+	    else
+	    {
+		// in case of local time, we need to call mkinitrd (after setting timezone)
+		if (Timezone::hwclock == "--localtime" && !Stage::initial ())
+		{
+		    Timezone::Set (Timezone::timezone, true);
+		    Timezone::call_mkinitrd	= true;
+		}
+
+		Timezone::SetTime( year, month, day, hour, minute, second );
+	    }
+	}
+    }
+    until( ret==`accept || ret==`cancel );
+
+    if (ret == `accept)
+    {
+	// new system time from ntpdate must be saved to hw clock
+	if (ntp_rb)
+	{
+	    Timezone::SystemTime2HWClock ();
+	}
+	// remember ui
+	ntp_call ("SetUseNTP", $["ntp_used" : ntp_rb]);
+	ntp_used	= ntp_rb;
+    }
+
+    Wizard::CloseDialog ();
+    return (ret == `accept);
+  };
+
+  /**
+   * Main dialog for time zone configuration
+   * @param args arguments passwd from the called (back/next buttons etc.)
+   */
+  define symbol TimezoneDialog (map args) {
+
+    boolean first_run = args["first_run"]:"no" == "yes";
+    // inst_timezone as a part of installation sequence
+    if (first_run && Stage::initial ())
+    {
+	if (Timezone::ProposeLocaltime ())
+	{
+	    Timezone::hwclock = "--localtime";
+	}
+    }
+
+
+    // get current timezone and clock setting
+    boolean changed_time = false;
+    string timezone	= Timezone::timezone;
+    string timezone_old = timezone;
+    string timezone_initial	= timezone;
+    string hwclock	= Timezone::hwclock;
+
+    y2milestone ( "timezone_old %1", timezone_old );
+
+    timezone		= Timezone::UpdateTimezone (timezone);
+
+    // Initially set the current timezone to establish a consistent state.
+    integer sel = Timezone::Set (timezone,
+	Stage::initial () && !Mode::live_installation ());
+
+    boolean utc_only = Timezone::utc_only ();
+    y2milestone( "utc_only %1", utc_only );
+
+    Timezone::PushVal();
+
+
+    term settime = `Empty();
+
+    // "On a mainframe it is impossible for the user to change the hardware clock.
+    // So you can only specify the timezone." (ihno)
+    if (!Arch::s390 () && !Mode::config ())
+    {
+	// button text
+	settime = `PushButton (`id(`settime), _("Cha&nge..."));
+    }
+
+    boolean textmode	= Language::GetTextMode ();
+
+    boolean timezone_selector	= false;
+
+    list<map> zonemap	= Timezone::get_zonemap ();
+
+    // map of zones conversions
+    map<string,string> yast2zonetab	= Timezone::yast2zonetab;
+
+    // map of timezone -> translated label to be passed to TimezoneSelector
+    map zones		= $[];
+
+    // cache the zonemap with the order sorted according to current locale
+    map sorted_zonemap  = $[];
+
+    foreach (map region, zonemap, {
+	foreach (string key, string name, region["entries"]:$[], {
+	    if (!haskey (yast2zonetab, key))
+		zones[yast2zonetab[key]:key]    = name;
+	});
+    });
+
+    ntp_installed	=
+	(Stage::initial() || Package::Installed ("yast2-ntp-client"));
+
+
+    // read NTP status
+    if (first_run && NetworkService::isNetworkRunning() &&
+	!Mode::live_installation () &&
+	!GetInstArgs::going_back() &&
+	ProductFeatures::GetBooleanFeature("globals","default_ntp_setup")==true)
+    {
+	// true by default (fate#303520)
+	ntp_used	= true;
+	// configure NTP client
+	srandom ();
+	ntp_server	= sformat ("%1.opensuse.pool.ntp.org", random (4));
+	map<string, any> argmap = $[
+	    "server"	: ntp_server,
+	    // FIXME ntp-client_proposal doesn't understand 'servers' yet
+	    "servers"	: [
+		"0.opensuse.pool.ntp.org",
+		"1.opensuse.pool.ntp.org",
+		"2.opensuse.pool.ntp.org",
+		"3.opensuse.pool.ntp.org",
+	    ],
+	    "ntpdate_only"	: true
+	];
+	symbol rv = (symbol) ntp_call ("Write", argmap);
+	if (rv == `invalid_hostname)
+	{
+	    y2warning ("Invalid NTP server hostname %1", ntp_server);
+	    ntp_used	= false;
+	}
+	else
+	{
+	    Timezone::SystemTime2HWClock ();
+	    y2milestone ("proposing NTP server %1", ntp_server);
+	    ntp_call ("SetUseNTP", $["ntp_used" : ntp_used]);
+	}
+    }
+    else if (Stage::initial ())
+    {
+	// from installation summaru
+	ntp_used	= Timezone::ntp_used;
+    }
+    else if (ntp_installed) {
+	ntp_used = (boolean) ntp_call ("GetNTPEnabled", $[]);
+	ntp_used = ntp_used == true; // nil->false, just in case of parse error
+    }
+
+    string time_frame_label	=
+	// frame label
+	ntp_used ? _("Date and Time (NTP is configured)") :
+	// frame label
+	_("Date and Time");
+
+    // Read system date and time.
+    string date = Timezone::GetDateTime(true, false);
+
+    term timezoneterm = `HBox ();
+
+    if (UI::HasSpecialWidget (`TimezoneSelector) == true)
+    {
+	timezone_selector	= true;
+	string worldmap	= Directory::themedir +"/current/worldmap/worldmap.jpg";
+	timezoneterm	= `VBox (
+	    `TimezoneSelector (`id(`timezonemap), `opt(`notify), worldmap,
+		zones),
+	    `HBox (
+		`HWeight (1,
+		    `ComboBox (`id(`region), `opt(`notify),
+			// label text
+			_("&Region"),Timezone::Region())
+		),
+		`HSpacing (),
+		`HWeight (1, `ReplacePoint (`id(`tzsel),
+		    // title for combo box 'timezone'
+		    `ComboBox (`id (`timezone), `opt(`notify), _("Time &Zone"))
+		))
+	    )
+	);
+    }
+    else
+    {
+	timezoneterm = `HBox (
+	    `SelectionBox (`id(`region),`opt(`notify,`immediate),
+		// label text
+		_("&Region"), Timezone::Region()
+	    ),
+	    `HSpacing (),
+	    `ReplacePoint (`id(`tzsel),
+		// title for selection box 'timezone'
+		`SelectionBox (`id (`timezone), `opt(`notify), _("Time &Zone"))
+	    )
+	);
+    }
+    term hwclock_term	= `VBox (
+	`CheckBox (`id (`hwclock), `opt(`hstretch, `notify),
+	    // check box label
+	    _("&Hardware Clock Set to UTC"), hwclock == "-u"
+	),
+	textmode ? `Label ("") : `Empty ()
+    );
+
+    term contents	= `MarginBox (
+	`leftMargin (2), `rightMargin (2), `topMargin (0), `bottomMargin (0.2),
+	`VBox (
+	    timezoneterm,
+	    `VSpacing (0.2),
+	    `VSquash (`HBox (
+		`HWeight (1,
+		    utc_only ? `Empty () : hwclock_term
+		),
+		`HSpacing (1),
+		// frame label
+		`HWeight (1, `Frame (`id (`time_fr), time_frame_label,
+		    `MarginBox (
+			`leftMargin (1.2), `rightMargin (1),
+			`topMargin (0), `bottomMargin (0),
+		    textmode ?
+		    `VBox (
+			`Label (`id(`date), `opt(`outputField,`hstretch), date),
+			`Right (settime)
+		    ) :
+		    `HBox (
+			`Label (`id(`date), date),
+			`HStretch(),
+			`Right (settime)
+		    )
+		)))
+	    ))
+	)
+    );
+    // cache for lists with timezone items
+    map timezones_for_region	= $[];
+    list get_timezones_for_region (integer region, string zone) {
+
+	if (!haskey (sorted_zonemap, region))
+	{
+	    list reg_list =
+		maplist (string key, string name, zonemap[region,"entries"]:$[],
+	    ``([ name, key ]));
+
+	    reg_list = sort (list a, list b, (list<list>) reg_list, {
+		    // bnc#385172: must use < instead of <=, the following means:
+		    // strcoll(x) <= strcoll(y) && strcoll(x) != strcoll(y)
+		    list lsorted	= lsort ([a[0]:"", b[0]:""]);
+		    list lsorted_r	= lsort ([b[0]:"", a[0]:""]);
+		    return lsorted[0]:"" == a[0]:"" && lsorted == lsorted_r;
+	    });
+	    sorted_zonemap[region]      = reg_list;
+	}
+	return maplist (list entry, sorted_zonemap[region]:[],
+	{
+	    return `item (`id(entry[1]:""), entry[0]:"", entry[1]:"" == zone);
+	});
+    }
+    // region was seleced: show the correct list of timezones
+    void show_selected_region (integer sel, string zone) {
+
+	if (timezone_selector)
+	    UI::ChangeWidget (`id(`region), `Value, sel);
+	else
+	    UI::ChangeWidget (`id(`region), `CurrentItem, sel);
+
+	UI::ReplaceWidget (`id(`tzsel), timezone_selector ?
+	    `ComboBox (`id(`timezone), `opt(`notify),
+		// label text
+		_("Time &Zone"), get_timezones_for_region (sel, zone)
+	    ) :
+	    `SelectionBox ( `id(`timezone), `opt(`notify),
+		// label text
+		_("Time &Zone"), get_timezones_for_region (sel, zone)
+	    )
+	);
+    }
+    // which region is selected?
+    integer selected_region () {
+	return timezone_selector ?
+	    (integer)UI::QueryWidget (`id(`region), `Value) :
+	    (integer)UI::QueryWidget (`id(`region), `CurrentItem);
+    }
+    // which timezone is selected?
+    string selected_timezone () {
+	return timezone_selector ?
+	    (string) UI::QueryWidget(`id(`timezone), `Value) :
+	    (string) UI::QueryWidget(`id(`timezone), `CurrentItem);
+    }
+
+    // for given timezone (selected in map), find out to which region it belongs
+    integer get_region_for_timezone (integer current, string zone) {
+	// first check if it is not in current region
+	if (haskey (zonemap[current,"entries"]:$[], zone))
+	    return current;
+	integer reg	= 0;
+	foreach (map region, zonemap, {
+	    if (haskey (region["entries"]:$[], zone))
+	    {
+		break;
+	    }
+	    reg	= reg + 1;
+	});
+	return reg;
+    }
+
+    // help for timezone screen
+    string help_text = _("
+<p><b><big>Time Zone and Clock Settings</big></b></p>") +
+
+    // help for timezone screen
+    _("<p>
+To select the time zone to use in your system, first select the <b>Region</b>.
+In <b>Time Zone</b>, then select the appropriate time zone, country, or 
+region from those available.
+</p>
+");
+
+    if (!utc_only)
+    {
+	// help for time calculation basis:
+	// hardware clock references local time or UTC?
+	help_text = help_text + _("<p>
+Specify whether your machine is set to local time or UTC in <b>Hardware Clock Set To</b>.
+Most PCs that also have other operating systems installed (such as Microsoft
+Windows) use local time.
+Machines that have only Linux installed are usually
+set to Universal Time Coordinated (UTC).
+If the hardware clock is set to UTC, your system can switch from standard time
+to daylight saving time and back automatically.
+</p>
+");
+
+        // help text: extra note about localtim
+        help_text = help_text + _("<p>
+Note: The internal system clock as used by the Linux kernel must
+always be in UTC, because this is the reference for the correct localtime
+in user space. If you are choosing localtime for CMOS clock,
+check the user manual for background information about side effects.
+</p>");
+
+    }
+
+
+    if (!Arch::s390 () && !Mode::config ())
+    {
+        // general help trailer
+	help_text = help_text + _("<p>
+If the current time is not correct, use <b>Change</b> to adjust it.
+</p>");
+    }
+
+    // Screen title for timezone screen
+    Wizard::SetContents (_("Clock and Time Zone"), contents,
+	help_text, args["enable_back"]:true, args["enable_next"]:true);
+
+    if ( Stage::initial () || Stage::firstboot ())
+    {
+	Wizard::SetTitleIcon ("yast-timezone");
+    }
+    else
+    {
+        Wizard::SetDesktopTitleAndIcon ("timezone");
+    }
+
+    symbol hwclock_s = (hwclock=="-u") ? `hwclock_utc : `hwclock_localtime;
+    symbol hwclock_s_old = hwclock_s;
+    hwclock_s_initial = hwclock_s;
+
+    show_selected_region (sel, timezone);
+    if (timezone_selector)
+    {
+	UI::ChangeWidget (`id(`timezonemap), `CurrentItem,
+	    yast2zonetab[timezone]:timezone);
+    }
+
+    UI::SetFocus (`id(`region));
+
+    symbol ret = nil;
+
+    repeat
+    {
+	ret = (symbol) Wizard::UserInput();
+
+	y2debug( "ret %1", ret );
+
+	if (ret == `ok)
+	    ret	= `next;
+
+	if (!Mode::config () && ret == `abort && Popup::ConfirmAbort(`painless))
+	{
+	    break;
+	}
+	if (ret == `region)
+	{
+	    integer num = selected_region ();
+	    if (num == sel)
+		continue;
+	    show_selected_region (num, "");
+	    string tz		= selected_timezone ();
+	    if (tz != timezone)
+	    {
+		timezone	= tz;
+		if (timezone != timezone_old)
+		    changed_time	= true;
+		timezone_old	= timezone;
+		SetTimezone (hwclock_s, timezone, false, changed_time);
+	    }
+	    if (timezone_selector)
+		UI::ChangeWidget (`id(`timezonemap), `CurrentItem, timezone);
+	    sel		= num;
+	}
+	else if (ret == `settime)
+	{
+	    // timezone was not adapted in ncurses (bnc#617861)
+	    if (textmode)
+	    {
+		string tz		= selected_timezone ();
+		if (tz != timezone)
+		{
+		    timezone	= tz;
+		    if (timezone != timezone_old)
+			changed_time	= true;
+		    timezone_old	= timezone;
+		    SetTimezone (hwclock_s, timezone, false, changed_time);
+		}
+	    }
+	    if (SetTimeDialog())
+	    {
+		Timezone::diff = 0;
+		UI::ChangeWidget(`id(`date), `Value,
+		    Timezone::GetDateTime (false, false));
+		changed_time = true;
+		// adapt frame label, NTP status may be changed
+		time_frame_label	=
+		    // frame label
+		    ntp_used ? _("Date and Time (NTP is configured)") :
+		    // frame label
+		    _("Date and Time");
+		UI::ChangeWidget (`id (`time_fr), `Label, time_frame_label);
+	    }
+	}
+	else if (ret == `next || ret == `timezone || ret == `timezonemap ||
+		 ret == `hwclock)
+	{
+	    // Get current settings.
+	    // UTC vs. localtime, only if needed
+	    //
+	    hwclock_s = `hwclock_utc;
+	    if (!utc_only)
+	    {
+		hwclock_s = ((boolean)UI::QueryWidget( `id(`hwclock), `Value))?
+		    `hwclock_utc : `hwclock_localtime;
+
+                if (ret == `next && !Timezone::windows_partition && hwclock_s == `hwclock_localtime)
+                {
+                    // warning popup, in case local time is selected (bnc#732769)
+                    if (!Popup::ContinueCancel (_("
+You selected local time, but only Linux  seems to be installed on your system.
+In such case, it is strongly recommended to use UTC, and to click Cancel.
+
+If you want to keep local time, you must adjust the CMOS clock twice the year
+because of Day Light Saving switches. If you miss to adjust the clock, backups may fail,
+your mail system may drop mail messages, etc.
+
+If you use UTC, the Linux will adjust the time automatically.
+
+Do you want to continue with your selection (local time)?")))
+                    {
+                        ret = `not_next;
+                        continue;
+                    }
+                }
+	    }
+	    if (ret == `timezonemap)
+	    {
+		timezone = (string) UI::QueryWidget(`id(`timezonemap),`Value);
+
+		integer reg	= get_region_for_timezone (sel, timezone);
+		if (reg == sel)
+		    UI::ChangeWidget (`id(`timezone), `Value, timezone);
+		else
+		{
+		    sel	= reg;
+		    show_selected_region (sel, timezone);
+		}
+	    }
+	    else
+		timezone = selected_timezone ();
+	    if (ret == `timezone)
+	    {
+		sel = selected_region ();
+		if (timezone_selector)
+		    UI::ChangeWidget (`id(`timezonemap), `Value,
+			yast2zonetab[timezone]:timezone);
+	    }
+
+	    if (timezone == nil || size(timezone) == 0)
+	    {
+	        // popup text
+		Popup::Error( _("Select a valid time zone.") );
+		ret = `again;
+		timezone = timezone_old;
+	    }
+	    y2milestone ("timezone %1 ret %2", timezone, ret);
+
+	    if (timezone != timezone_old || hwclock_s != hwclock_s_old || ret == `next)
+	    {
+		if (timezone != timezone_old)
+		{
+		    changed_time = true;
+		}
+		timezone_old	= timezone;
+		hwclock_s_old	= hwclock_s;
+		SetTimezone (hwclock_s, timezone, ret==`next, changed_time);
+	    }
+
+	    if (ret == `next)
+	    {
+		// User wants to keep his changes.
+		// Set user_decision flag in timezone module.
+		//
+		Timezone::user_decision	= true;
+		Timezone::user_hwclock	= true;
+		Timezone::ntp_used	= ntp_used;
+		// See bnc#638185c5: refresh_initrd should be called if HWCLOCK is changed (--localtime <-> --utc) and/or
+		// if --localtime is set and TIMEZONE will be changed.
+		if (hwclock_s != hwclock_s_initial || (hwclock_s == `hwclock_localtime && timezone != timezone_initial))
+		{
+		    Timezone::call_mkinitrd	= true;
+		}
+
+		if (ntp_used && ntp_server != "")
+		{
+		    // save NTP client settings now
+		    ntp_call ("Write", $[
+			"server"	: ntp_server,
+			"write_only": true
+		    ]);
+		}
+	    }
+	}
+    } until ( ret == `next || ret == `back || ret == `cancel );
+
+    if (ret != `next)
+    {
+	Timezone::PopVal();
+    }
+    return ret;
+  }
+}

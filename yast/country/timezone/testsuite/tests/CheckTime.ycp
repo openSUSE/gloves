@@ -1,0 +1,47 @@
+/**
+ * tests for Timezone::GetDateTime
+ * Author: jsuchome@suse.cz
+ * $Id: CheckTime.ycp 27936 2006-02-13 20:01:14Z olh $
+ */
+{
+
+    // testedfiles: Timezone.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    Testsuite::Init([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    Testsuite::Test (``(Timezone::CheckTime ("1", "2", "3")), [], []);
+
+    // wrong time:
+    Testsuite::Test (``(Timezone::CheckTime ("24", "2", "3")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckTime ("1", "62", "3")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckTime ("1", "2", "63")), [], []);
+
+    // wrong input:
+    Testsuite::Test (``(Timezone::CheckTime ("", "2", "3")), [], []);
+
+    Testsuite::Test (``(Timezone::CheckTime ("1", "2", "blah")), [], []);
+}

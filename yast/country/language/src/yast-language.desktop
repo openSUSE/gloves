@@ -1,0 +1,27 @@
+[Desktop Entry]
+Type=Application
+Categories=Settings;System;Qt;X-SuSE-YaST;X-SuSE-YaST-System;
+
+X-KDE-ModuleType=Library
+X-KDE-HasReadOnlyMode=true
+X-KDE-Library=yast2
+X-SuSE-YaST-Call=language
+
+X-SuSE-YaST-Group=System
+X-SuSE-YaST-Argument=
+X-SuSE-YaST-RootOnly=true
+X-SuSE-YaST-AutoInst=all
+X-SuSE-YaST-Geometry=
+X-SuSE-YaST-SortKey=
+X-SuSE-YaST-AutoInstResource=language
+X-SuSE-YaST-AutoInstClient=language_auto
+X-SuSE-YaST-AutoInstClonable=true
+X-SuSE-YaST-AutoInstSchema=language.rnc
+X-SuSE-YaST-Keywords=language,locale,country
+
+Icon=yast-language
+Exec=xdg-su -c "/sbin/yast2 language"
+
+Name=Language
+GenericName=Change the language and install additional languages
+StartupNotify=true

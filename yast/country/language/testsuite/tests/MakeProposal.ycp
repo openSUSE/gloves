@@ -1,0 +1,46 @@
+/**
+ * tests for Language::MakeProposal
+ * Author:	jsuchome@suse.cz
+ * $Id: MakeProposal.ycp 32769 2006-09-08 09:29:15Z jsuchome $
+ */
+{
+
+    // testedfiles: Language.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "language" : $[
+		"RC_LANG"		: "en_US.UTF-8",
+		"INSTALLED_LANGUAGES"	: "en_US,de_DE",
+	    ],
+	],
+	"target" : $[
+	    "bash_output"	: $[],
+	    "size"		: 1,
+	    "dir" : [
+		"language_de_DE.ycp"
+	    ],
+	    "yast2" : $[
+		"de_DE" : [
+		    "Deutsch",
+		    "Deutsch",
+		    ".UTF-8",
+		    "@euro",
+		    "German"
+		],
+	    ],
+	],
+    ];
+
+    TESTSUITE_INIT([READ,$[],READ], nil);
+
+    import "Language";
+
+    TEST(``(Language::MakeProposal (false, false)), [READ,$[],$[]], []);
+
+    Language::languages	= "en_US";
+
+    TEST(``(Language::MakeProposal (true, false)), [READ,$[],$[]], []);
+}

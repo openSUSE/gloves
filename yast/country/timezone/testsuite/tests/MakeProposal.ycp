@@ -1,0 +1,57 @@
+/**
+ * tests for Timezone::MakeProposal
+ * Author:	jsuchome@suse.cz
+ * $Id: MakeProposal.ycp 27936 2006-02-13 20:01:14Z olh $
+ */
+{
+    // testedfiles: Timezone.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"DEFAULT_TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    TESTSUITE_INIT([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    map R	= $[
+	"probe"		: $[
+	    "architecture"	: "i386",
+	],
+	"target" : $[
+	    "yast2"		: [
+	    $[
+		"name"		: "Europe",
+		"entries"	: $[
+		    "Europe/Berlin" : "Germany",
+		    "Europe/Prague" : "Czech Republic",
+		]
+	    ],
+	    ]
+	],
+    ];
+    map E	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    TEST(``(Timezone::MakeProposal (true, false)), [R,$[],E], []);
+}

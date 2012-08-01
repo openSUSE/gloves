@@ -3,7 +3,7 @@ require "packaging"
 
 desc "install all things on system"
 task :install do
-  for client in Dir["yast++lib*"]
+  for client in Dir["gloves*"]
     sh "cd #{client}/ && rake install;cd -" if File.exist?(File.join(client,"Rakefile"))
   end
   for agent in Dir["config_*"]

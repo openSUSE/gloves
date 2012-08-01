@@ -1,0 +1,44 @@
+/**
+ * test for Timezone::GetDateTimeMap
+ *	- check correct parsing after changed time format (bug #62312)
+ * Author: jsuchome@suse.cz
+ * $Id: GetDateTimeMap.ycp 31665 2006-06-26 14:24:27Z jsuchome $
+ */
+{
+    // testedfiles: Timezone.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    Testsuite::Init([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    map E	= $[
+	"target" : $[
+	    "bash_output"	: $[
+		"stdout"	: "23:59:59 - 0000-12-24"
+	    ],
+	],
+    ];
+
+    Testsuite::Test (``(Timezone::GetDateTimeMap ()), [$[],$[],E], []);
+
+}

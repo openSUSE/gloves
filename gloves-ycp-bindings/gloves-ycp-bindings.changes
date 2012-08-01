@@ -1,0 +1,10 @@
+-------------------------------------------------------------------
+Tue Jul 17 10:42:27 CEST 2012 - jsuchome@suse.cz
+
+- require ruby, so the build macros work 
+
+-------------------------------------------------------------------
+Fri Apr  6 08:57:56 CEST 2012 - jsuchome@suse.cz
+
+- package cannot be noarch, it points to arch specific ruby path
+

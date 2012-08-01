@@ -1,0 +1,935 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+/**
+ * File:	modules/Timezone.ycp
+ * Package:	Country settings
+ * Summary:	Timezone related stuff
+ * Authors:	Klaus Kaempf <kkaempf@suse.de>
+ *		Thomas Roelz <tom@suse.de>
+ *
+ * $Id: Timezone.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ */
+
+{
+
+module "Timezone";
+textdomain "country";
+
+import "Arch";
+import "Language";
+import "Misc";
+import "Mode";
+import "Stage";
+import "String";
+import "ProductFeatures";
+
+// ruby API
+import "Glove::Timezone";
+
+// --------------------------------------------------------------
+// START: Globally defined data to be accessed via Timezone::<variable>
+// --------------------------------------------------------------
+
+global string timezone = "";	// e.g. "Europe/Berlin"
+
+// hwclock parameter
+// possible values:
+//	 ""		dont change timezone
+//	 "-u"		system clock runs UTC
+//   "--localtime"	system clock runs localtime
+global string hwclock = "";
+
+// The default timezone if set.
+//
+global string default_timezone = "";
+
+// Flag indicating if the user has chosen a timezone.
+// To be set from outside.
+//
+global boolean user_decision = false;
+global boolean user_hwclock = false;
+
+// If NTP is configured
+global boolean ntp_used		= false;
+
+global integer diff = 0;
+
+/**
+ * if anyuthing was modified (currently for auto client only)
+ */
+global boolean modified		= false;
+
+/**
+ * If there is windows partition, assume that local time is used
+ */
+global boolean windows_partition	= false;
+
+// if mkinitrd should be called at the end
+global boolean call_mkinitrd		= false;
+
+// translation of correct timezone to the one that could be shown in map widget
+global map <string,string> yast2zonetab	= $[
+	"Mideast/Riyadh87"	: "Asia/Riyadh",
+	"Mideast/Riyadh88"	: "Asia/Riyadh",
+	"Mideast/Riyadh89"	: "Asia/Riyadh",
+	"Europe/Vatican"	: "Europe/Rome",
+];
+
+// on init, translate these to correct ones
+global map<string,string> obsoleted_zones	= $[
+	"Iceland"		: "Atlantic/Reykjavik",
+	"Europe/Belfast"	: "Europe/London",
+
+	"Australia/South"	: "Australia/Adelaide",
+	"Australia/North"	: "Australia/Darwin",
+	"Australia/NSW"		: "Australia/Sydney",
+	"Australia/ACT"		: "Australia/Canberra",
+	"Australia/Queensland"	: "Australia/Brisbane",
+	"Australia/Tasmania"	: "Australia/Hobart",
+	"Australia/Victoria"	: "Australia/Melbourne",
+	"Australia/West"	: "Australia/Perth",
+
+	"US/Alaska"		: "America/Anchorage",
+	"US/Aleutian"		: "America/Adak",
+	"US/Arizona"		: "America/Phoenix",
+	"US/Central"		: "America/Chicago",
+	"US/East-Indiana"	: "America/Indiana/Indianapolis",
+	"US/Hawaii"		: "Pacific/Honolulu",
+	"US/Indiana-Starke"	: "America/Indiana/Knox",
+	"US/Michigan"		: "America/Detroit",
+	"US/Mountain"		: "America/Denver",
+	"US/Pacific"		: "America/Los_Angeles",
+	"US/Samoa"		: "Pacific/Pago_Pago",
+	"US/Eastern"		: "America/New_York",
+
+	"Canada/Atlantic"	: "America/Halifax",
+	"Canada/Central"	: "America/Winnipeg",
+	"Canada/Eastern"	: "America/Toronto",
+	"Canada/Saskatchewan"	: "America/Regina",
+	"Canada/East-Saskatchewan" : "America/Regina",
+	"Canada/Mountain"	: "America/Edmonton",
+	"Canada/Newfoundland"	: "America/St_Johns",
+	"Canada/Pacific"	: "America/Vancouver",
+	"Canada/Yukon"		: "America/Whitehorse",
+
+	"America/Buenos_Aires"	: "America/Argentina/Buenos_Aires",
+	"America/Virgin"	: "America/St_Thomas",
+	"Brazil/Acre"		: "America/Rio_Branco",
+	"Brazil/East"		: "America/Sao_Paulo",
+	"Brazil/West"		: "America/Manaus",
+	"Chile/Continental"	: "America/Santiago",
+	"Chile/EasterIsland"	: "Pacific/Easter",
+	"Mexico/BajaNorte"	: "America/Tijuana",
+	"Mexico/BajaSur"	: "America/Mazatlan",
+	"Mexico/General"	: "America/Mexico_City",
+	"Jamaica"		: "America/Jamaica",
+
+	"Asia/Macao"		: "Asia/Macau",
+	"Israel"		: "Asia/Jerusalem",
+	"Asia/Tel_Aviv"		: "Asia/Jerusalem",
+	"Hongkong"		: "Asia/Hong_Kong",
+	"Japan"			: "Asia/Tokyo",
+	"ROK"			: "Asia/Seoul",
+
+	"Africa/Timbuktu"	: "Africa/Bamako",
+	"Egypt"			: "Africa/Cairo",
+];
+// ------------------------------------------------------------------
+// END: Globally defined data to be accessed via Timezone::<variable>
+// ------------------------------------------------------------------
+
+
+
+// ------------------------------------------------------------------
+// START: Locally defined data
+// ------------------------------------------------------------------
+
+// internal map used to store initial data
+map push = $[];
+
+
+string name = "";
+
+// list with maps, each map provides time zone information about one region
+list < map < string, any> > zonemap = [];
+
+// 'language --> default timezone' conversion map
+map<string, string> lang2tz = $[];
+
+// remember if /sbin/hwclock --hctosys was called, it can be done only once (bnc#584484)
+boolean systz_called	= false;
+
+// ------------------------------------------------------------------
+// END: Locally defined data
+// ------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+// START: Globally defined functions
+// -----------------------------------------------------------------------------
+
+/**
+ * get_lang2tz()
+ *
+ * Get the language --> timezone conversion map.
+ *
+ * @return  conversion map
+ *
+ * @see	get_zonemap()
+ */
+
+define map<string, string> get_lang2tz () {
+
+    if (size (lang2tz) == 0)
+    {
+	map base_lang2tz = (map) SCR::Read (.target.yast2, "lang2tz.ycp");
+	if (base_lang2tz == nil) base_lang2tz = $[];
+
+	lang2tz	= (map<string,string>) union (
+	    base_lang2tz,
+	    Language::GetLang2TimezoneMap (true)
+	);
+    }
+    return lang2tz;
+}
+
+/**
+ * get_zonemap()
+ *
+ * Get the timezone database.
+ *
+ * @return  timezone DB (map)
+ *
+ * @see	get_lang2tz()
+ */
+
+global define list<map<string,any> > get_zonemap() {
+
+// FIXME using Gloves: (we'll lose translation!)
+// map glove_regions   = (map) Glove::Timezone::read ($[ "kind" : "regions" ]);
+//    y2security ("glove  : %1", glove_regions["Africa"]:nil);
+    if (size(zonemap) == 0)
+    {
+	list<map<string,any> > zmap = (list<map<string,any> >)
+	    eval (SCR::Read (.target.yast2, "timezone_raw.ycp"));
+	if (zmap == nil) zmap = [];
+
+	zonemap = sort (map<string,any> a, map<string,any> b, zmap, {
+	    // [ "USA", "Canada" ] -> [ "Canada", "USA" ]
+	    // bnc#385172: must use < instead of <=, the following means:
+	    // strcoll(x) <= strcoll(y) && strcoll(x) != strcoll(y)
+	    list lsorted	= lsort ([a["name"]:"", b["name"]:""]);
+	    list lsorted_r	= lsort ([b["name"]:"", a["name"]:""]);
+	    return lsorted[0]:"" == a["name"]:"" && lsorted == lsorted_r;
+	});
+    }
+    return zonemap;
+}
+
+// ------------------------------------------------------------------
+// END: Locally defined functions
+// ------------------------------------------------------------------
+/**
+ * Set()
+ *
+ * Set system to selected timezone.
+ *
+ * @param	string timezone to select, e.g. "Europe/Berlin"
+ *
+ * @return	the number of the region that contains the timezone
+ *
+ */
+global define integer Set (string zone, boolean really) {
+
+    list <map <string, any> > zmap = get_zonemap();
+
+    // Set the new timezone internally
+    timezone = zone;
+
+    integer sel = 0;
+    while (sel<size (zmap) && !haskey (zmap[sel,"entries"]:$[], zone))
+    {
+	sel = sel + 1;
+    }
+
+    name	= zmap [sel,"name"]:"" + " / " + zmap[sel,"entries",zone]:zone;
+
+    // Adjust system to the new timezone.
+    //
+    if (!Mode::config () && really )
+    {
+	boolean textmode        = Language::GetTextMode ();
+	// turn off the screensaver when clock can change radically (bnc#455771)
+	// (in non-firstboot cases, installation process handles it)
+	if (Stage::firstboot() && !textmode)
+	{
+	    SCR::Execute ( .target.bash, "/usr/bin/xset -dpms");
+	    SCR::Execute ( .target.bash, "/usr/bin/xset s reset");
+	    SCR::Execute ( .target.bash, "/usr/bin/xset s off");
+	}
+        map write   = $[
+          "hwclock"     : hwclock,
+          "timezone"    : timezone
+        ];
+        map ret     = (map) Glove::Timezone::modify ($["only_apply" : true ], write);
+        y2internal ("timezone applied: %1", ret);
+
+	if (Stage::firstboot() && !textmode)
+	{
+	    SCR::Execute (.target.bash, "/usr/bin/xset s on");
+	    SCR::Execute ( .target.bash, "/usr/bin/xset +dpms");
+	}
+    }
+
+    // On first assignment store default timezone.
+    //
+    if (default_timezone == "")
+    {
+	default_timezone = timezone;
+	y2milestone( "Set default timezone: <%1>", timezone );
+    }
+
+    y2milestone( "Set timezone:%1 sel:%2 name:%3", timezone, sel, name );
+    return sel;
+}
+
+/**
+ * Convert the duplicated timezone to the only one supported
+ * Temporary solution - a result of discussion of bug #47472
+ * @param tmz current timezone
+ */
+global define string UpdateTimezone (string tmz) {
+
+    string updated_tmz	= tmz;
+
+    if (haskey (obsoleted_zones, tmz))
+    {
+	updated_tmz	= obsoleted_zones[tmz]:tmz;
+	y2milestone ("updating timezone from %1 to %2", tmz, updated_tmz);
+    }
+
+    return updated_tmz;
+}
+
+
+  /**
+   * Read timezone settings from sysconfig
+   */
+  global define void Read () {
+
+    map read    = (map) Glove::Timezone::read ($[]);
+    hwclock     = read["hwclock"]:hwclock;
+    timezone    = read["timezone"]:timezone;
+    default_timezone    = read["default_timezone"]:default_timezone;
+
+    // get name for cloning purposes
+    if (Mode::config ())
+    {
+	list <map <string, any> > zmap = get_zonemap();
+	integer sel = 0;
+	while (sel<size (zmap) && !haskey (zmap[sel,"entries"]:$[], timezone))
+	{
+	    sel = sel + 1;
+	}
+	name	= zmap [sel,"name"]:"" + " / " + zmap[sel,"entries",timezone]:timezone;
+    }
+  }
+
+/**
+  * Timezone()
+  *
+  * The module constructor.
+  * Sets the proprietary module data defined globally for public access.
+  * This is done only once (and automatically) when the module is loaded for the first time.
+  * Calls Set() in initial mode.
+  * Reads current timezone from sysconfig in normal mode.
+  *
+  * @see	Set()
+  */
+global define void Timezone() {
+
+    // Set default values.
+    //
+    hwclock = "-u";
+    if (Stage::initial () && !Mode::live_installation ())
+    {
+	// language --> timezone database, e.g. "de_DE" : "Europe/Berlin"
+	map<string, string> lang2tz = get_lang2tz();
+
+	string new_timezone = lang2tz[Language::language]:"";
+	y2milestone( "Timezone new_timezone %1", new_timezone );
+
+	if (new_timezone != "")
+	{
+	    Set (new_timezone, true);
+	}
+    }
+    else if (!Mode::config ())
+    {
+	Read ();
+    }
+    return;
+}
+
+global boolean CallMkinitrd () {
+
+    y2milestone ("calling mkinitrd...");
+    SCR::Execute (.target.bash, "/sbin/mkinitrd >> /var/log/YaST2/y2logmkinitrd 2>> /var/log/YaST2/y2logmkinitrd");
+    y2milestone ("... done");
+    return true;
+}
+
+/**
+ * Set the new time and date given by user
+ */
+global define void SetTime (string year, string month, string day,
+                            string hour, string minute, string second ) {
+    if (!Arch::s390 ())
+    {
+	string date = sformat( " --date=\"%1/%2/%3 %4:%5:%6\" ", month, day,
+	                       year, hour, minute, second );
+	string cmd = "";
+	if (size (timezone) >0 && hwclock != "--localtime")
+	{
+	    cmd = "TZ=" + timezone + " ";
+	}
+	cmd = cmd + "/sbin/hwclock --set " + hwclock + date;
+	y2milestone( "SetTime cmd %1", cmd );
+	SCR::Execute(.target.bash, cmd );
+	cmd = "/sbin/hwclock --hctosys " + hwclock;
+	y2milestone( "SetTime cmd %1", cmd );
+	SCR::Execute(.target.bash, cmd );
+	// actually, it was probably not called, but do not let it change the time again after manual change
+	systz_called	= true;
+    }
+};
+
+/**
+ * Set the Hardware Clock to the current System Time.
+ */
+global define void SystemTime2HWClock () {
+
+    if (!Arch::s390 ())
+    {
+	string cmd = "";
+	if (size (timezone) >0 && hwclock != "--localtime")
+	{
+	    cmd = "TZ=" + timezone + " ";
+	}
+	cmd = "/sbin/hwclock --systohc " + hwclock;
+	y2milestone ("cmd %1", cmd);
+	SCR::Execute(.target.bash, cmd);
+    }
+}
+
+/**
+ * GetTimezoneForLanguage()
+ *
+ * Get the timezone for the given system language.
+ *
+ * @param	System language code, e.g. "en_US".
+ *		Default timezone to be returned if nothing found.
+ *
+ * @return  The timezone for this language, e.g. "US/Eastern"
+ *		or the default value if nothing found.
+ *
+ * @see	-
+ */
+global define string GetTimezoneForLanguage (string sys_language,
+                                             string default_timezone)
+{
+    // The system_language --> timezone conversion map.
+    //
+    map<string, string> lang2timezone = get_lang2tz();
+    string ret = lang2timezone[sys_language]:default_timezone;
+
+    y2milestone ("language %1 default timezone %2 returned timezone %3",
+                 sys_language, default_timezone, ret);
+    return ret;
+}
+
+/**
+ * Set the timezone for the given system language.
+ * @param	System language code, e.g. "en_US".
+ * @return the number of the region that contains the timezone
+ */
+global define void SetTimezoneForLanguage (string sys_language) {
+
+    string tmz = GetTimezoneForLanguage (sys_language, "US/Eastern");
+    y2debug ("language %1 proposed timezone %2", sys_language, tmz);
+    if (tmz != "")
+    {
+	Set (tmz, true);
+    }
+}
+
+/**
+ * Return the language code for given timezone (by reverse searching the
+ * "language -> timezone" map)
+ * @param timezone, if empty the current one is used
+ */
+global define string GetLanguageForTimezone (string tz)
+{
+    if (tz == "" || tz == nil)
+	tz	= timezone;
+
+    string lang	= "";
+    foreach (string code, string tmz, get_lang2tz(), {
+	if (tmz == tz && (lang == "" || !issubstring (lang, "_")))
+	    lang	= code;
+    });
+    return lang;
+}
+
+/**
+ * Return the country part of language code for given timezone
+ * @param timezone, if empty the current one is used
+ */
+global define string GetCountryForTimezone (string tz)
+{
+    return Language::GetGivenLanguageCountry (GetLanguageForTimezone(tz));
+}
+
+/**
+ * Return translated country name of given timezone
+ * @param timezone value (as saved in sysconfig/clock)
+ */
+global define string GetTimezoneCountry (string zone) {
+
+    list zmap = (list) eval (SCR::Read (.target.yast2, "timezone_raw.ycp"));
+
+    integer sel = 0;
+    while (sel<size (zmap) && !haskey (zmap[sel,"entries"]:$[], zone))
+    {
+	sel = sel + 1;
+    }
+    return zmap [sel,"name"]:"" + " / " + zmap[sel,"entries",zone]:zone;
+}
+
+/**
+ * GetDateTime()
+ *
+ * Get the output of date "+%H:%M:%S - %Y-%m-%d" or in locale defined format
+ *
+ * @param	flag if to get real system time or if to simulate changed
+ *		timezone settings with TZ=
+ * @param	if the date and time should be returned in locale defined format
+ *
+ * @return  The string output.
+ *
+ */
+global define string GetDateTime (boolean real_time, boolean locale_format) {
+
+    string cmd = "";
+
+    string date_format = (locale_format && Mode::normal ())
+	? "+%c" : "+%Y-%m-%d - %H:%M:%S";
+
+    y2milestone( "GetDateTime hwclock %1 real:%2", hwclock, real_time );
+    if (!real_time && !Mode::config ())
+    {
+	integer ds = 0;
+	if (diff!=0)
+	{
+	    map out	= (map) SCR::Execute (.target.bash_output, "date +%z");
+	    string tzd = out["stdout"]:"";
+	    y2milestone( "GetDateTime tcd=%1", tzd );
+	    integer t = tointeger( String::CutZeros( substring( tzd, 1, 2 )));
+	    if (t != nil)
+	    {
+		ds = ds + t * 3600;
+		t = tointeger( String::CutZeros( substring( tzd, 3, 2 )));
+		ds = ds + t * 60;
+		if (substring (tzd, 0, 1) == "-")
+		    ds = -ds;
+		y2milestone( "GetDateTime ds %1 diff %2", ds, diff );
+	    }
+	}
+	cmd = "";
+	if (hwclock != "--localtime")
+	{
+	    cmd = sformat( "TZ=%1 ", timezone );
+	}
+	cmd = cmd + sformat( "/bin/date \"%1\" \"--date=now %2sec\"",
+			     date_format, ds*diff );
+    }
+    else
+	{
+	cmd = sformat( "/bin/date \"%1\"", date_format );
+	}
+    y2milestone( "GetDateTime cmd=%1", cmd );
+    map out	= (map) SCR::Execute (.target.bash_output, cmd);
+    string local_date = deletechars (out["stdout"]:"", "\n");
+
+    y2milestone( "GetDateTime local_date='%1'", local_date );
+
+    return( local_date );
+    }
+
+/**
+ * Clear the internal map with timezones, so the timezone data could be
+ * retranslated next time when they are needed
+ */
+global define void  ResetZonemap() {
+    zonemap = [];
+}
+
+/**
+ * Return true if localtime should be proposed as default
+ * Based on current hardware configuration:
+ * Win partitions present or 32bit Mac
+ */
+global define boolean ProposeLocaltime () {
+
+    return windows_partition || (Arch::board_mac() && Arch::ppc32());
+}
+
+/**
+ * Return proposal list of strings.
+ *
+ * @param	boolean force_reset
+ *		boolean language_changed
+ *
+ * @return	list user readable description.
+ *
+ * If force_reset is true reset the module to the timezone
+ * stored in default_timezone.
+ */
+global define list<string> MakeProposal (boolean force_reset,
+                                   boolean language_changed )
+{
+    y2milestone ("force_reset: %1", force_reset);
+    y2milestone ("language_changed: %1 user_decision %2 user_hwclock %3",
+	language_changed, user_decision, user_hwclock);
+
+    if (language_changed)
+	ResetZonemap();
+
+    if (!user_hwclock || force_reset)
+    {
+	hwclock = "-u";
+	if (ProposeLocaltime ())
+	{
+	    hwclock = "--localtime";
+	}
+    }
+    if (force_reset)
+    {
+	// If user wants to reset do it if a default is available.
+	//
+	if( default_timezone != "" )
+	    {
+	    Set( default_timezone, true );	// reset
+	    }
+
+	// Reset user_decision flag.
+	//
+	user_decision = false;
+    }
+    else	// no reset
+    {
+	// Only follow the language if the user has never actively chosen
+	// a timezone. The indicator for this is user_decision which is
+	// set from outside the module.
+	//
+	if (user_decision || Mode::autoinst () ||
+	    ProductFeatures::GetStringFeature ("globals", "timezone") != "")
+	{
+	    if( language_changed )
+		{
+		y2milestone("User has chosen a timezone; not following language - only retranslation.");
+
+		Set( timezone, true );
+		}
+	}
+	else
+	{
+	    // User has not yet chosen a timezone ==> follow language.
+	    //
+	    string local_timezone =
+		GetTimezoneForLanguage( Language::language, "US/Eastern");
+
+	    if( local_timezone != "" )
+		{
+		Set( local_timezone, true );
+		default_timezone = local_timezone;
+		}
+	    else
+		{
+		if( language_changed )
+		    {
+		    y2error("Can't follow language - only retranslation");
+
+		    Set( timezone, true );
+		    }
+		}
+	}
+    }
+
+    // label text (Clock setting)
+    string clock_setting = _("UTC");
+
+    if (hwclock == "--localtime")
+	// label text, Clock setting: local time (not UTC)
+	clock_setting = _("Local Time");
+
+    // label text
+    clock_setting = _("Hardware Clock Set To") + " " + clock_setting;
+
+    string date = GetDateTime (true, true);
+
+    y2milestone( "MakeProposal hwclock %1", hwclock );
+
+    list<string> ret = [ name + " - " + clock_setting + " " + date ];
+    if (ntp_used)
+	// summary label
+	ret	= add (ret, _("NTP configured"));
+    return ret;
+}
+
+/**
+  * Selection()
+  *
+  * Return a map of ids and names to build up a selection list
+  * for the user. The key is used later in the Set function
+  * to select this timezone. The name is a translated string.
+  *
+  * @param	-
+  *
+  * @return	map	map for timezones
+  *			'timezone_id' is used internally in Set and Probe
+  *			functions. 'timezone_name' is a user-readable string.
+  *			Uses Language::language for translation.
+  * @see Set()
+  */
+
+global define list Selection (integer num) {
+
+    list<map<string,any> > zmap = get_zonemap();
+
+    list<list<string> > trl	= maplist (
+	string key, string name, zmap[num,"entries"]:$[], ``([ name, key ]));
+
+    trl	= sort (list<string> a, list<string> b, trl, {
+	// bnc#385172: must use < instead of <=, the following means:
+	// strcoll(x) <= strcoll(y) && strcoll(x) != strcoll(y)
+	list lsorted	= lsort ([a[0]:"", b[0]:""]);
+	list lsorted_r	= lsort ([b[0]:"", a[0]:""]);
+	return (lsorted[0]:"" == a[0]:"" && lsorted == lsorted_r);
+    });
+    y2debug ("trl = %1", trl);
+
+    return maplist (list e, trl, ``(`item (`id(e[1]:""), e[0]:"", false)));
+}
+
+/**
+ * Return list of regions for timezone selection list
+ */
+global define list Region() {
+
+    integer num = -1;
+    return maplist (map entry, get_zonemap (), {
+	num = num + 1;
+	return (`item (`id(num), entry["name"]:"", false ));
+    });
+}
+
+
+/**
+ * Save()
+ *
+ * Save timezone to target sysconfig.
+ */
+global define void Save() {
+
+    if ( Mode::update () )
+    {
+	return;
+    }
+
+    map write   = $[
+      "hwclock"                 : hwclock,
+      "default_timezone"        : default_timezone,
+      "timezone"                : timezone
+    ];
+
+    map ret     = (map) Glove::Timezone::modify ($[], write);
+
+    y2milestone( "Saved data for timezone %1: %2", timezone, ret);
+
+    return;
+}
+
+
+/**
+ * Return current date and time in the map
+ */
+global define map GetDateTimeMap() {
+
+    map ret = $[];
+    list dparts = filter (
+	string v,splitstring (GetDateTime (false,false), " -:" ),``(size(v)>0));
+
+    ret["year"]		= dparts[0]:"";
+    ret["month"]	= dparts[1]:"";
+    ret["day"]		= dparts[2]:"";
+    ret["hour"]		= dparts[3]:"";
+    ret["minute"]	= dparts[4]:"";
+    ret["second"]	= dparts[5]:"";
+
+    y2milestone( "GetDateTimeMap dparts %1 ret %2", dparts, ret );
+    return( ret );
+}
+
+global define boolean CheckTime( string hour, string minute, string second )
+    ``{
+    boolean ret = true;
+    integer tmp = tointeger( String::CutZeros(hour) );
+    if (tmp == nil) return false;
+    ret = ret && tmp>=0 && tmp<24;
+    tmp = tointeger( String::CutZeros(minute) );
+    if (tmp == nil) return false;
+    ret = ret && tmp>=0 && tmp<60;
+    tmp = tointeger( String::CutZeros(second) );
+    if (tmp == nil) return false;
+    ret = ret && tmp>=0 && tmp<60;
+    return( ret );
+    }
+
+global define boolean CheckDate( string day, string month, string year )
+    ``{
+    list mdays = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+    boolean ret = true;
+    integer yea = tointeger( String::CutZeros(year) );
+    integer mon = tointeger( String::CutZeros(month) );
+    integer da = tointeger(  String::CutZeros(day) );
+    if (yea == nil || mon == nil || da == nil)
+	return false;
+    ret = ret && mon>=1 && mon<=12;
+    if( yea%4==0 && (yea%100!=0 || yea%400==0))
+	{
+	mdays[1] = 29;
+	}
+    ret = ret && da>=1 && da<=mdays[mon-1]:0;
+    ret = ret && yea>=1970 && yea<2032;
+    return( ret );
+    }
+
+// does the hwclock run on UTC only ? -> skip asking
+global define boolean utc_only () {
+
+    y2milestone( "Arch::sparc () %1 Arch::board_iseries () %2 Arch::board_chrp () %3 Arch::board_prep () %4", Arch::sparc (), Arch::board_iseries (), Arch::board_chrp (), Arch::board_prep () );
+
+    return (Arch::sparc () || Arch::board_iseries () ||
+	    Arch::board_chrp () || Arch::board_prep ());
+}
+
+  /**
+   * save the initial data
+   */
+  global define void PushVal () {
+
+    push = $[ "hwclock" : hwclock, "timezone" : timezone ];
+    y2milestone ( "PushVal map %1", push );
+  }
+
+  /**
+   * restore the original data from internal map
+   */
+  global define void PopVal() {
+
+    y2milestone ("before Pop: timezone %1 hwclock %2", timezone, hwclock );
+    if ( haskey( push, "hwclock" ))
+	hwclock = push["hwclock"]:hwclock;
+    if( haskey( push, "timezone" ))
+	timezone = push["timezone"]:timezone;
+    push = $[];
+    y2milestone ("after Pop: timezone %1 hwclock %2", timezone, hwclock );
+  }
+
+  /**
+   * was anything modified?
+   */
+  global define boolean Modified () {
+
+    return modified ||
+	timezone != push["timezone"]:timezone || hwclock != push["hwclock"]:hwclock;
+  }
+
+  /**
+   * AutoYaST interface function: Get the Timezone configuration from a map.
+   * @param settings imported map
+   * @return success
+   */
+  global define boolean Import (map settings) {
+
+    // Read was not called -> do the init
+    if (push == $[])
+	PushVal ();
+
+    if (haskey (settings, "hwclock"))
+    {
+	hwclock	= settings["hwclock"]:"UTC" == "UTC" ? "-u" : "--localtime";
+	user_hwclock	= true;
+    }
+    Set (settings["timezone"]:timezone, true);
+    return true;
+  }
+
+  /**
+   * AutoYaST interface function: Return the Timezone configuration as a map.
+   * @return map with the settings
+   */
+  global define map Export () {
+
+    map ret = $[
+	"timezone"	: timezone,
+	"hwclock"	: hwclock == "-u" ? "UTC" : "localtime",
+    ];
+    return ret;
+  }
+
+  /**
+   * AutoYaST interface function: Return the summary of Timezone configuration as a map.
+   * @return summary string (html)
+   */
+  global define string Summary () {
+
+    import "HTML";
+
+    string clock_setting = _("UTC");
+
+    if (hwclock == "--localtime")
+	// label text, Clock setting: local time (not UTC)
+	clock_setting = _("Local Time");
+
+    // label text
+    clock_setting = _("Hardware Clock Set To") + " " + clock_setting;
+
+    list<string> ret =  [
+	// summary label
+	sformat (_("Current Time Zone: %1"), name),
+	clock_setting
+    ];
+    return HTML::List (ret);
+  }
+
+
+} // -EOF-

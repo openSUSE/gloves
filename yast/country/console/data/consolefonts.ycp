@@ -1,0 +1,116 @@
+/*
+ * Maintainer:  Thomas Fehr <fehr@suse.de>
+ *
+ * $Id: consolefonts.ycp 65886 2011-09-21 10:22:14Z jsuchome $
+ */
+
+$[
+      // LANG		font		    unicode map	screen map,	console magic
+      "en_GB@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "en_GB"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "en_US"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "en"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "en_US.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "en_GB.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "de_DE@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(B" ],
+      "de_DE"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "de_CH"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "de"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "de_DE.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "de_CH.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "de_AT.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "fr_FR@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(B" ],
+      "fr_FR"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "fr_CH"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "fr"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "fr_FR.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "it_IT@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "it_IT"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "it"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "it_IT.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "es_ES@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(B" ],
+      "es_ES"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "es"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "es_ES.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "nl_NL@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "nl_NL"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "nl"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "nl_NL.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "pt_PT@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "pt_PT"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "pt_BR"		: [ "lat1-16.psfu",	"",	"trivial",	"(B" ],
+      "pt"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "pt_PT.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "pt_BR.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "ca_ES@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "ca_ES"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "ca"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "ca_ES.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "gl_ES@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "gl_ES"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "gl"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "gl_ES.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "br_FR@euro"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "br_FR"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "br"		: [ "lat1-16.psfu",	"",	"none",		"(B" ],
+      "br_FR.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "el_GR"		: [ "iso07u-16.psfu",	"",	"trivial",	"(K" ],
+      "el"		: [ "iso07u-16.psfu",	"",	"trivial",	"(K" ],
+      "el_GR.UTF-8"	: [ "iso07u-16.psfu",	"",	"trivial",	"(K" ],
+
+      "pl_PL"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "pl"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "pl_PL.UTF-8"     : [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+
+      "cs_CZ"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "cs"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "cs_CZ.UTF-8"     : [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+
+      "sk_SK"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "sk"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "sk_SK.UTF-8"     : [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+
+      "hu_HU"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "hu"		: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "hu_HU.UTF-8"     : [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+
+      "lt_LT"		: [ "lat4a-16.psfu",	"",	"8859-13",	"(K" ],
+      "lt"		: [ "lat4a-16.psfu",	"",	"8859-13",	"(K" ],
+      "lt_LT.UTF-8"     : [ "lat4a-16.psfu",	"",	"8859-13",	"(K" ],
+
+      "ru_RU.KOI8-R"	: [ "UniCyr_8x16.psf",	"",	"koi2alt",	"(K" ],
+      "ru"		: [ "UniCyr_8x16.psf",	"",	"koi2alt",	"(K" ],
+      "ru_RU.UTF-8"     : [ "UniCyr_8x16.psf",	"",	"none",		"(K" ],
+
+      "sr_RS@latin"	: [ "lat2-16.psfu",	"",	"8859-2",	"(K" ],
+      "sr"		: [ "UniCyr_8x16.psf",	"",	"trivial",	"(K" ],
+      "sr_RS.UTF-8"     : [ "UniCyr_8x16.psf",	"",	"none",		"(K" ],
+
+      "uk"		: [ "UniCyr_8x16.psf",	"",	"trivial",	"(K" ],
+      "uk_UA.UTF-8"     : [ "UniCyr_8x16.psf",	"",	"none",		"(K" ],
+
+      "tg"		: [ "UniCyr_8x16.psf",	"",	"trivial",	"(K" ],
+      "tg_TJ.UTF-8"     : [ "UniCyr_8x16.psf",	"",	"none",		"(K" ],
+
+      "bg_BG"		: [ "UniCyr_8x16.psf",	"",	"trivial",	"(K" ],
+      "bg"		: [ "UniCyr_8x16.psf",	"",	"trivial",	"(K" ],
+      "bg_BG.UTF-8"     : [ "UniCyr_8x16.psf",	"",	"none",		"(K" ],
+
+      "ja_JP.sjis"	: [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+      "ja"		: [ "lat1-16.psfu",	"",	"none",		"(K" ],
+      "ja_JP.UTF-8"     : [ "lat9w-16.psfu",	"",	"trivial",	"(K" ],
+
+      "tr_TR"		: [ "iso09.f16n",	"",	"none",		"(K" ],
+      "tr"		: [ "iso09.f16n",	"",	"none",		"(K" ],
+      "tr_TR.UTF-8"     : [ "iso09.f16n",	"",	"trivial",	"(K" ]
+  ]

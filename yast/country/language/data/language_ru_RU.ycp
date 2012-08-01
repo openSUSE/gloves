@@ -1,0 +1,43 @@
+/**
+ * This file contains the description of the language needed by yast2-country
+ * module.
+ *
+ * Translation of the 'language name' to actual YaST language be must applied
+ * each time this file is invoked.
+ *
+ * If you want to add new language to YaST using a file of this type provided
+ * by some module different from yast2-country (e.g. in some Add-On Product),
+ * consider using special textdomain, so it is possible to provide also
+ * translations of the 'language name' string to all installed languages.
+ *
+ * Author:	Jiří Suchomel <jsuchome@suse.cz>
+ * $Id: language_ru_RU.ycp 32769 2006-09-08 09:29:15Z jsuchome $
+ */
+{
+    textdomain "languages_db";
+
+    return
+    $[
+	// 1. information for language selection:
+	// Format is
+	// <LANG-Code> : [
+	//	<Language-to-display-UTF8-coded>,
+	//	<Language-to-display-ASCII-coded-if-needed>,
+	//	<LANG modifier used when UTF-8 enconding is selected>
+	//	<LANG modifier used when no UTF-8 enconding is selected>
+	//	<translated Language-to-display-UTF8-coded> ]
+	//
+	"ru_RU"	: [
+		    "Русский ",
+		    "Russian",
+		    ".UTF-8",
+		    "",
+		    // language name
+		    _("Russian")
+	],
+	// 2. what time zone propose for this language
+	"timezone"	: "Europe/Moscow",
+	// 3. which keyboard layout propose for this language
+	"keyboard"	: "russian",
+    ];
+}

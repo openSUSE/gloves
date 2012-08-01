@@ -1,0 +1,82 @@
+/**
+ * File:
+ *   xkblayout2keyboard.ycp
+ *
+ * Authors:
+ *   Thomas Roelz <tom@suse.de>
+ *
+ * Summary:
+ * Maps xkblayout-codes to YaST2-keyboard-codes.
+ *
+ * The YaST2-keyboard-codes are used for looking up a keyboard description in
+ * the YaST2-keyboard-database (see keyboard_raw.ycp).
+ *
+ * The xkblayout-codes may or may not resemble a locale code, therefore
+ * an extra conversion map is necessary (see also lang2keyboard.ycp).
+ *
+ * $Id: xkblayout2keyboard.ycp 54383 2009-01-06 06:56:49Z jsuchome $
+ *
+ * *****************************************************************
+ * In case of changes please keep the following three files in sync:
+ * lang2keyboard.ycp, xkblayout2keyboard.ycp, keyboard_raw.ycp
+ * *****************************************************************
+ */
+$[
+	"us"		: "english-us",
+	"gb"        : "english-uk",
+	"de"        : "german",
+	"de_CH"     : "german-ch",
+
+	"fr"        : "french",
+	"fr_CH"     : "french-ch",
+	"cn-latin1" : "cn-latin1",
+
+	"it"        : "italian",
+
+	"es"        : "spanish",
+
+	"pt"        : "portugese",
+	"br"        : "portugese-br",
+
+	"gr"        : "greek",
+
+	"nl"        : "dutch",
+
+	"no"	      : "norwegian",
+
+	"dk"        : "danish",
+
+	"cz"		: "czech",
+	"cz_qwerty"	: "czech-qwerty",
+	"si"		: "slovene",
+	"sk"		: "slovak",
+	"sk_qwerty"	: "slovak-qwerty",
+
+	"hu"        : "hungarian",
+
+	"pl"        : "polish",
+
+	"ru"        : "russian",
+
+	"no"        : "norwegian",
+
+	"se"        : "swedish",
+
+	"fi"        : "finnish",
+
+	"tr"        : "turkish",
+
+	"jp"        : "japanese",
+
+	"be"        : "belgian",
+
+	"dvorak"    : "dvorak",
+
+	"is"        : "icelandic",
+
+	"lt"		: "lithuanian",
+
+	"hr"		: "croatian",
+	"ua"		: "ukrainian",
+	"kr"		: "korean",
+]

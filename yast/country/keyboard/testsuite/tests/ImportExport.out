@@ -1,0 +1,6 @@
+Return	false
+Read	.target.yast2 "keyboard_raw.ycp" $["czech-qwerty":["Czech (qwerty)", $["pc104":$["compose":"latin2", "ncurses":"cz-lat2-us.map.gz"]]]]
+Return	true
+Return	true
+Return	$["keymap":"czech-qwerty"]
+Return	<ul><li>Current Keyboard Layout: Czech (qwerty)</li></ul>

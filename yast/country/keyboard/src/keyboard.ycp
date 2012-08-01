@@ -1,0 +1,193 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2012 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/*
+ *
+ * Module:             keyboard.ycp
+ *
+ * Author:             Thomas Roelz (tom@suse.de)
+ *
+ * Submodules:
+ *
+ *
+ * Purpose:	configure keyboard in running system
+ *
+ * Modify:
+ *
+ *
+ * $Id: keyboard.ycp 67149 2012-01-12 08:37:15Z jsuchome $
+ */
+
+{
+textdomain "country";
+
+import "Arch";
+import "CommandLine";
+import "Confirm";
+import "Keyboard";
+import "Popup";
+import "Service";
+import "Stage";
+import "Wizard";
+
+include "keyboard/dialogs.ycp";
+
+/**
+ * read keyboard settings
+ */
+define boolean KeyboardRead () {
+
+    Keyboard::Read ();
+    // Check if this is a reconfiguration run.
+    //
+    if (Stage::reprobe ())
+    {
+	// Reprobe keyboard module to achieve same behaviour as
+	// during installation.
+	Keyboard::Probe();
+	Keyboard::SetConsole( Keyboard::current_kbd );
+	Keyboard::SetX11( Keyboard::current_kbd );
+
+	y2milestone("Reprobed keyboard");
+    }
+    return true;
+}
+
+/**
+ * write keyboard settings
+ */
+define boolean KeyboardWrite () {
+
+    Keyboard::Save ();
+    Service::Restart ("kbd");
+    return true;
+}
+
+/**
+ * the keyboard configuration sequence
+ */
+define any KeyboardSequence () {
+
+    // dont ask for keyboard on S/390
+    if (Arch::s390 ())
+	return `next;
+
+    KeyboardRead ();
+
+    Wizard::OpenOKDialog();
+
+    symbol result = KeyboardDialog ($[]);
+
+    if (result == `next)
+    {
+	KeyboardWrite ();
+    }
+    else
+    {
+	y2milestone( "User cancelled --> no change" );
+    }
+    Wizard::CloseDialog();
+    return result;
+}
+
+/**
+ * Handler for keyboard summary
+ */
+define boolean KeyboardSummaryHandler (map options) {
+
+    // summary label
+    CommandLine::Print (sformat (_("Current Keyboard Layout: %1"),
+	Keyboard::current_kbd));
+    return false;
+}
+
+/**
+ * Handler for listing keyboard layouts
+ */
+define boolean KeyboardListHandler (map options) {
+
+    foreach (string code, string name, Keyboard::Selection (), {
+	CommandLine::Print (sformat ("%1 (%2)", code, name));
+    });
+    return false;
+}
+
+
+/**
+ * Handler for changing keyboard settings
+ */
+define boolean KeyboardSetHandler (map options) {
+
+    string keyboard	= options["layout"]:"";
+
+    if (keyboard == "" || !haskey (Keyboard::Selection(), keyboard))
+    {
+	// error message (%1 is given layout); do not translate 'list'
+	CommandLine::Print (sformat (_("Keyboard layout '%1' is invalid. Use a 'list' command to see possible values."), keyboard));
+    }
+    Keyboard::Set (keyboard);
+
+    return (Keyboard::Modified ());
+}
+
+
+/* -- the command line description map -------------------------------------- */
+map cmdline = $[
+    "id"		: "keyboard",
+    // translators: command line help text for Securoty module
+    "help"		: _("Keyboard configuration."),
+    "guihandler"	: KeyboardSequence,
+    "initialize"	: KeyboardRead,
+    "finish"		: KeyboardWrite,
+    "actions"		: $[
+	"summary" :$[
+	    "handler"	: KeyboardSummaryHandler,
+	    // command line help text for 'summary' action
+	    "help"	: _("Keyboard configuration summary."),
+	],
+	"set" :$[
+	    "handler"	: KeyboardSetHandler,
+	    // command line help text for 'set' action
+	    "help"	: _("Set new values for keyboard configuration."),
+	],
+	"list": $[
+	    "handler"	: KeyboardListHandler,
+	    // command line help text for 'list' action
+	    "help"	: _("List all available keyboard layouts.")
+	],
+    ],
+    "options"		: $[
+	"layout"		: $[
+	    // command line help text for 'set layout' option
+	    "help"	: _("New keyboard layout"),
+	    "type"	: "string"
+	],
+    ],
+    "mappings"		: $[
+	"summary"	: [],
+	"set"		: [ "layout" ],
+	"list"		: [],
+    ]
+];
+
+CommandLine::Run (cmdline);
+return true;
+
+}

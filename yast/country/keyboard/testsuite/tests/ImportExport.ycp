@@ -1,0 +1,61 @@
+/**
+ * tests for Keyboard.ycp autoyast functions
+ * Author:	jsuchome@suse.cz
+ * $Id: ImportExport.ycp 57028 2009-04-29 10:58:09Z lslezak $
+ */
+{
+    // testedfiles: Keyboard.ycp
+
+    import "Testsuite";
+
+    map READ = $[
+	"target" : $[
+	    "size"		: 1,
+	    "dir"		: [],
+	    "yast2"		: $[
+		"czech-qwerty"	: [
+		    "Czech (qwerty)",
+		    $[
+			"pc104": $[
+			    "ncurses": "cz-lat2-us.map.gz",
+			    "compose" : "latin2"
+			],
+		    ]
+		],
+	    ],
+	],
+	"probe"	: $[
+	    "architecture"	: "i386"
+	],
+    ];
+
+    map E	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    import "Mode";
+
+    // let's simulate Mode::config
+    Mode::SetMode ("autoinst_config");
+
+    Testsuite::Init ([READ,$[],E], nil);
+
+    import "Keyboard";
+
+    Testsuite::Test (``(Keyboard::Modified ()), [], nil);
+
+    map imported	= $[
+	"keymap"	: "czech-qwerty"
+    ];
+
+    Testsuite::Test (``(Keyboard::Import (imported)), [READ,$[],E], nil);
+
+    Testsuite::Test (``(Keyboard::Modified ()), [], nil);
+
+    Testsuite::Test (``(Keyboard::Export ()), [], nil);
+
+    Testsuite::Test (``(Keyboard::Summary ()), [], nil);
+
+}

@@ -1,0 +1,50 @@
+/**
+ * tests for Keyboard.ycp constructor
+ * Author: jsuchome@suse.cz
+ * $Id: Keyboard.ycp 39978 2007-08-06 10:46:16Z jsuchome $
+ */
+{
+
+    // testedfiles: Keyboard.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "keyboard" : $[
+		"YAST_KEYBOARD"	: "czech-qwerty,pc104",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[
+		"czech-qwerty"	: [
+		    "Czech (qwerty)",
+		    $[
+			"pc104": $[
+				"ncurses": "cz-lat2-us.map.gz",
+				"compose" : "latin2"
+			],
+		    ]
+		],
+	    ],
+	    "tmpdir"		: "/tmp",
+	    "ycp"		: $[
+		"XkbLayout"	: "cz_qwerty,us",
+	    ],
+	],
+	"probe"	: $[
+	    "architecture"	: "i386"
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    TESTSUITE_INIT([READ,$[],EXECUTE], nil);
+
+    import "Keyboard";
+
+}

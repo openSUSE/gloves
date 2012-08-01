@@ -1,0 +1,39 @@
+/**
+ * tests for Timezone::UpdateTimezone
+ * Author: jsuchome@suse.cz
+ * $Id: UpdateTimezone.ycp 27936 2006-02-13 20:01:14Z olh $
+ */
+{
+
+    // testedfiles: Timezone.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"sysconfig" : $[
+	    "clock" : $[
+		"TIMEZONE"	: "Europe/Prague",
+		"HWCLOCK"	: "-u",
+	    ],
+	],
+	"target" : $[
+	    "size"		: 1,
+	    "yast2"		: $[],
+	],
+    ];
+    map EXECUTE	= $[
+	"target" : $[
+	    "bash_output"	: $[],
+	],
+    ];
+
+    TESTSUITE_INIT([READ,$[],EXECUTE], nil);
+
+    import "Timezone";
+
+    TEST (``(Timezone::UpdateTimezone ("US/Pacific")), [], []);
+
+    TEST (``(Timezone::UpdateTimezone ("Australia/Adelaide")), [], []);
+
+    TEST (``(Timezone::UpdateTimezone ("Australia/South")), [], []);
+}

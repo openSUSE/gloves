@@ -16,7 +16,7 @@ URL:            https://github.com/yast/yast--
 Autoreqprov:    on
 Version:        VERSION_TEMPLATE
 Release:        0
-Summary:        Set of dbus services for basic access to kerberos config
+Summary:        Set of services for basic access to kerberos config
 Source:         %{name}-%{version}.tar.bz2
 Source1:        %{name}-rpmlintrc
 Requires:       libconfigagent > 0.2.0
@@ -35,7 +35,7 @@ BuildRequires:  rubygem-rcov >= 0.9.3.2
 
 %description
 config_agent-kerberos - Set of config agents for for easier access to kerberos
-configuration files and services via dbus.
+configuration files and services.
 Authors:
 --------
     Jiri Suchomel <jsuchome@suse.cz>
@@ -62,13 +62,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/augeas
 %dir /usr/share/augeas/lenses
-%dir /usr/share/polkit-1
-%dir /usr/share/polkit-1/actions
 %doc COPYING COPYING.LESSER
 %{rb_vendorlib}/config_agent
 /usr/share/augeas/lenses/*
-/usr/share/config_agents
-/usr/share/polkit-1/actions/org.opensuse.config_agent*
 
 
 #---------------------------------------------------------------
