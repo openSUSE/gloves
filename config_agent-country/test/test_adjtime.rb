@@ -33,13 +33,13 @@ class TestAdjtime < Test::Unit::TestCase
   end
 
   def test_no_file
-    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir + "/tmp", :include => LENSES_DIR) )
+    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir + "/tmp", :include => LENSES_DIR)
     adjtime = file.read({})
     assert_equal Hash.new, adjtime
   end
 
   def test_reading
-    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir, :include => LENSES_DIR) )
+    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir, :include => LENSES_DIR)
     adjtime = file.read({})
     assert_equal "LOCAL", adjtime["3"]
   end
