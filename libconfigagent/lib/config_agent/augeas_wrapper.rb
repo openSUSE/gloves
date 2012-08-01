@@ -97,7 +97,7 @@ module ConfigAgent
 
     # opens connection to augeas
     def open_augeas()
-      aug = Augeas::open(nil, @incl_path, Augeas::NO_MODL_AUTOLOAD)
+      aug = Augeas::open(@root_dir, @incl_path, Augeas::NO_MODL_AUTOLOAD)
 
       aug.transform(:lens => @lens, :incl => @file_path)
 
