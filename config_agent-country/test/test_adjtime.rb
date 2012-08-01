@@ -17,12 +17,15 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
+$LOAD_PATH.unshift File.dirname(__FILE__)
 require "test/unit/testcase"
 require 'test/unit/ui/console/testrunner'
 require "rubygems"
 require "config_agent/adjtime"
 
 class TestAdjtime < Test::Unit::TestCase
+  LENSES_DIR = File.join(File.dirname(__FILE__),'..','lens')
+
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
     @data1_dir = File.join(File.dirname(__FILE__),"data1")
@@ -30,13 +33,13 @@ class TestAdjtime < Test::Unit::TestCase
   end
 
   def test_no_file
-    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir + "/tmp", :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir + "/tmp", :include => LENSES_DIR) )
     adjtime = file.read({})
     assert_equal Hash.new, adjtime
   end
 
   def test_reading
-    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir, :include => File.join(File.dirname(__FILE__),'..',"lens") )
+    file = ConfigAgent::Adjtime.new( :root_dir => @data_dir, :include => LENSES_DIR) )
     adjtime = file.read({})
     assert_equal "LOCAL", adjtime["3"]
   end
