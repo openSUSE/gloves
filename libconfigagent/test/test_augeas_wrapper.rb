@@ -41,6 +41,16 @@ class TestAugeasWrapper < Test::Unit::TestCase
     assert_equal "25", ret["at"]["gid"]
     assert_equal "hh", ret["hh"]["name"]
   end
+
+  def test_default_write
+    file = Passwd.new :root_dir => @data_dir
+    ret = file.read({})
+    ret["at"]["gid"] = "25"
+    ret["new_user"] = { "shell"=>"/bin/false", "password"=>"", "home"=>"/var/lib/test", "gid"=>"1", "name"=>"new_user", "uid"=>"150"}
+    file.write ret
+    test_ret = file.read({})
+    assert_equal ret,test_ret
+  end
 end
 
 Test::Unit::UI::Console::TestRunner.run(TestAugeasWrapper)
