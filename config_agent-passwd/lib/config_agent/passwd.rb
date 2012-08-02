@@ -22,28 +22,30 @@ require 'augeas'
 module ConfigAgent
   class Passwd < ConfigAgent::FileAgent
 
+    PASSWD_FILE = '/etc/passwd'
+
     # read users from /etc/passwd
     def read(params)
 
       aug        	= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
-      aug.transform(:lens => "Passwd.lns", :incl => "/etc/passwd")
+      aug.transform(:lens => "Passwd.lns", :incl => PASSWD_FILE)
       aug.load
 
       ret         = {}
       retlist     = []
 
       # possible error: parse_failed
-      unless aug.get("/augeas/files/etc/passwd/error").nil?
+      unless aug.get("/augeas/files#{PASSWD_FILE}/error").nil?
         aug.close
         return ret
       end
 
       only = params["only"]
       unless params["id"].nil?
-        ret       = read_one_user(aug, "/files/etc/passwd/" + params["id"])
+        ret       = read_one_user(aug, "/files#{PASSWD_FILE}/" + params["id"])
       else
         # read all users
-        aug.match("/files/etc/passwd/*").each do |user_path|
+        aug.match("/files#{PASSWD_FILE}/*").each do |user_path|
           user      = user_path.split("/").last
           next if user.start_with? "#comment"
           # when 'only' is specified, we return list of values, not hash
