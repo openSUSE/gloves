@@ -57,6 +57,15 @@ module ConfigAgent
       @aug_tree.close if @aug_tree
     end
 
+    def read(params)
+      #default behavior of read is to provide augeas tree, feel free to overwrite it in subclass
+      serialize params
+    end
+
+    def write(params)
+      deserialize params
+    end
+
     # loads data from the augeas tree and stores them in a hash
     def serialize( params)
       raise ArgumentError, "_aug_internal not supported" if params.has_key?( "_aug_internal")
