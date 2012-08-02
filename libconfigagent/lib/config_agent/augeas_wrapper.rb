@@ -66,28 +66,35 @@ module ConfigAgent
       deserialize params
     end
 
+protected
     # loads data from the augeas tree and stores them in a hash
     def serialize( params)
       raise ArgumentError, "_aug_internal not supported" if params.has_key?( "_aug_internal")
 
-      ret = {}
-
       aug = load_augeas( @aug_tree)
 
       #FIXME report it.
-      return ret unless aug.get("/augeas/files#{self.class.file_path}/error").nil?
+      return Hash.new unless aug.get("/augeas/files#{self.class.file_path}/error").nil?
+      return aug_tree_to_hash aug, "/files/"+self.class.file_path
+    end
 
-      aug.match("/files#{self.class.file_path}/*").each do |key_path|
-        key = key_path.split("/").last
-
+    def aug_tree_to_hash aug,path
+      reduction_func = Proc.new do |res,path|
+        item = path.split("/").last
         # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
         # TODO: configurable option?
-        #      next if key.start_with? "#comment"
-
-        ret[ key] = aug.get(key_path)
+        #      next if item.start_with? "#comment"
+        if match = /^(.+)\[(\d+)\]$/.match(item)
+          res[match[1]] ||= []
+          res[match[1]][match[2].to_i] = aug_tree_to_hash(aug,path)
+        else
+          res[item] = aug_tree_to_hash(aug,path)
+        end
+        res
       end
-
-      return ret
+      res = aug.match(path+"/*").reduce({},&reduction_func)
+      res = aug.get(path) if res.empty?
+      return res
     end
 
     # loads data from given hash and stores them in the augeas tree
