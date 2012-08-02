@@ -1,7 +1,7 @@
 #--
 # Config Agents Framework
 #
-# Copyright (C) 2011 Novell, Inc.
+# Copyright (C) 2012 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
 # it only under the terms of version 2.1 or version 3 of the GNU Lesser General Public
 # License as published by the Free Software Foundation.
@@ -16,13 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "config_agent/logger"
-require 'config_agent/constant'
-
 module ConfigAgent
-  # Represent service for reading and writing files.
-  # @abstract Subclass and implement read and write methods
-  class FileAgent
-    include ConfigAgent::Logger
+  module Constant
+    AGENTS_LOGDIR = '/var/log/config_agents'
+    AGENTS_LOGFILE = 'services.log'
+
+    LENSES_DIR = '/usr/share/augeas/lenses/'
   end
 end
