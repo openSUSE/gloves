@@ -22,7 +22,20 @@ require 'augeas'
 module ConfigAgent
 
   class AugeasWrapper < ConfigAgent::FileAgent
+    class << self
+      def lens (value=nil)
+        @lens = value if value
+        raise "Missing specified lens" unless @lens
+        @lens
+      end
 
+      def file_path (value=nil)
+        @file_path = value if value
+        raise ArgumentError,"Path argument must be absolut path" unless @file_path.start_with? '/'
+        raise "Missing specified file_path" unless @file_path
+        @file_path
+      end
+    end
     #
     # known params:
     # * lens     - which lens should be used
@@ -32,12 +45,9 @@ module ConfigAgent
     #
     def initialize( params)
 
-      @lens      = params[ :lens]
-      @file_path = params[ :path]
       @incl_path = params[ :include]
       @root_dir  = params[ :root_dir]
 
-      raise ArgumentError,"Path argument must be absolut path" unless @file_path.start_with? '/'
       # TODO: add other checks here
 
       @aug_tree = open_augeas
@@ -56,9 +66,9 @@ module ConfigAgent
       aug = load_augeas( @aug_tree)
 
       #FIXME report it.
-      return ret unless aug.get("/augeas/files#{@file_path}/error").nil?
+      return ret unless aug.get("/augeas/files#{self.class.file_path}/error").nil?
 
-      aug.match("/files#{@file_path}/*").each do |key_path|
+      aug.match("/files#{self.class.file_path}/*").each do |key_path|
         key = key_path.split("/").last
 
         # do not ignore comments, there are several bugs on YaST2 (e.g. comments got lost, ...)
@@ -80,14 +90,14 @@ module ConfigAgent
       }
 
       aug = load_augeas( @aug_tree)
-
+      file_path = self.class.file_path
       params.each do |key, value|
-          aug.set("/files#{@file_path}/#{key}", value)
+          aug.set("/files#{file_path}/#{key}", value)
       end
 
       unless aug.save
         ret["success"] = false
-        ret["message"] = aug.get("/augeas/files#{@file_path}/error/message")
+        ret["message"] = aug.get("/augeas/files#{file_path}/error/message")
       end
 
       return ret
@@ -99,7 +109,7 @@ module ConfigAgent
     def open_augeas()
       aug = Augeas::open(@root_dir, @incl_path, Augeas::NO_MODL_AUTOLOAD)
 
-      aug.transform(:lens => @lens, :incl => @file_path)
+      aug.transform(:lens => self.class.lens, :incl => self.class.file_path)
 
       return aug
     end
