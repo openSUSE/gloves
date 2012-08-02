@@ -38,7 +38,6 @@ class TestAugeasWrapper < Test::Unit::TestCase
   def test_default_read
     file = Passwd.new :root_dir => @data_dir
     ret = file.read({})
-    puts ret.inspect
     assert_equal "25", ret["at"]["gid"]
     assert_equal "hh", ret["hh"]["name"]
   end
