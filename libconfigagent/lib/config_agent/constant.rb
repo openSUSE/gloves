@@ -18,9 +18,6 @@
 
 module ConfigAgent
   module Constant
-    AGENTS_LOGDIR = '/var/log/config_agents'
-    AGENTS_LOGFILE = 'services.log'
-
     LENSES_DIR = '/usr/share/augeas/lenses/'
   end
 end

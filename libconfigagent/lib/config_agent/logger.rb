@@ -23,6 +23,9 @@ require 'config_agent/constant'
 module ConfigAgent
   # provides unified logging mechanism
   module Logger
+    AGENTS_LOGDIR = '/var/log/config_agents'
+    AGENTS_LOGFILE = 'services.log'
+
     # logger object
     #
     # ensures that logging directory exists
@@ -31,8 +34,8 @@ module ConfigAgent
     # @return [Logger] instance of logger
     def log
       if !@log_instance
-        FileUtils.mkdir_p(ConfigAgent::Constant::AGENTS_LOGDIR) unless File.exist?(ConfigAgent::Constant::AGENTS_LOGDIR)
-        @log_instance ||= ::Logger.new(File.join(ConfigAgent::Constant::AGENTS_LOGDIR, ConfigAgent::Constant::AGENTS_LOGFILE)) # no log rotation yet
+        FileUtils.mkdir_p(AGENTS_LOGDIR) unless File.exist?(AGENTS_LOGDIR)
+        @log_instance ||= ::Logger.new(File.join(AGENTS_LOGDIR, AGENTS_LOGFILE)) # no log rotation yet
       end
       @log_instance
     end
