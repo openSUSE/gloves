@@ -67,7 +67,7 @@ module ConfigAgent
   private
     
     def load_augeas(params)
-      aug = params["_aug_internal"] || Augeas::open(nil, ConfigAgent::Constant::LENSES_DIR, Augeas::NO_MODL_AUTOLOAD)
+      aug = params["_aug_internal"] || Augeas::open(nil, LENSES_DIR, Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Adjtime.lns", :incl => FILE_PATH)
       aug.load
       return aug

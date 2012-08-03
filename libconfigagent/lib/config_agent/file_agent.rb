@@ -17,12 +17,13 @@
 #++
 
 require "config_agent/logger"
-require 'config_agent/constant'
 
 module ConfigAgent
   # Represent service for reading and writing files.
   # @abstract Subclass and implement read and write methods
   class FileAgent
     include ConfigAgent::Logger
+
+    LENSES_DIR = '/usr/share/augeas/lenses/'
   end
 end
