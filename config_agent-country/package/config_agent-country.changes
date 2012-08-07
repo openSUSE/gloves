@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Aug  7 10:18:19 CEST 2012 - jsuchome@suse.cz
+
+- Simplified tests using LENSES_DIR constant (locilka)
+- Removed unneccessary syntactic sugar.
+- config-agent-country adapted to new sysconfig agent (mfilka)
+- 0.2.2 
+
+-------------------------------------------------------------------
 Mon Jul 16 14:10:32 CEST 2012 - jsuchome@suse.cz
 
 - remove dbus and polkit references
