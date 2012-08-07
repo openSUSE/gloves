@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue Aug  7 10:19:27 CEST 2012 - jsuchome@suse.cz
+
+- Logfile-related constants went to Logger (jreidinger)
+- Added support for @root_dir in augeas_wrapper (mfilka)
+- Replaced system call by appropriate FileUtils methods
+- Modified testsuite for sysconfig agent
+- Refactoring in sysconfig agent (mfilka)
+- 0.3.2
+
+-------------------------------------------------------------------
 Tue Jul 17 15:20:43 CEST 2012 - jsuchome@suse.cz
 
 - require rubygem-open4
