@@ -18,7 +18,6 @@
 
 require "logger"
 require "fileutils"
-require 'config_agent/constant'
 
 module ConfigAgent
   # provides unified logging mechanism
