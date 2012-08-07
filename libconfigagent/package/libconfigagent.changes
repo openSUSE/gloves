@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug  7 10:24:58 CEST 2012 - jreidinger@suse.com
+
+- port to ruby 1.9 and remove dependency on open4 
+- 0.3.3
+
+-------------------------------------------------------------------
 Tue Aug  7 10:19:27 CEST 2012 - jsuchome@suse.cz
 
 - Logfile-related constants went to Logger (jreidinger)

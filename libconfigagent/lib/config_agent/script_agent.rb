@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require "open4"
 require "config_agent/logger"
+require "open3"
 
 module ConfigAgent
   # Represent service for executing scripts.
@@ -30,12 +30,12 @@ module ConfigAgent
     # @return [Hash] result of command in map with keys stdout,stderr and exit
     def run command
       ret = {}
-      status = Open4::popen4(*command) do |pid,stdin,stdout,stderr|
+      status = Open3::popen3(*command) do |stdin,stdout,stderr,wait_thr|
         stdin.close
         ret["stdout"] = stdout.read.strip
         ret["stderr"] = stderr.read.strip
+        ret["exit"] = wait_thr.value.exitstatus
       end
-      ret["exit"] = status.exitstatus
       ret
     end
   end
