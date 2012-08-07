@@ -23,5 +23,7 @@ module ConfigAgent
   # @abstract Subclass and implement read and write methods
   class FileAgent
     include ConfigAgent::Logger
+
+    LENSES_DIR = '/usr/share/augeas/lenses/'
   end
 end
