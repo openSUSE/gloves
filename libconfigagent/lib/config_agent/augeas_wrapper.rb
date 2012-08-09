@@ -22,20 +22,6 @@ require 'augeas'
 module ConfigAgent
 
   class AugeasWrapper < ConfigAgent::FileAgent
-    class << self
-      def lens (value=nil)
-        @lens = value if value
-        raise "Missing specified lens" unless @lens
-        @lens
-      end
-
-      def file_path (value=nil)
-        @file_path = value if value
-        raise ArgumentError,"Path argument must be absolut path" unless @file_path.start_with? '/'
-        raise "Missing specified file_path" unless @file_path
-        @file_path
-      end
-    end
     #
     # known params:
     # * lens     - which lens should be used
@@ -74,8 +60,8 @@ protected
       aug = load_augeas( @aug_tree)
 
       #FIXME report it.
-      return Hash.new unless aug.get("/augeas/files#{self.class.file_path}/error").nil?
-      return aug_tree_to_hash aug, "/files/"+self.class.file_path
+      return Hash.new unless aug.get("/augeas/files#{self.class::FILE_PATH}/error").nil?
+      return aug_tree_to_hash aug, "/files/"+self.class::FILE_PATH
     end
 
     def aug_tree_to_hash aug,path
@@ -106,7 +92,7 @@ protected
       }
 
       aug = load_augeas( @aug_tree)
-      file_path = self.class.file_path
+      file_path = self.class::FILE_PATH
       params.each do |key, value|
           aug.set("/files#{file_path}/#{key}", value)
       end
@@ -125,7 +111,7 @@ protected
     def open_augeas()
       aug = Augeas::open(@root_dir, @incl_path, Augeas::NO_MODL_AUTOLOAD)
 
-      aug.transform(:lens => self.class.lens, :incl => self.class.file_path)
+      aug.transform(:lens => self.class::LENS, :incl => self.class::FILE_PATH)
 
       return aug
     end
