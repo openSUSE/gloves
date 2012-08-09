@@ -19,6 +19,7 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require "rubygems"
+require 'config_agent/script_agent'
 
 # module for runlevel configuration
 module Glove
@@ -30,7 +31,8 @@ module Glove
     # Read runlevel info
     def self.read(params)
       # read current runlevel
-      current_runlevel  = `/sbin/runlevel`.split()[1] if File.exists? "/sbin/runlevel"
+      out               = ConfigAgent::ScriptAgent.new.run ["/sbin/runlevel"]
+      current_runlevel  = out["stdout"].split()[1] unless out["stdout"].empty?
       default_runlevel  = read_default_runlevel
 
       ret       = {
@@ -60,7 +62,8 @@ module Glove
     def self.read_default_runlevel
 
       # default runlevel for sysvinit:
-      default_runlevel  = `grep 'id:.:initdefault:' /etc/inittab`.split(":")[1] || ""
+      out               = ConfigAgent::ScriptAgent.new.run ["/bin/grep", "id:.:initdefault:", "/etc/inittab"]
+      default_runlevel  = out["stdout"].split(":")[1] || ""
 
       # Check if systemd is in use
       if File.directory? SYSTEMD_MOUNT_DIR
