@@ -24,24 +24,19 @@ require "rubygems"
 module Glove
   module Runlevel
 
+    SYSTEMD_MOUNT_DIR   = "/sys/fs/cgroup/systemd"
     RUNLEVEL_TARGET     = "/etc/systemd/system/default.target"
-
-    def self.last_error
-      return @error
-    end
 
     # Read runlevel info
     def self.read(params)
-      ret       = {}
-
       # read current runlevel
-      current_runlevel  = `/sbin/runlevel`.split()[1]
+      current_runlevel  = `/sbin/runlevel`.split()[1] if File.exists? "/sbin/runlevel"
+      default_runlevel  = read_default_runlevel
 
-      # default runlevel for sysvinit:
-      default_runlevel  = `grep 'id:.:initdefault:' /etc/inittab`.split(":")[1]
-
-      # default runlevel for systemd
-      runlevel_link     = File.readlink (RUNLEVEL_TARGET)
+      ret       = {
+        "current"       => current_runlevel || "",
+        "default"       => default_runlevel
+      }
 
       return ret;
     end
@@ -60,6 +55,36 @@ module Glove
     end
 
   private
+
+    # read default runlevel (based on current init system)
+    def self.read_default_runlevel
+
+      # default runlevel for sysvinit:
+      default_runlevel  = `grep 'id:.:initdefault:' /etc/inittab`.split(":")[1] || ""
+
+      # Check if systemd is in use
+      if File.directory? SYSTEMD_MOUNT_DIR
+        # default runlevel for systemd
+        target  = File.readlink(RUNLEVEL_TARGET)
+        return default_runlevel if target.nil?
+        # target is something like /lib/systemd/system/runlevel5.target
+        runlevel        = target.gsub(/^[a-zA-Z\/]*\/([^\/]+)\.target.*$/,"\\1")
+        if runlevel.start_with? "runlevel"
+          default_runlevel      = runlevel.gsub(/^runlevel/,"")
+        else
+          # map the symbolic names to runlevel numbers
+          mapping       = {
+            "poweroff"          => "0",
+            "rescue"            => "1",
+            "multi-user"        => "3",
+            "graphical"         => "5",
+            "reboot"            => "6"
+          }
+          default_runlevel      = mapping[runlevel] || default_runlevel
+        end
+       end
+      return default_runlevel
+    end
 
   end
 end
