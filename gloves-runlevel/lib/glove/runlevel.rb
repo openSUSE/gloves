@@ -20,20 +20,18 @@ $LOAD_PATH << File.dirname(__FILE__)
 
 require "rubygems"
 require 'config_agent/script_agent'
+require 'config_agent/runlevel'
 
 # module for runlevel configuration
 module Glove
   module Runlevel
-
-    SYSTEMD_MOUNT_DIR   = "/sys/fs/cgroup/systemd"
-    RUNLEVEL_TARGET     = "/etc/systemd/system/default.target"
 
     # Read runlevel info
     def self.read(params)
       # read current runlevel
       out               = ConfigAgent::ScriptAgent.new.run ["/sbin/runlevel"]
       current_runlevel  = out["stdout"].split()[1] unless out["stdout"].empty?
-      default_runlevel  = read_default_runlevel
+      default_runlevel  = ConfigAgent::Runlevel.new.read({})
 
       ret       = {
         "current"       => current_runlevel || "",
@@ -59,35 +57,9 @@ module Glove
   private
 
     # read default runlevel (based on current init system)
-# FIXME move whole function to config agent, so File calls could be chrooted
     def self.read_default_runlevel
 
-      # default runlevel for sysvinit:
-      out               = ConfigAgent::ScriptAgent.new.run ["/bin/grep", "id:.:initdefault:", "/etc/inittab"]
-      default_runlevel  = out["stdout"].split(":")[1] || ""
-
-      # Check if systemd is in use
-      if File.directory? SYSTEMD_MOUNT_DIR
-        # default runlevel for systemd
-        target  = File.readlink(RUNLEVEL_TARGET)
-        return default_runlevel if target.nil?
-        # target is something like /lib/systemd/system/runlevel5.target
-        runlevel        = target.gsub(/^[a-zA-Z\/]*\/([^\/]+)\.target.*$/,"\\1")
-        if runlevel.start_with? "runlevel"
-          default_runlevel      = runlevel.gsub(/^runlevel/,"")
-        else
-          # map the symbolic names to runlevel numbers
-          mapping       = {
-            "poweroff"          => "0",
-            "rescue"            => "1",
-            "multi-user"        => "3",
-            "graphical"         => "5",
-            "reboot"            => "6"
-          }
-          default_runlevel      = mapping[runlevel] || default_runlevel
-        end
-       end
-      return default_runlevel
+      return ""
     end
 
   end
