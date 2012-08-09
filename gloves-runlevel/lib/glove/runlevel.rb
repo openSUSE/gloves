@@ -59,6 +59,7 @@ module Glove
   private
 
     # read default runlevel (based on current init system)
+# FIXME move whole function to config agent, so File calls could be chrooted
     def self.read_default_runlevel
 
       # default runlevel for sysvinit:
