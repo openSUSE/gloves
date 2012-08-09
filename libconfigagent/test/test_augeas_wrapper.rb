@@ -24,8 +24,8 @@ require "config_agent/augeas_wrapper"
 
 #test augeas wrapper
 class Passwd < ConfigAgent::AugeasWrapper
-  lens "Passwd.lns"
-  file_path "/etc/passwd"
+  LENS = "Passwd.lns"
+  FILE_PATH = "/etc/passwd"
 end
 
 
