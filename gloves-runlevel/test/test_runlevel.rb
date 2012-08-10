@@ -28,33 +28,19 @@ class TestRunlevel < Test::Unit::TestCase
     runlevel_out        = {
       "stdout"  => "N 3"
     }
-    out        = {
-      "stdout"  => "id:5:initdefault:"
-    }
     ConfigAgent::ScriptAgent.any_instance.stubs(:run).with(["/sbin/runlevel"]).returns(runlevel_out)
-    ConfigAgent::ScriptAgent.any_instance.stubs(:run).with(["/bin/grep", "id:.:initdefault:", "/etc/inittab"]).returns(out)
   end
 
-  def test_read_sysvinit
-    File.stubs(:directory?).returns(false)
-    ret = Glove::Runlevel.read({})
-    assert_kind_of Hash, ret
-    assert_equal "3", ret["current"]
-    assert_equal "5", ret["default"]
-  end
-
-  def test_read_systemd_1
-    File.stubs(:directory?).returns(true)
-    File.stubs(:readlink).returns("/lib/systemd/system/runlevel1.target")
+  def test_read_1
+    ConfigAgent::Runlevel.any_instance.stubs(:read).returns "1"
     ret = Glove::Runlevel.read({})
     assert_kind_of Hash, ret
     assert_equal "3", ret["current"]
     assert_equal "1", ret["default"]
   end
 
-  def test_read_systemd_graphical
-    File.stubs(:directory?).returns(true)
-    File.stubs(:readlink).returns("/lib/systemd/system/graphical.target")
+  def test_read_5
+    ConfigAgent::Runlevel.any_instance.stubs(:read).returns "5"
     ret = Glove::Runlevel.read({})
     assert_kind_of Hash, ret
     assert_equal "3", ret["current"]

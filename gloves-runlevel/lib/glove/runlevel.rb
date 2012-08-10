@@ -56,11 +56,5 @@ module Glove
 
   private
 
-    # read default runlevel (based on current init system)
-    def self.read_default_runlevel
-
-      return ""
-    end
-
   end
 end
