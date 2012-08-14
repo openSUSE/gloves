@@ -1,21 +1,21 @@
-yast++ Tutorial!
+Gloves Tutorial!
 ================
 
 First of all you need checkout the sources and install needed the ruby gems:
-# git clone git@github.com:yast/yast--.git
+# git clone git://github.com/openSUSE/gloves.git
 
 Follow the README file, doc/architecture.txt document and install needed dependencies:
-# sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
-# sudo zypper in rubygem-ruby-augeas rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
+# sudo zypper ar http://download.opensuse.org/repositories/YaST:/Head:/YaST++/openSUSE_12.2
+# sudo zypper in rubygem-ruby-augeas rubygem-packaging_rake_tasks
 
-Run rake install from the yast-- directory:
+Run rake install from the gloves directory:
 # sudo rake install
 
 First Step: Run an example:
-# ./yast++lib-country/examples/keyboard_conf
+# ./gloves-country/examples/keyboard_conf
 
-Next Step: Own yast++ module:
-It's time to write your own yast++ module now. We'll start with the config_agent, the low level part:
+Next Step: Own gloves module:
+It's time to write your own gloves module now. We'll start with the config_agent, the low level part:
 # mkdir config_agent-windowmanager
 # cd config_agent-windowmanager
 
@@ -29,12 +29,12 @@ Make sure not to return nil values as they are not supported by dbus and will re
 like "Message did not receive a reply (timeout by message bus) (DBus::Error)" 
 
 Next part is the ylib:
-# mkdir yast++lib-windowmanager
-# cd yast++lib-windowmanager
-# mkdir ./lib/y_lib
+# mkdir gloves-windowmanager
+# cd gloves-windowmanager
+# mkdir ./lib/glove
 
 Create your code, use another module for copy&paste:
-# vi ./lib/y_lib/windowmanager.rb
+# vi ./lib/glove/windowmanager.rb
 
 And finally the last part: An example application
 copy&paste is your friend :-)   
