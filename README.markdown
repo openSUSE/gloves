@@ -11,17 +11,17 @@ You can try it, but it is not for production use. We'd like to hear any comments
 Various written documenation is located at doc directory.
 
 ### Generated code documenation
-[Fresh generated documenation] (http://rubydoc.info/github/yast/yast--)
+[Fresh generated documenation] (http://rubydoc.info/github/openSUSE/gloves)
 
 ### How to try it from git
-install rubygem dependencies from the OpenSUSE build system's Ruby Extensions repository
+install rubygem dependencies from the OpenSUSE build system Ruby Extensions repositories
 
-    sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_12.1/devel:languages:ruby:extensions.repo
-    sudo zypper in rubygem-ruby-augeas augeas-lenses rubygem-open4 rubygem-packaging_rake_tasks rubygem-ruby-dbus
+    sudo zypper ar http://download.opensuse.org/repositories/YaST:/Head:/YaST++/openSUSE_12.2
+    sudo zypper in rubygem-ruby-augeas augeas-lenses rubygem-packaging_rake_tasks
 
     sudo rake install
-    cd yast++lib-kerberos-client
-    ruby examples/kerberos_conf
+    cd gloves-country
+    ruby examples/timezone_conf
 
 
 #### How to obtain permission for common user:
@@ -39,7 +39,7 @@ TODO create pattern
 
 ###Directory structure
 * config_agent-* - contains packages with config agents
-* doc - overall yast++ documentation
+* doc - overall documentation
 * libconfigagent - infrastructure and generators for config agents
-* yast - contains modified yast modules to use yast++
-* yast++lib* - contains high level configuration library
+* yast - contains modified YaST modules using Gloves
+* gloves-* - contains high level configuration library
