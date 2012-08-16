@@ -44,13 +44,10 @@ module Glove
     # modify runlevel settings
     def self.modify(config,params)
 
-      ret		= {
-    	"success"	=> true
-      }
-      # TODO check if sysvinit or systemd is installed and set runlevel accordingly
+      # TODO check if params are valid
 
-      # write init scripts default: sed s/^id:.:initdefault:/id:$rootpart:initdefault:/g /etc/inittab > /etc/inittab.yast2.tmp
-      # write systemd default: create symlink to RUNLEVEL_TARGET
+      ret = ConfigAgent::Runlevel.new.write(params)
+
       return ret
     end
 
