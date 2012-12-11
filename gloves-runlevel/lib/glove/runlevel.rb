@@ -29,7 +29,7 @@ module Glove
     # Read runlevel info
     def self.read(params)
       # read current runlevel
-      out               = ConfigAgent::ScriptAgent.new.run ["/sbin/runlevel"]
+      out               = ConfigAgent::ScriptAgent.new.call ["/sbin/runlevel"]
       current_runlevel  = out["stdout"].split()[1] unless out["stdout"].empty?
       default_runlevel  = ConfigAgent::Runlevel.new.read({})
 

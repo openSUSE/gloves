@@ -98,7 +98,7 @@ module Glove
           ) unless apply.empty?
         end
         # FIXME pick correct console font!
-        ConfigAgent::ScriptAgent.new.run("/bin/loadkeys",keymap)
+        ConfigAgent::ScriptAgent.new.call("/bin/loadkeys",keymap)
       end
 
       return ret

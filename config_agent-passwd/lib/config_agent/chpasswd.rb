@@ -22,7 +22,7 @@ require 'tempfile'
 module ConfigAgent
   class Chpasswd < ConfigAgent::ScriptAgent
 
-    def execute(params)
+    def run(params)
       ret = {}
 
       # allow one hash with user+pass or array of values:
@@ -36,7 +36,7 @@ module ConfigAgent
       begin
         config.each { |i| f.puts("#{i["user"]}:#{i["pw"]}") }
         f.close
-        ret = run(["/usr/sbin/chpasswd"]+(params["exec_args"]||[])+[f.path])
+        ret = super(["/usr/sbin/chpasswd"]+(params["exec_args"]||[])+[f.path])
       ensure
         f.unlink
       end

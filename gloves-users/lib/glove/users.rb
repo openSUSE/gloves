@@ -67,14 +67,14 @@ module Glove
       useradd = useradd + [ "-s", params["shell"] ]     if params["shell"]
       useradd = useradd + [ "--system" ]                if params["system"]
 
-      ret = ConfigAgent::ScriptAgent.new.run useradd
+      ret = ConfigAgent::ScriptAgent.new.call useradd
 
       if ret["exit"] == 0 && params["password"]
         ret = ConfigAgent::Chpasswd.new.execute({ "user" => username, "pw" => params["password"]})
       end
 
       if ret["exit"] == 0
-        ret = ConfigAgent::ScriptAgent.new.run ["/usr/sbin/useradd.local", username]
+        ret = ConfigAgent::ScriptAgent.new.call ["/usr/sbin/useradd.local", username]
       end
 
       return ret

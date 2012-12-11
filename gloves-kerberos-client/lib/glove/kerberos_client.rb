@@ -128,15 +128,15 @@ module Glove
 
   private
     def self.pam_query(mod)
-      return ConfigAgent::ScriptAgent.new.run(["/usr/sbin/pam-config","-q", "--" + mod])["stdout"] || ""
+      return ConfigAgent::ScriptAgent.new.call(["/usr/sbin/pam-config","-q", "--" + mod])["stdout"] || ""
     end
 
     def self.pam_add(mod)
-      return ConfigAgent::ScriptAgent.new.run(["/usr/sbin/pam-config","-a", "--" + mod])
+      return ConfigAgent::ScriptAgent.new.call(["/usr/sbin/pam-config","-a", "--" + mod])
     end
 
     def self.pam_delete(mod)
-      return ConfigAgent::ScriptAgent.new.run(["/usr/sbin/pam-config","-d", "--" + mod])
+      return ConfigAgent::ScriptAgent.new.call(["/usr/sbin/pam-config","-d", "--" + mod])
     end
 
     # Read state of ssh support from /etc/ssh/ssh_config

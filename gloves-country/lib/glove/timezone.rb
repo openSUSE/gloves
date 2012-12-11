@@ -124,17 +124,17 @@ module Glove
 
       # apply the time zone changes to the system
       if config["apply"] || config["only_apply"]
-	ConfigAgent::ScriptAgent.new.run ["/usr/sbin/zic","-l",  timezone]
+	ConfigAgent::ScriptAgent.new.call ["/usr/sbin/zic","-l",  timezone]
         unless `uname -m`.start_with?("s390")
           # synchronize hw clock to system clock
-	  ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock"," --hctosys", hwclock]
+	  ConfigAgent::ScriptAgent.new.call ["/sbin/hwclock"," --hctosys", hwclock]
         end
       end
 
       # call mkinitrd if hwclock was changed or timezone was changed while localtime is in use
       if (hwclock != sysconfig_timezone["HWCLOCK"] ||
          (hwclock == "--localtime" && timezone != sysconfig_timezone["TIMEZONE"]))
-          ConfigAgent::ScriptAgent.new.run ["/sbin/mkinitrd"]
+          ConfigAgent::ScriptAgent.new.call ["/sbin/mkinitrd"]
       end
 
       return ret
@@ -156,7 +156,7 @@ module Glove
 
     # return current system time
     def self.current_time
-      time    = ConfigAgent::ScriptAgent.new.run ["/bin/date","+%Y-%m-%d - %H:%M:%S"]
+      time    = ConfigAgent::ScriptAgent.new.call ["/bin/date","+%Y-%m-%d - %H:%M:%S"]
       return {
         "time"      => time["stdout"] || ""
       }
@@ -231,9 +231,9 @@ module Glove
 #        end
 
         # set the HW clock
-	ConfigAgent::ScriptAgent.new.run args
+	ConfigAgent::ScriptAgent.new.call args
         # synchronize to system clock
-	ConfigAgent::ScriptAgent.new.run ["/sbin/hwclock", "--hctosys", hwclock]
+	ConfigAgent::ScriptAgent.new.call ["/sbin/hwclock", "--hctosys", hwclock]
 
     end
   end

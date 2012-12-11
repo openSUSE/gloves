@@ -25,8 +25,12 @@ module ConfigAgent
   class ScriptAgent
     include ConfigAgent::Logger
 
+    def call command
+      run command
+    end
+
     # Runs given command. Argument processing is without shell using popen call.
-    # @arg [Array[String]] command to execute
+    # @arg [Array[String]] command to execute, if last argument is Hash, then it is used as options
     # @return [Hash] result of command in map with keys stdout,stderr and exit
     def run command
       ret = {}
