@@ -25,5 +25,12 @@ module ConfigAgent
     include ConfigAgent::Logger
 
     LENSES_DIR = '/usr/share/augeas/lenses/'
+    def read params
+      get params
+    end
+    
+    def write params
+      put params
+    end
   end
 end

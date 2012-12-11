@@ -23,7 +23,7 @@ module ConfigAgent
   class Krb5Conf < ConfigAgent::FileAgent
     KERBEROS_CONFIG = '/etc/krb5.conf'
 
-    def read(params)
+    def get(params)
 
       aug		= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Krb5.lns", :incl => KERBEROS_CONFIG)
@@ -73,7 +73,7 @@ module ConfigAgent
       return krb5_conf
     end
 
-    def write(params)
+    def put(params)
       aug		= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Krb5.lns", :incl => KERBEROS_CONFIG)
       aug.load

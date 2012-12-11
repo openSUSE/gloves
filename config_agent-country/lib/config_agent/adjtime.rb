@@ -24,7 +24,7 @@ module ConfigAgent
 
     FILE_PATH = "/etc/adjtime"
 
-    def read(params)
+    def get(params)
 
       aug = load_augeas(params)
 
@@ -44,7 +44,7 @@ module ConfigAgent
       return ret
     end
 
-    def write(params)
+    def put(params)
       
       ret = {
         "success" => true

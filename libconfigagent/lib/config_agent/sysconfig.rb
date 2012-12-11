@@ -33,11 +33,11 @@ module ConfigAgent
       @orig_values = {};
     end
 
-    def read(params)
+    def get(params)
       ret = prepare_read( serialize( params));
     end
 
-    def write(params)
+    def put(params)
       return deserialize( prepare_write( params));
     end
 

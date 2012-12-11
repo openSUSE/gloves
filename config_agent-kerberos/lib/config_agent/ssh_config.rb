@@ -22,7 +22,7 @@ require "augeas"
 module ConfigAgent
   class SshConfig < ConfigAgent::FileAgent
 
-    def read(params)
+    def get(params)
       aug		= params["_aug_internal"] || Augeas::open(nil, LENSES_DIR, Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Ssh.lns", :incl => "/etc/ssh/ssh_config")
       aug.load
@@ -55,7 +55,7 @@ module ConfigAgent
       return ret
     end
 
-    def write(params)
+    def put(params)
       aug		= params["_aug_internal"] || Augeas::open(nil, "/usr/share/augeas/lenses/", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Ssh.lns", :incl => "/etc/ssh/ssh_config")
       aug.load

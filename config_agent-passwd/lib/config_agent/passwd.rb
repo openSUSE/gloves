@@ -25,7 +25,7 @@ module ConfigAgent
     PASSWD_FILE = '/etc/passwd'
 
     # read users from /etc/passwd
-    def read(params)
+    def get(params)
 
       aug        	= params["_aug_internal"] || Augeas::open(nil, "", Augeas::NO_MODL_AUTOLOAD)
       aug.transform(:lens => "Passwd.lns", :incl => PASSWD_FILE)
@@ -71,7 +71,7 @@ module ConfigAgent
       return ret
     end
 
-    def write(params)
+    def put(params)
       #TODO add your code here
       return {}
     end
