@@ -17,7 +17,9 @@
 #++
 
 require "singleton"
-require "dbus_clients/dbus_client"
+require "glove/chroot_env"
+require "config_agent/file_agent"
+require "config_agent/script_agent"
 
 module Glove
   class Configuration
@@ -33,14 +35,53 @@ module Glove
 end
 
 #reopen config_agents so all gloves lib implicitelly use agent parameters
-module DbusClients
-  module DbusClient
-    class << self
-      alias_method :gloves_conf_extended_call, :call
-      def call name, id, type, method, options
-        options = Glove::Configuration.instance.agent_parameters.merge options
-        gloves_conf_extended_call name, id, type, method, options
+module ConfigAgent
+  module FileAgent
+    # if it start increasing lets add hooks to agents
+    alias_method :gloves_conf_extended_read, :read
+    def read params
+      chroot_dir = Glove::Configuration.instance.chroot
+      if chroot_dir
+        Glove::ChrootEnv.run(chroot_dir) do
+          gloves_conf_extended_read params
+        end
+      else
+        #first what we do is chrooting
+        gloves_conf_extended_read params
+      end
+    end
+
+    alias_method :gloves_conf_extended_write, :write
+    def write params
+      chroot_dir = Glove::Configuration.instance.chroot
+      if chroot_dir
+        Glove::ChrootEnv.run(chroot_dir) do
+          gloves_conf_extended_write params
+        end
+      else
+        #first what we do is chrooting
+        gloves_conf_extended_write params
       end
     end
   end
 end
+
+module ConfigAgent
+  module ScriptAgent
+    # if it start increasing lets add hooks to agents
+    alias_method :gloves_conf_extended_call, :call
+    def call params
+      chroot_dir = Glove::Configuration.instance.chroot
+      if chroot_dir
+        Glove::ChrootEnv.run(chroot_dir) do
+          gloves_conf_extended_call params
+        end
+      else
+        #first what we do is chrooting
+        gloves_conf_extended_call params
+      end
+    end
+  end
+end
+
+
