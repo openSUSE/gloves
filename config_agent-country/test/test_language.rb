@@ -17,13 +17,11 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/language"
 
 class TestLanguage < Test::Unit::TestCase
-  LENSES_DIR = File.join(File.dirname(__FILE__),'..','lens')
 
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
@@ -32,7 +30,7 @@ class TestLanguage < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Language.new( :root_dir => @data_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Language.new( :root_dir => @data_dir)
     sysconfig_language = file.read({})
     assert_equal "cs_CZ.UTF-8", sysconfig_language["RC_LANG"]
     assert_equal "", sysconfig_language["INSTALLED_LANGUAGES"]
@@ -40,7 +38,7 @@ class TestLanguage < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Language.new( :root_dir => @data1_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Language.new( :root_dir => @data1_dir)
     params        = {
         "ROOT_USES_LANG"	=> "yes",
         "RC_LANG"		=> "en_US.UTF-8"
@@ -52,12 +50,12 @@ class TestLanguage < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/language data2/etc/sysconfig/language -> change value of RC_LANG
   def test_overwrite
-    file = ConfigAgent::Language.new( :root_dir => @data_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Language.new( :root_dir => @data_dir)
     params = file.read({})
     assert_equal "cs_CZ.UTF-8", params["RC_LANG"]
     assert_equal "", params["INSTALLED_LANGUAGES"]
 
-    file2 = ConfigAgent::Language.new( :root_dir => @data2_dir, :include => LENSES_DIR )
+    file2 = ConfigAgent::Language.new( :root_dir => @data2_dir)
     params["RC_LANG"]        	= "en_US.UTF-8"
     params["INSTALLED_LANGUAGES"]        = "cs_CZ,en_US"
 
@@ -65,5 +63,3 @@ class TestLanguage < Test::Unit::TestCase
     assert_equal nil, ret["message"]
   end
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestLanguage)

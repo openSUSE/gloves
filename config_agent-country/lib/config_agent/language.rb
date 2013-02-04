@@ -20,6 +20,6 @@ require 'config_agent/sysconfig'
 
 module ConfigAgent
   class Language < ConfigAgent::Sysconfig
-    FILE_PATH = "/etc/sysconfig/clock"
+    FILE_PATH = "/etc/sysconfig/language"
   end
 end

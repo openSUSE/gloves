@@ -17,8 +17,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "augeas"
 require "config_agent/passwd"
@@ -50,5 +49,3 @@ class TestPasswd < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestPasswd)

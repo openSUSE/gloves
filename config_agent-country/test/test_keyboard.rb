@@ -17,13 +17,11 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/keyboard"
 
 class TestKeyboard < Test::Unit::TestCase
-  LENSES_DIR = File.join(File.dirname(__FILE__),'..','lens')
 
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
@@ -32,7 +30,7 @@ class TestKeyboard < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir)
     sysconfig_keyboard = file.read({})
     assert_equal "english-us,pc104", sysconfig_keyboard["YAST_KEYBOARD"]
     assert_equal "us.map.gz", sysconfig_keyboard["KEYTABLE"]
@@ -42,7 +40,7 @@ class TestKeyboard < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Keyboard.new( :root_dir => @data1_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Keyboard.new( :root_dir => @data1_dir)
     params        = {
         "YAST_KEYBOARD"		=> "english-uk,pc104",
         "KEYTABLE"		=> "uk.map.gz"
@@ -54,12 +52,12 @@ class TestKeyboard < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/keyboard data2/etc/sysconfig/keyboard -> change value of RC_LANG
   def test_overwrite
-    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Keyboard.new( :root_dir => @data_dir)
     params = file.read({})
     assert_equal "english-us,pc104", params["YAST_KEYBOARD"]
     assert_equal "us.map.gz", params["KEYTABLE"]
 
-    file2 = ConfigAgent::Keyboard.new( :root_dir => @data2_dir, :include => LENSES_DIR )
+    file2 = ConfigAgent::Keyboard.new( :root_dir => @data2_dir)
     params["YAST_KEYBOARD"]        = "english-uk,pc104"
     params["KEYTABLE"]        	= "uk.map.gz"
 
@@ -67,5 +65,3 @@ class TestKeyboard < Test::Unit::TestCase
     assert_equal nil, ret["message"]
   end
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestKeyboard)
