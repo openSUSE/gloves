@@ -20,9 +20,6 @@ require 'config_agent/sysconfig'
 
 module ConfigAgent
   class Clock < ConfigAgent::Sysconfig
-    def initialize params={}
-      params[ :path] = "/etc/sysconfig/clock"
-      super( params)
-    end
+    FILE_PATH = "/etc/sysconfig/clock"
   end
 end

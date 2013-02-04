@@ -18,8 +18,7 @@
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 $LOAD_PATH.unshift File.dirname(__FILE__)
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/adjtime"
 
@@ -74,5 +73,3 @@ class TestAdjtime < Test::Unit::TestCase
 
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestAdjtime)
