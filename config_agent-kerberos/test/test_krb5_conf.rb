@@ -17,8 +17,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/krb5_conf"
 
@@ -71,5 +70,3 @@ class TestKrb5Conf < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestKrb5Conf)
