@@ -65,7 +65,7 @@ module ConfigAgent
       }
 
       runlevel  = params["runlevel"]
-      if runlevel.nil? || ! runlevel.is_a? Integer
+      if runlevel.nil? || (! runlevel.is_a? Integer)
         log.error "wrong argument for runlevel"
         ret["success"]  = false
         return ret
@@ -83,7 +83,7 @@ module ConfigAgent
       # TODO special handling for runlevel 4 (see RunlevelEd::Write)
     end
 
-  private:
+  private
     
     def systemd_used?
       return File.directory? SYSTEMD_MOUNT_DIR
