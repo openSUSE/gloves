@@ -22,7 +22,6 @@ require "rubygems"
 require "config_agent/clock"
 
 class TestClock < Test::Unit::TestCase
-  LENSES_DIR = File.join(File.dirname(__FILE__),'..','lens')
 
   def setup
     @data_dir = File.expand_path("../data",__FILE__)
@@ -31,7 +30,7 @@ class TestClock < Test::Unit::TestCase
   end
 
   def test_reading
-    file = ConfigAgent::Clock.new( :root_dir => @data_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Clock.new( :root_dir => @data_dir)
     sysconfig_clock = file.read({})
     assert_equal "Europe/Prague", sysconfig_clock["TIMEZONE"]
     assert_equal "--localtime", sysconfig_clock["HWCLOCK"]
@@ -40,7 +39,7 @@ class TestClock < Test::Unit::TestCase
 
   # write new file
   def test_write
-    file = ConfigAgent::Clock.new( :root_dir => @data1_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Clock.new( :root_dir => @data1_dir)
     params	= {
 	"TIMEZONE"		=> "US/Eastern",
 	"HWCLOCK"		=> "-u"
@@ -52,11 +51,11 @@ class TestClock < Test::Unit::TestCase
 
   # diff data/etc/sysconfig/clock data2/etc/sysconfig/clock -> change value of TIMEZONE
   def test_overwrite
-    file = ConfigAgent::Clock.new( :root_dir => @data_dir, :include => LENSES_DIR )
+    file = ConfigAgent::Clock.new( :root_dir => @data_dir)
     params = file.read({})
     assert_equal "Europe/Prague", params["TIMEZONE"]
 
-    file2 = ConfigAgent::Clock.new( :root_dir => @data2_dir, :include => LENSES_DIR )
+    file2 = ConfigAgent::Clock.new( :root_dir => @data2_dir)
     params["TIMEZONE"]		= "US/Eastern"
 
     ret = file2.write params
