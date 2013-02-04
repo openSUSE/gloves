@@ -17,8 +17,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/keyboard"
 
@@ -67,5 +66,3 @@ class TestKeyboard < Test::Unit::TestCase
     assert_equal nil, ret["message"]
   end
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestKeyboard)
