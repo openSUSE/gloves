@@ -19,8 +19,7 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__),'..')
 require "rubygems"
 require "mocha"
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "glove/users"
 
 class TestUsers < Test::Unit::TestCase
@@ -32,5 +31,3 @@ class TestUsers < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestUsers)
