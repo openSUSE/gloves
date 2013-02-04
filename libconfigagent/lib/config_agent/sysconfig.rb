@@ -22,12 +22,10 @@ require 'shellwords'
 module ConfigAgent
   class Sysconfig <  AugeasWrapper
 
-    SYSCONFIG_LENS = "Shellvars.lns"
+    LENS = "Shellvars.lns"
     DEFAULT_QUOTE  = '"'
 
     def initialize( params = {})
-      params[ :lens] = SYSCONFIG_LENS
-
       super( params);
 
       @orig_values = {};

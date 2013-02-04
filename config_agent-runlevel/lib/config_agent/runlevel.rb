@@ -34,7 +34,7 @@ module ConfigAgent
       log.info "default runlevel for sysvinit: #{default_runlevel}"
 
       # Check if systemd is in use
-      if File.directory? SYSTEMD_MOUNT_DIR
+      if systemd_used?
         # default runlevel for systemd
         target  = File.readlink(RUNLEVEL_TARGET)
         return default_runlevel if target.nil?
@@ -57,5 +57,37 @@ module ConfigAgent
       end
       return default_runlevel
     end
+
+    def write(params)
+
+      ret = {
+        "success" => true
+      }
+
+      runlevel  = params["runlevel"]
+      if runlevel.nil? || ! runlevel.is_a? Integer
+        log.error "wrong argument for runlevel"
+        ret["success"]  = false
+        return ret
+        # TODO raise exception
+      end
+
+      # 1. always write init scripts default:
+      out = run [ "/bin/sed", "--in-place", "s/^id:.:initdefault:/id:#{runlevel}:initdefault:/g", "/etc/inittab"]
+      # 2. write systemd default: create symlink to RUNLEVEL_TARGET
+      if systemd_used?
+        File.unlink RUNLEVEL_TARGET if File.exists? RUNLEVEL_TARGET
+        File.symlink("/lib/systemd/system/runlevel#{runlevel}.target", RUNLEVEL_TARGET)
+      end
+      # TODO use augeas inittab
+      # TODO special handling for runlevel 4 (see RunlevelEd::Write)
+    end
+
+  private:
+    
+    def systemd_used?
+      return File.directory? SYSTEMD_MOUNT_DIR
+    end
+
   end
 end
