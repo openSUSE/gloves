@@ -17,8 +17,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/clock"
 
@@ -26,9 +25,9 @@ class TestClock < Test::Unit::TestCase
   LENSES_DIR = File.join(File.dirname(__FILE__),'..','lens')
 
   def setup
-    @data_dir = File.join(File.dirname(__FILE__),"data")
-    @data1_dir = File.join(File.dirname(__FILE__),"data1")
-    @data2_dir = File.join(File.dirname(__FILE__),"data2")
+    @data_dir = File.expand_path("../data",__FILE__)
+    @data1_dir = File.expand_path("../data1",__FILE__)
+    @data2_dir = File.expand_path("../data2",__FILE__)
   end
 
   def test_reading
@@ -65,5 +64,3 @@ class TestClock < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestClock)
