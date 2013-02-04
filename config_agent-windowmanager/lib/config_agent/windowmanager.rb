@@ -21,8 +21,6 @@ require 'augeas'
 
 module ConfigAgent
   class Windowmanager < ConfigAgent::Sysconfig
-    def initialize params={}
-      super "/etc/sysconfig/windowmanager",params
-    end
+    FILE_PATH = "/etc/sysconfig/windowmanager"
   end
 end

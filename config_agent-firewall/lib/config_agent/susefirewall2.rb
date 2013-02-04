@@ -21,11 +21,6 @@ require 'augeas'
 
 module ConfigAgent
   class Susefirewall2 < ConfigAgent::Sysconfig
-
-    FIREWALL_FILE = "/etc/sysconfig/SuSEfirewall2"
-    def initialize params = {}
-      super FIREWALL_FILE,params
-    end
-
+    FILE_PATH = "/etc/sysconfig/clock"
   end
 end

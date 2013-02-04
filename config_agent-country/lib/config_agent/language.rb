@@ -20,9 +20,6 @@ require 'config_agent/sysconfig'
 
 module ConfigAgent
   class Language < ConfigAgent::Sysconfig
-    def initialize params={}
-      params[ :path] = "/etc/sysconfig/language" 
-      super( params )
-    end
+    FILE_PATH = "/etc/sysconfig/clock"
   end
 end
