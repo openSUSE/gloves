@@ -21,6 +21,6 @@ require 'augeas'
 
 module ConfigAgent
   class Susefirewall2 < ConfigAgent::Sysconfig
-    FILE_PATH = "/etc/sysconfig/clock"
+    FILE_PATH = "/etc/sysconfig/SuSEfirewall2"
   end
 end
