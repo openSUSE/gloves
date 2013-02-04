@@ -17,8 +17,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/ssh_config"
 
@@ -59,5 +58,3 @@ class TestSshConfig < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestSshConfig)

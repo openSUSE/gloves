@@ -20,8 +20,7 @@ $LOAD_PATH << File.join(File.dirname(__FILE__),'..')
 require "rubygems"
 require "mocha"
 require 'augeas'
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "glove/susefirewall2"
 require "config_agent/susefirewall2"
 
@@ -118,5 +117,3 @@ class TestFirewall < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestFirewall)

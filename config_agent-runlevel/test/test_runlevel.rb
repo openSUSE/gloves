@@ -19,8 +19,7 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
 require "rubygems"
 require "mocha"
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "config_agent/runlevel"
 require "config_agent/logger"
 
@@ -60,5 +59,3 @@ class TestRunlevel < Test::Unit::TestCase
   end
 
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestRunlevel)

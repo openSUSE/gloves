@@ -1,2 +1,4 @@
 TIMEZONE="US/Eastern"
 HWCLOCK="-u"
+ROOT_USES_LANG="yes"
+RC_LANG="en_US.UTF-8"

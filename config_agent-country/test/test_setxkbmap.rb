@@ -17,8 +17,7 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "rubygems"
 require "config_agent/setxkbmap"
 
@@ -30,5 +29,3 @@ class TestSetxkbmap < Test::Unit::TestCase
   def test_reading
   end
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestSetxkbmap)

@@ -17,29 +17,28 @@
 #++
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__),'..','lib')
-require "test/unit/testcase"
-require 'test/unit/ui/console/testrunner'
+require "test/unit"
 require "tmpdir"
 require "rubygems"
 require "config_agent/susefirewall2"
 
 class TestSusefirewall2 < Test::Unit::TestCase
+
   def setup
     @data_dir = File.join(File.dirname(__FILE__),"data")
   end
 
   def test_read
-    file = ConfigAgent::Susefirewall2.new
-    firewall = file.read "_aug_internal" => Augeas::open(@data_dir, File.join(File.dirname(__FILE__),'..',"lens"),Augeas::NO_MODL_AUTOLOAD)
+    file = ConfigAgent::Susefirewall2.new( :root_dir => @data_dir)
+    firewall = file.read({})
     assert_equal "zone:ext", firewall["FW_MASQ_DEV"]
   end
 
   def test_write
     Dir.mktmpdir do |tmp_dir|
       FileUtils.mkdir_p "#{tmp_dir}/etc/sysconfig/"
-      file = ConfigAgent::Susefirewall2.new
+      file = ConfigAgent::Susefirewall2.new(:root_dir => tmp_dir)
       params = {
-        "_aug_internal" => Augeas::open(tmp_dir,nil, Augeas::NO_MODL_AUTOLOAD),
         "FW_MASQ_DEV" => "zone:int",
       }
       ret = file.write params
@@ -48,5 +47,3 @@ class TestSusefirewall2 < Test::Unit::TestCase
     end
   end
 end
-
-Test::Unit::UI::Console::TestRunner.run(TestSusefirewall2)
