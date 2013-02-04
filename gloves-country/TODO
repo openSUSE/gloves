@@ -1,0 +1,34 @@
+langauge:
+  
+  TODO
+  - return timezone for given language
+
+  - return keyboard for given language
+
+keyboard:
+timezone:
+
+  DONE:
+
+  - return zones (done, just prepare output for YaPI)
+
+    Glove::Timezone::read { "kind" => "timezones" }
+
+  - return current time: Timezone->GetDateTime
+
+    Glove::Timezone::read { "kind" => "time" }
+
+  - return timezone for given language: Timezone->GetTimezoneForLanguage
+
+    Glove::Timezone::read { "kind" => "language", "language" => "de_DE" }
+
+  - write current time: Timezone->SetTime
+
+  - use /etc/adjtime for HWCLOCK
+
+  - return "UTC only" - architecture checks
+ 
+  TODO:
+
+
+

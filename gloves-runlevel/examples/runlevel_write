@@ -1,5 +1,6 @@
+#!/usr/bin/env ruby
 #--
-# Config Agents Framework
+# Gloves Runlevel Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -16,10 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #++
 
-require 'config_agent/sysconfig'
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__),"..","lib")
+require "glove/runlevel"
+begin
+  ret = Glove::Runlevel::modify({}, {"runlevel" => 3})
+  puts ret.inspect
 
-module ConfigAgent
-  class Clock < ConfigAgent::Sysconfig
-    FILE_PATH = "/etc/sysconfig/clock"
-  end
+rescue Exception => e
+  puts e.inspect
+  raise
 end
