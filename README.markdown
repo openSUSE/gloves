@@ -16,7 +16,7 @@ Various written documenation is located at doc directory.
 ### How to try it from git
 install rubygem dependencies from the OpenSUSE build system Ruby Extensions repositories
 
-    sudo zypper ar http://download.opensuse.org/repositories/YaST:/Head:/YaST++/openSUSE_12.2
+    sudo zypper ar http://download.opensuse.org/repositories/YaST:/Head:/Gloves/openSUSE_12.2
     sudo zypper in rubygem-ruby-augeas augeas-lenses rubygem-packaging_rake_tasks
 
     sudo rake install
