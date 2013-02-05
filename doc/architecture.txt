@@ -1,4 +1,4 @@
-YaST++
+Gloves (originally YaST++)
 ------
 
 Long term goal
@@ -9,7 +9,7 @@ Provide clean, understandable, backward compatible and common API for system
 configuration related tasks, not only for YaST.
 
 
-Main advantages of YaST++ compared to YaST
+Main advantages of Gloves compared to YaST
 ------------------------------------------
 
 1. Using modern and well-known language
@@ -39,12 +39,12 @@ Main advantages of YaST++ compared to YaST
 
 3. Better modularity
 
-    By splitting the business logic part (YLib) from UI (Qt, WWW) and from
+    By splitting the business logic part (Glove) from UI (Qt, WWW) and from
     system access (config-agents), modules that borrow functionality from
     other ones do not need to import (install) their UI.
 
     In the end, there should be smaller space requirements for situations when
-    only part of YaST++ stack should be installed (e.g. WebYaST usage).
+    only part of Gloves stack should be installed (e.g. WebYaST usage).
 
 
 The architecture in short
@@ -52,9 +52,9 @@ The architecture in short
 
 Look at doc/architecture.svg diagram.
 
-YaST++ consist of two new layers: YLib and Config Agents.
+Gloves consist of two new layers: Glove(s) and Config Agents.
 
-YLib is the public library layer. It provides simple API for those who want to
+Glove is the public library layer. It provides simple API for those who want to
 configure the system.
 
 The API consists of these functions
@@ -70,7 +70,7 @@ The API consists of these functions
                           should be in ylib or library above it, that just take
                           input and return map for ylib modules)
 
-See https://github.com/yast/yast--/wiki/YLib-Use-Cases for more about YLib API.
+See https://github.com/openSUSE/gloves/wiki/Gloves-Use-Cases for more about Gloves API.
 
 Config agent works with system, by which we mean it either modifies files or
 runs scripts.
@@ -87,28 +87,28 @@ The implementation of config agents should very simple, basically file agents
 only parse a file they manage and return its structure as hash (for read
 command) and write the new contents in case of write command. Script agent just
 executes its script with the given arguments. Config agents do not have any
-knowleadge about the data semantics, this is the task for YLib library.
+knowleadge about the data semantics, this is the task for Gloves library.
 
-Using YaST++
+Using Gloves
 ------------
 
-    YLib can be imported for any ruby code, see
+    Glove can be imported for any ruby code, see
 
-        yast++lib-kerberos-client/examples/kerberos_conf for an example
+        gloves-kerberos-client/examples/kerberos_conf for an example
 
-    YLib can be directly used from current YaST modules using
-    yast2-ruby-bindings and yast++lib-ycp
+    Glove can be directly used from current YaST modules using
+    yast2-ruby-bindings and gloves-ycp-bindings
 
-        yast++lib-kerberos-client/examples/kerberos-example.ycp for simple
-        example of calling YLib
+        gloves-kerberos-client/examples/kerberos-example.ycp for simple
+        example of calling Glove
 
-        yast--/yast/kerberos-client for whole YaST module where system access
-        is replaced with YLib calls
+        gloves/yast/kerberos-client for whole YaST module where system access
+        is replaced with Gloves calls
 
     TODO: usage from WebYast
 
 
-What YLib developer should know
+What Gloves developer should know
 -------------------------------
 
 What Config Agent developer should know
@@ -138,5 +138,5 @@ Policies
 -----------------
 
 Policies is needed to define what can common user run. We use now PolicyKit.
-If YLib is run as root, then policy checking wouldn't be performed.
+If Glove is run as root, then policy checking wouldn't be performed.
 Each agent have method polkit_definitions which allow to introspect which permission is needed for given task.

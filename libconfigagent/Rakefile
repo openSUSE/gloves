@@ -32,7 +32,7 @@ task :install, :prefix, :ruby_path do |t,args|
 end
 
 Packaging::Configuration.run do |conf|
-  conf.obs_project = "YaST:Head:YaST++"
+  conf.obs_project = "YaST:Head:Gloves"
   conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
 end
 

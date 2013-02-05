@@ -1,5 +1,5 @@
 #--
-# YaST++ Kerberos Client Library
+# Gloves Country Library
 #
 # Copyright (C) 2011 Novell, Inc.
 #   This library is free software; you can redistribute it and/or modify
@@ -29,8 +29,7 @@ task :install, :prefix, :ruby_path do |t,args|
 end
 
 Packaging::Configuration.run do |conf|
-  conf.obs_project = "YaST:Head:YaST++"
-  conf.obs_target = "devel_languages_ruby_extensions_openSUSE_Factory"
+  conf.obs_project = "YaST:Head:Gloves"
   conf.package_name = "gloves-country"
 end
 
